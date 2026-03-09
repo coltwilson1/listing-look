@@ -134,32 +134,37 @@ export default function SiteHeader() {
               Custom Order
             </a>
           </li>
-          <li>
-            <a href="/portal" className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors">
-              {firstName ? (
-                <span className="text-coral font-semibold">Hi, {firstName}</span>
-              ) : (
-                "My Orders"
-              )}
-            </a>
-          </li>
-          <li>
-            <button
-              onClick={() => openModal("signup")}
-              className="bg-coral text-white px-5 py-2 rounded-full text-[0.9rem] font-semibold hover:bg-coral-dark transition-colors"
-            >
-              Get Started
-            </button>
-          </li>
+          {!currentUser && (
+            <li>
+              <button
+                onClick={() => openModal("signup")}
+                className="bg-coral text-white px-5 py-2 rounded-full text-[0.9rem] font-semibold hover:bg-coral-dark transition-colors border-none cursor-pointer"
+              >
+                Get Started
+              </button>
+            </li>
+          )}
         </ul>
 
+        {/* Right-side auth area */}
         {currentUser ? (
-          <button
-            onClick={handleLogout}
-            className="border border-border text-slate text-[0.85rem] font-medium px-4 py-2 rounded-full hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer"
-          >
-            Log Out
-          </button>
+          <div className="flex items-center gap-3">
+            <span className="hidden sm:block font-sans text-[0.82rem] text-slate">
+              Hi, {firstName}
+            </span>
+            <a
+              href="/portal"
+              className="bg-coral text-white px-4 py-2 rounded-full text-[0.85rem] font-semibold hover:bg-coral-dark transition-colors no-underline"
+            >
+              Agent Portal
+            </a>
+            <button
+              onClick={handleLogout}
+              className="font-sans text-[0.8rem] text-slate/60 hover:text-coral transition-colors border-none bg-transparent cursor-pointer"
+            >
+              Log out
+            </button>
+          </div>
         ) : (
           <button
             onClick={() => openModal("login")}
