@@ -162,24 +162,27 @@ export default function PostcardOrderModal({ open, onClose }) {
 
   if (!open) return null;
 
+  const PC_STEP_LABELS = ["Contact Info", "Listing Details", "Postcard Details"];
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-center sm:p-4"
       style={{ background: "rgba(28,28,46,0.6)", backdropFilter: "blur(4px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-cream w-full sm:max-w-[640px] sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-screen sm:max-h-[90vh]">
+      <div className="bg-cream w-full h-dvh sm:h-auto sm:max-w-[640px] sm:rounded-3xl sm:max-h-[90vh] shadow-2xl flex flex-col">
 
-        {/* ── Header ── */}
-        <div className="bg-deep px-8 pt-7 pb-5 flex-shrink-0">
-          <div className="flex justify-between items-start mb-5">
+        {/* ── Header (sticky) ── */}
+        <div
+          className="bg-deep flex-shrink-0"
+          style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+        >
+          <div className="flex justify-between items-center px-5 pt-5 pb-3 sm:px-8 sm:pt-7">
             <div>
-              <p className="font-sans text-[0.7rem] uppercase tracking-[0.15em] text-blush/70 mb-1">
-                Order Form
-              </p>
-              <h2 className="font-serif text-[1.4rem] text-white">Postcards & Print</h2>
+              <p className="font-sans text-[0.65rem] uppercase tracking-[0.15em] text-blush/70 mb-0.5">Order Form</p>
+              <h2 className="font-serif text-[1.25rem] sm:text-[1.4rem] text-white leading-tight">Postcards & Print</h2>
             </div>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-2">
               {sessionUser && (
                 <div className="w-8 h-8 rounded-full bg-coral flex items-center justify-center flex-shrink-0">
                   <span className="font-sans text-[0.75rem] font-bold text-white leading-none">
@@ -187,46 +190,63 @@ export default function PostcardOrderModal({ open, onClose }) {
                   </span>
                 </div>
               )}
+              {/* Close — minimum 44×44px tap target */}
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white/70 hover:text-white flex-shrink-0"
+                className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors flex items-center justify-center text-white flex-shrink-0"
                 aria-label="Close"
               >
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-                  <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M2 2l12 12M14 2L2 14"/>
                 </svg>
               </button>
             </div>
           </div>
 
+          {/* Step progress — circles + labels */}
           {!submitted && (
-            <div className="space-y-2">
-              <div className="flex gap-1.5">
-                {[1, 2, 3].map((n) => (
-                  <div
-                    key={n}
-                    className="h-1 flex-1 rounded-full transition-all duration-300"
-                    style={{ background: n <= step ? "#E8825A" : "rgba(255,255,255,0.15)" }}
-                  />
-                ))}
-              </div>
-              <div className="flex justify-between">
-                {["Contact Info", "Listing Details", "Postcard Details"].map((label, i) => (
-                  <span
-                    key={i}
-                    className="font-sans text-[0.68rem] transition-colors duration-200"
-                    style={{ color: i + 1 <= step ? "#F2C4B0" : "rgba(255,255,255,0.3)" }}
-                  >
-                    {label}
-                  </span>
-                ))}
+            <div className="px-5 pb-5 sm:px-8">
+              <div className="flex items-start">
+                {PC_STEP_LABELS.map((label, i) => {
+                  const n = i + 1;
+                  const done = n < step;
+                  const current = n === step;
+                  return (
+                    <div key={n} className="flex-1 flex flex-col items-center relative">
+                      {i > 0 && (
+                        <div className="absolute right-1/2 left-0 top-[13px] h-px transition-colors duration-300"
+                          style={{ background: done || current ? "#E8825A" : "rgba(255,255,255,0.2)" }} />
+                      )}
+                      {i < PC_STEP_LABELS.length - 1 && (
+                        <div className="absolute left-1/2 right-0 top-[13px] h-px transition-colors duration-300"
+                          style={{ background: done ? "#E8825A" : "rgba(255,255,255,0.2)" }} />
+                      )}
+                      <div className={`relative z-10 w-[26px] h-[26px] rounded-full flex items-center justify-center font-sans text-[0.68rem] font-bold transition-all duration-300 ${
+                        done ? "bg-coral text-white" :
+                        current ? "bg-coral text-white ring-4 ring-coral/25" :
+                        "bg-white/10 text-white/40"
+                      }`}>
+                        {done ? (
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                            <path d="M2 5l2 2 4-4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        ) : n}
+                      </div>
+                      <p className={`font-sans text-[0.6rem] text-center mt-1.5 leading-tight px-0.5 transition-colors duration-300 ${
+                        current ? "text-blush font-semibold" : done ? "text-blush/60" : "text-white/30"
+                      }`}>
+                        {label}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
         </div>
 
-        {/* ── Body ── */}
-        <div className="overflow-y-auto flex-1 px-8 py-7">
+        {/* ── Body (scrollable) ── */}
+        <div className="overflow-y-auto flex-1 px-5 py-6 sm:px-8 sm:py-7">
           {submitted && builtOrder ? (
             <SuccessWithAccount
               contactName={contact.name}
@@ -292,11 +312,14 @@ export default function PostcardOrderModal({ open, onClose }) {
 
         {/* ── Footer ── */}
         {!submitted && (
-          <div className="px-8 py-5 border-t border-border flex justify-between items-center flex-shrink-0 bg-cream">
+          <div
+            className="px-5 pt-4 border-t border-border flex justify-between items-center flex-shrink-0 bg-cream sm:px-8 sm:py-5"
+            style={{ paddingBottom: "max(env(safe-area-inset-bottom), 20px)" }}
+          >
             {step > 1 ? (
               <button
                 onClick={() => { setStep((s) => s - 1); setErrors({}); }}
-                className="font-sans text-[0.88rem] text-slate hover:text-deep transition-colors flex items-center gap-1.5"
+                className="min-h-[44px] font-sans text-[0.88rem] text-slate hover:text-deep active:text-deep transition-colors flex items-center gap-1.5 px-2"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <path d="M10 3L5 8l5 5"/>
@@ -309,7 +332,7 @@ export default function PostcardOrderModal({ open, onClose }) {
             <button
               onClick={handleNext}
               disabled={submitting}
-              className="font-sans bg-coral text-white font-semibold text-[0.9rem] px-8 py-2.5 rounded-full hover:bg-coral-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(232,130,90,0.4)] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="min-h-[44px] font-sans bg-coral text-white font-semibold text-[0.9rem] px-8 py-3 rounded-full hover:bg-coral-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(232,130,90,0.4)] active:bg-coral-dark transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {submitting ? "Submitting…" : step === 3 ? "Submit Order" : "Continue"}
               {!submitting && step < 3 && (
