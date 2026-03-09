@@ -5,7 +5,7 @@ import {
   getCurrentUser, login, logout, updateUser,
   addNoteToOrder, updateOrderStatus, updateOrderById, hashPassword,
 } from "@/app/lib/auth";
-import { getFile } from "@/app/lib/fileStorage";
+import { getFile, storeFile } from "@/app/lib/fileStorage";
 import SocialMediaOrderModal from "@/app/components/SocialMediaOrderModal";
 import PostcardOrderModal from "@/app/components/PostcardOrderModal";
 
@@ -720,23 +720,61 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
 // ── Profile View ──────────────────────────────────────────────────────────────
 
 function ProfileView({ user, onUpdate }) {
-  const [name, setName]           = useState(user.name || "");
-  const [brokerage, setBrokerage] = useState(user.brokerage || "");
-  const [currentPw, setCurrentPw] = useState("");
-  const [newPw, setNewPw]         = useState("");
-  const [confirmPw, setConfirmPw] = useState("");
-  const [profileMsg, setProfileMsg] = useState("");
-  const [pwMsg, setPwMsg]           = useState("");
-  const headshotRef = useRef(null);
-  const logoRef     = useRef(null);
+  const [name, setName]               = useState(user.name || "");
+  const [brokerage, setBrokerage]     = useState(user.brokerage || "");
+  const [mobilePhone, setMobilePhone] = useState(user.mobilePhone || "");
+  const [officePhone, setOfficePhone] = useState(user.officePhone || "");
+  const [currentPw, setCurrentPw]     = useState("");
+  const [newPw, setNewPw]             = useState("");
+  const [confirmPw, setConfirmPw]     = useState("");
+  const [profileMsg, setProfileMsg]   = useState("");
+  const [pwMsg, setPwMsg]             = useState("");
+
+  // Brand asset preview URLs loaded from IndexedDB
+  const [assetUrls, setAssetUrls] = useState({ headshot: null, logo: null, personalLogo: null });
+  const assetUrlsRef = useRef({});
+  const headshotRef    = useRef(null);
+  const logoRef        = useRef(null);
+  const personalLogoRef = useRef(null);
 
   const iCls = "w-full font-sans text-[0.9rem] bg-light-gray border border-border rounded-xl px-4 py-2.5 outline-none focus:border-coral focus:ring-2 focus:ring-coral/20 transition-all placeholder:text-slate/40";
   const lCls = "block font-sans text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-slate mb-1.5";
 
+  // Load asset previews from IndexedDB on mount
+  useEffect(() => {
+    let cancelled = false;
+    async function loadAssets() {
+      const fields = ["headshot", "logo", "personalLogo"];
+      const urls = {};
+      for (const field of fields) {
+        try {
+          const blob = await getFile(`profile::${user.email}`, field);
+          if (blob && !cancelled) urls[field] = URL.createObjectURL(blob);
+        } catch {}
+      }
+      if (!cancelled) {
+        // revoke old
+        Object.values(assetUrlsRef.current).forEach((u) => { try { URL.revokeObjectURL(u); } catch {} });
+        assetUrlsRef.current = urls;
+        setAssetUrls(urls);
+      }
+    }
+    loadAssets();
+    return () => {
+      cancelled = true;
+      Object.values(assetUrlsRef.current).forEach((u) => { try { URL.revokeObjectURL(u); } catch {} });
+    };
+  }, [user.email]);
+
   function saveProfile(e) {
     e.preventDefault();
     if (!name.trim()) return setProfileMsg("Name is required.");
-    const result = updateUser(user.email, { name: name.trim(), brokerage: brokerage.trim() });
+    const result = updateUser(user.email, {
+      name: name.trim(),
+      brokerage: brokerage.trim(),
+      mobilePhone: mobilePhone.trim(),
+      officePhone: officePhone.trim(),
+    });
     if (result.success) { setProfileMsg("Profile saved!"); onUpdate(); }
   }
 
@@ -749,6 +787,38 @@ function ProfileView({ user, onUpdate }) {
     const result = updateUser(user.email, { passwordHash: hashPassword(newPw) });
     if (result.success) { setPwMsg("Password changed!"); setCurrentPw(""); setNewPw(""); setConfirmPw(""); }
   }
+
+  async function handleAssetUpload(field, file) {
+    if (!file) return;
+    try {
+      await storeFile(`profile::${user.email}`, field, file);
+      // Update user metadata with filename so admin knows asset exists
+      updateUser(user.email, { [field]: file.name });
+      // Refresh preview URL
+      const newUrl = URL.createObjectURL(file);
+      if (assetUrlsRef.current[field]) { try { URL.revokeObjectURL(assetUrlsRef.current[field]); } catch {} }
+      assetUrlsRef.current = { ...assetUrlsRef.current, [field]: newUrl };
+      setAssetUrls((prev) => ({ ...prev, [field]: newUrl }));
+      onUpdate();
+    } catch (err) {
+      console.error("Failed to store asset:", err);
+    }
+  }
+
+  function handleAssetRemove(field) {
+    updateUser(user.email, { [field]: "" });
+    if (assetUrlsRef.current[field]) { try { URL.revokeObjectURL(assetUrlsRef.current[field]); } catch {} }
+    assetUrlsRef.current = { ...assetUrlsRef.current, [field]: null };
+    setAssetUrls((prev) => ({ ...prev, [field]: null }));
+    onUpdate();
+  }
+
+  const ASSETS = [
+    { label: "Headshot Photo",          field: "headshot",    ref: headshotRef,    hint: "JPG or PNG", desc: null },
+    { label: "Brokerage Logo",          field: "logo",        ref: logoRef,        hint: "PNG preferred", desc: null },
+    { label: "Personal Logo / Team Logo", field: "personalLogo", ref: personalLogoRef, hint: "PNG preferred",
+      desc: "Upload your personal brand logo or team logo if different from your brokerage logo" },
+  ];
 
   return (
     <div className="max-w-[620px] mx-auto px-6 py-10 space-y-6">
@@ -770,6 +840,16 @@ function ProfileView({ user, onUpdate }) {
             <label className={lCls}>Brokerage</label>
             <input className={iCls} placeholder="Your brokerage" value={brokerage} onChange={(e) => setBrokerage(e.target.value)} />
           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={lCls}>Mobile Phone</label>
+              <input className={iCls} type="tel" placeholder="(555) 000-0000" value={mobilePhone} onChange={(e) => setMobilePhone(e.target.value)} />
+            </div>
+            <div>
+              <label className={lCls}>Office Phone</label>
+              <input className={iCls} type="tel" placeholder="(555) 000-0000" value={officePhone} onChange={(e) => setOfficePhone(e.target.value)} />
+            </div>
+          </div>
           {profileMsg && <p className="font-sans text-[0.82rem] text-coral">{profileMsg}</p>}
           <button type="submit" className="font-sans bg-coral text-white font-semibold px-7 py-2.5 rounded-full hover:bg-coral-dark transition-colors border-none cursor-pointer text-[0.9rem]">
             Save Changes
@@ -780,37 +860,54 @@ function ProfileView({ user, onUpdate }) {
       {/* Brand assets */}
       <div className="bg-white rounded-2xl border border-border p-6">
         <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-slate mb-1">Brand Assets</p>
-        <p className="font-sans text-[0.82rem] text-slate/70 mb-4">Upload once and we'll pull these automatically for every future order.</p>
-        <div className="grid grid-cols-2 gap-4">
-          {[
-            { label: "Headshot Photo", ref: headshotRef, field: "headshot", hint: "JPG or PNG" },
-            { label: "Brokerage Logo", ref: logoRef,     field: "logo",     hint: "PNG preferred" },
-          ].map((asset) => (
+        <p className="font-sans text-[0.82rem] text-slate/70 mb-5">Upload once and we'll pull these automatically for every future order.</p>
+        <div className="space-y-5">
+          {ASSETS.map((asset) => (
             <div key={asset.field}>
               <label className={lCls}>{asset.label}</label>
-              <button
-                type="button"
-                onClick={() => asset.ref.current?.click()}
-                className="w-full border-2 border-dashed border-border rounded-xl py-5 text-center hover:border-coral transition-colors group"
-              >
-                {user[asset.field] ? (
-                  <span className="font-sans text-[0.8rem] text-deep break-all px-2">{user[asset.field]}</span>
-                ) : (
-                  <>
-                    <span className="block text-xl mb-1 opacity-40 group-hover:opacity-70">📎</span>
-                    <span className="font-sans text-[0.78rem] text-slate group-hover:text-coral transition-colors">{asset.hint}</span>
-                  </>
-                )}
-              </button>
+              {asset.desc && (
+                <p className="font-sans text-[0.78rem] text-slate/60 mb-2">{asset.desc}</p>
+              )}
+              {assetUrls[asset.field] ? (
+                <div className="flex items-start gap-3">
+                  <img
+                    src={assetUrls[asset.field]}
+                    alt={asset.label}
+                    className="w-20 h-20 object-cover rounded-xl border border-border bg-light-gray flex-shrink-0"
+                  />
+                  <div className="flex flex-col gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => asset.ref.current?.click()}
+                      className="font-sans text-[0.8rem] font-semibold text-coral border border-coral px-4 py-1.5 rounded-full hover:bg-coral hover:text-white transition-all cursor-pointer bg-transparent"
+                    >
+                      Replace
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAssetRemove(asset.field)}
+                      className="font-sans text-[0.8rem] text-slate/60 hover:text-rose-500 transition-colors border-none bg-transparent cursor-pointer px-0 text-left"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => asset.ref.current?.click()}
+                  className="w-full border-2 border-dashed border-border rounded-xl py-5 text-center hover:border-coral transition-colors group"
+                >
+                  <span className="block text-xl mb-1 opacity-40 group-hover:opacity-70">📎</span>
+                  <span className="font-sans text-[0.78rem] text-slate group-hover:text-coral transition-colors">{asset.hint}</span>
+                </button>
+              )}
               <input
                 ref={asset.ref}
                 type="file"
                 className="sr-only"
                 accept="image/*"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) { updateUser(user.email, { [asset.field]: f.name }); onUpdate(); }
-                }}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleAssetUpload(asset.field, f); e.target.value = ""; }}
               />
             </div>
           ))}

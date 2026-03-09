@@ -5,7 +5,7 @@ import {
   getAllOrders, updateOrderById,
   getAdminNotifications, markAdminNotificationsRead, addAdminNotification,
 } from "@/app/lib/auth";
-import { storeFile } from "@/app/lib/fileStorage";
+import { storeFile, getFile } from "@/app/lib/fileStorage";
 
 // ── Change this to update the admin password ───────────────────────────────────
 const ADMIN_PASSWORD    = "admin2025";
@@ -898,6 +898,9 @@ function AdminOrderDetailView({ order, onBack, onUpdate, showToast }) {
               <p className="font-sans text-[0.88rem] text-deep">{formData.listing?.highlights || print.notes}</p>
             </InfoCard>
           )}
+
+          {/* Client brand assets */}
+          <ClientBrandAssetsCard order={currentOrder} />
         </div>
 
         {/* Right: admin actions */}
@@ -932,6 +935,114 @@ function InfoGrid({ items, cols = 2 }) {
           <p className="font-sans text-[0.85rem] text-deep mt-0.5 break-words">{v}</p>
         </div>
       ) : null)}
+    </div>
+  );
+}
+
+// ── Client Brand Assets Card ───────────────────────────────────────────────────
+function ClientBrandAssetsCard({ order }) {
+  const [urls, setUrls] = useState({ headshot: null, logo: null, personalLogo: null });
+  const urlsRef = useRef({});
+  const clientEmail = order.clientEmail;
+
+  // Load client profile images from IndexedDB
+  useEffect(() => {
+    if (!clientEmail) return;
+    let cancelled = false;
+    async function load() {
+      const fields = ["headshot", "logo", "personalLogo"];
+      const result = {};
+      for (const field of fields) {
+        try {
+          const blob = await getFile(`profile::${clientEmail}`, field);
+          if (blob && !cancelled) result[field] = { url: URL.createObjectURL(blob), blob };
+        } catch {}
+      }
+      if (!cancelled) {
+        Object.values(urlsRef.current).forEach((d) => { try { URL.revokeObjectURL(d.url); } catch {} });
+        urlsRef.current = result;
+        setUrls({ headshot: result.headshot?.url || null, logo: result.logo?.url || null, personalLogo: result.personalLogo?.url || null });
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+      Object.values(urlsRef.current).forEach((d) => { try { URL.revokeObjectURL(d.url); } catch {} });
+    };
+  }, [clientEmail]);
+
+  function downloadAsset(field, label) {
+    const url = urls[field];
+    if (!url) return;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${order.clientName?.replace(/\s+/g, "-") || "client"}-${label}.png`;
+    a.click();
+  }
+
+  // Read client user data from localStorage for contact info
+  let clientUser = null;
+  try {
+    const users = JSON.parse(localStorage.getItem("tll_users") || "[]");
+    clientUser = users.find((u) => u.email === clientEmail) || null;
+  } catch {}
+
+  const hasAnyAsset = urls.headshot || urls.logo || urls.personalLogo;
+
+  const ASSET_BOXES = [
+    { field: "headshot",    label: "Headshot" },
+    { field: "logo",        label: "Brokerage Logo" },
+    { field: "personalLogo", label: "Personal / Team Logo" },
+  ];
+
+  return (
+    <div className="bg-white rounded-2xl border border-border p-5">
+      <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-slate mb-4">Client Brand Assets & Contact Info</p>
+
+      {/* Contact info row */}
+      <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-5">
+        {[
+          ["Name",          order.clientName],
+          ["Email",         clientEmail],
+          ["Mobile Phone",  clientUser?.mobilePhone],
+          ["Office Phone",  clientUser?.officePhone],
+          ["Brokerage",     clientUser?.brokerage],
+        ].map(([k, v]) => v ? (
+          <div key={k}>
+            <p className="font-sans text-[0.68rem] uppercase tracking-[0.08em] text-slate/60">{k}</p>
+            <p className="font-sans text-[0.82rem] text-deep mt-0.5 break-all">{v}</p>
+          </div>
+        ) : null)}
+      </div>
+
+      {/* Asset image boxes */}
+      <div className="grid grid-cols-3 gap-3">
+        {ASSET_BOXES.map(({ field, label }) => (
+          <div key={field} className="flex flex-col items-center gap-2">
+            <p className="font-sans text-[0.68rem] uppercase tracking-[0.08em] text-slate/60 text-center">{label}</p>
+            <div className="w-full aspect-square rounded-xl border border-border bg-light-gray flex items-center justify-center overflow-hidden">
+              {urls[field] ? (
+                <img src={urls[field]} alt={label} className="w-full h-full object-cover" />
+              ) : (
+                <p className="font-sans text-[0.7rem] text-slate/40 text-center px-2 leading-tight">Not uploaded yet</p>
+              )}
+            </div>
+            <button
+              onClick={() => downloadAsset(field, label)}
+              disabled={!urls[field]}
+              className="w-full font-sans text-[0.75rem] font-semibold text-slate border border-border px-3 py-1.5 rounded-full hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Download
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {!hasAnyAsset && (
+        <p className="font-sans text-[0.78rem] text-slate/50 italic mt-4">
+          Client has not uploaded brand assets yet. You can request them via the message thread below.
+        </p>
+      )}
     </div>
   );
 }
