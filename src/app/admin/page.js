@@ -81,10 +81,10 @@ export default function AdminPage() {
     } catch {}
   }, []);
 
-  // Poll notifications every 8s
+  // Poll orders + notifications every 8s
   useEffect(() => {
     if (!authed) return;
-    const id = setInterval(loadNotifications, 8000);
+    const id = setInterval(() => { loadOrders(); loadNotifications(); }, 8000);
     return () => clearInterval(id);
   }, [authed]);
 

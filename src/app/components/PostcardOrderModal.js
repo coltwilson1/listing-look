@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ContactStep, ListingStep, labelCls, inputCls, selectCls } from "./OrderFormShared";
-import { buildPostcardOrder, getCurrentUser, addOrderToUser } from "@/app/lib/auth";
+import { buildPostcardOrder, getCurrentUser } from "@/app/lib/auth";
 import SuccessWithAccount from "./SuccessWithAccount";
 import OrderFormLoginBanner from "./OrderFormLoginBanner";
 
@@ -140,10 +140,6 @@ export default function PostcardOrderModal({ open, onClose }) {
     setTimeout(() => {
       const order = buildPostcardOrder({ contact, listing, print });
       setBuiltOrder(order);
-      try {
-        const user = getCurrentUser();
-        if (user) addOrderToUser(user.email, order);
-      } catch {}
       setSubmitting(false);
       setSubmitted(true);
     }, 1000);

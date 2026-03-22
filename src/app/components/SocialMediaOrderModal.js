@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ContactStep, ListingStep, labelCls, inputCls } from "./OrderFormShared";
-import { buildSocialOrder, getCurrentUser, addOrderToUser } from "@/app/lib/auth";
+import { buildSocialOrder, getCurrentUser } from "@/app/lib/auth";
 import SuccessWithAccount from "./SuccessWithAccount";
 import OrderFormLoginBanner from "./OrderFormLoginBanner";
 
@@ -272,10 +272,6 @@ export default function SocialMediaOrderModal({ open, onClose }) {
     setTimeout(() => {
       const order = buildSocialOrder({ contact, listing, photos, pkg, design });
       setBuiltOrder(order);
-      try {
-        const user = getCurrentUser();
-        if (user) addOrderToUser(user.email, order);
-      } catch {}
       setSubmitting(false);
       setSubmitted(true);
     }, 1000);
