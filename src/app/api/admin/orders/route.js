@@ -18,11 +18,34 @@ function isAdmin(req) {
 export async function GET(req) {
   if (!isAdmin(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data, error } = await serviceClient()
+  const sb = serviceClient();
+  const { data, error } = await sb
     .from("orders")
     .select("*")
     .order("submitted_at", { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json((data || []).map(expandOrder));
+
+  // Collect unique user IDs and fetch their profiles in one query
+  const userIds = [...new Set((data || []).map((o) => o.user_id).filter(Boolean))];
+  let profileMap = {};
+  if (userIds.length > 0) {
+    const { data: profiles } = await sb
+      .from("profiles")
+      .select("id, headshot, logo, personal_logo")
+      .in("id", userIds);
+    (profiles || []).forEach((p) => { profileMap[p.id] = p; });
+  }
+
+  const orders = (data || []).map((row) => {
+    const profile = profileMap[row.user_id] || {};
+    return {
+      ...expandOrder(row),
+      clientHeadshot:    profile.headshot     || null,
+      clientLogo:        profile.logo         || null,
+      clientPersonalLogo: profile.personal_logo || null,
+    };
+  });
+
+  return NextResponse.json(orders);
 }

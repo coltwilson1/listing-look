@@ -66,6 +66,7 @@ export async function getCurrentUser() {
     officePhone: profile?.office_phone || "",
     headshot: profile?.headshot || "",
     logo: profile?.logo || "",
+    personalLogo: profile?.personal_logo || "",
     orders: (orders || []).map(expandOrder),
   };
 }

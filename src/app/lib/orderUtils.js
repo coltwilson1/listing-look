@@ -58,6 +58,7 @@ export function expandOrder(row) {
     notes: row.notes || [],
     formData: row.form_data,
     submittedAt: row.submitted_at,
+    userId: row.user_id,
     clientName: row.client_name,
     clientEmail: row.client_email,
     clientBrokerage: row.client_brokerage,

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { storeFile, getFile } from "@/app/lib/fileStorage";
+import { supabase } from "@/app/lib/supabase";
 
 // ── Change this to update the admin password ───────────────────────────────────
 const ADMIN_PASSWORD    = "admin2025";
@@ -1009,42 +1010,19 @@ function InfoGrid({ items, cols = 2 }) {
 
 // ── Client Brand Assets Card ───────────────────────────────────────────────────
 function ClientBrandAssetsCard({ order }) {
-  const [urls, setUrls] = useState({ headshot: null, logo: null, personalLogo: null });
-  const urlsRef = useRef({});
-  const clientEmail = order.clientEmail;
-
-  // Load client profile images from IndexedDB
-  useEffect(() => {
-    if (!clientEmail) return;
-    let cancelled = false;
-    async function load() {
-      const fields = ["headshot", "logo", "personalLogo"];
-      const result = {};
-      for (const field of fields) {
-        try {
-          const blob = await getFile(`profile::${clientEmail}`, field);
-          if (blob && !cancelled) result[field] = { url: URL.createObjectURL(blob), blob };
-        } catch {}
-      }
-      if (!cancelled) {
-        Object.values(urlsRef.current).forEach((d) => { try { URL.revokeObjectURL(d.url); } catch {} });
-        urlsRef.current = result;
-        setUrls({ headshot: result.headshot?.url || null, logo: result.logo?.url || null, personalLogo: result.personalLogo?.url || null });
-      }
-    }
-    load();
-    return () => {
-      cancelled = true;
-      Object.values(urlsRef.current).forEach((d) => { try { URL.revokeObjectURL(d.url); } catch {} });
-    };
-  }, [clientEmail]);
+  const urls = {
+    headshot:     order.clientHeadshot     || null,
+    logo:         order.clientLogo         || null,
+    personalLogo: order.clientPersonalLogo || null,
+  };
 
   function downloadAsset(field, label) {
     const url = urls[field];
     if (!url) return;
+    const ext = url.split(".").pop().split("?")[0] || "png";
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${order.clientName?.replace(/\s+/g, "-") || "client"}-${label}.png`;
+    a.download = `${order.clientName?.replace(/\s+/g, "-") || "client"}-${label}.${ext}`;
     a.click();
   }
 

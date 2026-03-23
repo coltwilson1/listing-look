@@ -784,31 +784,14 @@ function ProfileView({ user, onUpdate }) {
   const iCls = "w-full font-sans text-[0.9rem] bg-light-gray border border-border rounded-xl px-4 py-2.5 outline-none focus:border-coral focus:ring-2 focus:ring-coral/20 transition-all placeholder:text-slate/40";
   const lCls = "block font-sans text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-slate mb-1.5";
 
-  // Load asset previews from IndexedDB on mount
+  // Load asset preview URLs from user profile (Supabase Storage public URLs)
   useEffect(() => {
-    let cancelled = false;
-    async function loadAssets() {
-      const fields = ["headshot", "logo", "personalLogo"];
-      const urls = {};
-      for (const field of fields) {
-        try {
-          const blob = await getFile(`profile::${user.email}`, field);
-          if (blob && !cancelled) urls[field] = URL.createObjectURL(blob);
-        } catch {}
-      }
-      if (!cancelled) {
-        // revoke old
-        Object.values(assetUrlsRef.current).forEach((u) => { try { URL.revokeObjectURL(u); } catch {} });
-        assetUrlsRef.current = urls;
-        setAssetUrls(urls);
-      }
-    }
-    loadAssets();
-    return () => {
-      cancelled = true;
-      Object.values(assetUrlsRef.current).forEach((u) => { try { URL.revokeObjectURL(u); } catch {} });
-    };
-  }, [user.email]);
+    setAssetUrls({
+      headshot:    user.headshot    || null,
+      logo:        user.logo        || null,
+      personalLogo: user.personalLogo || null,
+    });
+  }, [user.headshot, user.logo, user.personalLogo]);
 
   async function saveProfile(e) {
     e.preventDefault();
@@ -838,9 +821,20 @@ function ProfileView({ user, onUpdate }) {
   async function handleAssetUpload(field, file) {
     if (!file) return;
     try {
-      await storeFile(`profile::${user.email}`, field, file);
-      await updateUser(user.email, { [field]: file.name });
-      // Refresh preview URL
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/${field}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("agent-profiles")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (uploadErr) throw uploadErr;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("agent-profiles")
+        .getPublicUrl(path);
+
+      await updateUser(user.email, { [field]: publicUrl });
+
+      // Refresh preview URL locally
       const newUrl = URL.createObjectURL(file);
       if (assetUrlsRef.current[field]) { try { URL.revokeObjectURL(assetUrlsRef.current[field]); } catch {} }
       assetUrlsRef.current = { ...assetUrlsRef.current, [field]: newUrl };
@@ -852,9 +846,15 @@ function ProfileView({ user, onUpdate }) {
   }
 
   async function handleAssetRemove(field) {
+    // Try to remove from storage (best-effort — ignore errors for old/missing files)
+    try {
+      const currentUrl = user[field];
+      if (currentUrl) {
+        const path = currentUrl.split("/agent-profiles/")[1];
+        if (path) await supabase.storage.from("agent-profiles").remove([path]);
+      }
+    } catch {}
     await updateUser(user.email, { [field]: "" });
-    if (assetUrlsRef.current[field]) { try { URL.revokeObjectURL(assetUrlsRef.current[field]); } catch {} }
-    assetUrlsRef.current = { ...assetUrlsRef.current, [field]: null };
     setAssetUrls((prev) => ({ ...prev, [field]: null }));
     onUpdate();
   }
