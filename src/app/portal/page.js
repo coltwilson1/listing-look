@@ -435,6 +435,7 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
   const [showRevision, setShowRevision] = useState(false);
   const [revText, setRevText]           = useState("");
   const [submitting, setSubmitting]     = useState(false);
+  const revisionCount = (order.notes || []).filter((n) => n.text?.startsWith("REVISION REQUEST:")).length;
   const [showCancel, setShowCancel]     = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelConfirm, setCancelConfirm] = useState(false);
@@ -574,7 +575,7 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
             </div>
           )}
           {!showRevision ? (
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-3 flex-wrap items-center">
               <button
                 onClick={handleApprove}
                 disabled={submitting}
@@ -582,12 +583,18 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
               >
                 {submitting ? "Approving…" : "✓ Approve This Design"}
               </button>
-              <button
-                onClick={() => setShowRevision(true)}
-                className="font-sans border border-border text-slate px-6 py-2.5 rounded-full hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer text-[0.9rem]"
-              >
-                Request a Revision
-              </button>
+              {revisionCount === 0 ? (
+                <button
+                  onClick={() => setShowRevision(true)}
+                  className="font-sans border border-border text-slate px-6 py-2.5 rounded-full hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer text-[0.9rem]"
+                >
+                  Request a Revision
+                </button>
+              ) : (
+                <span className="font-sans text-[0.82rem] text-slate/50 italic">
+                  Revision already submitted — only 1 allowed per proof
+                </span>
+              )}
             </div>
           ) : (
             <form onSubmit={handleRevision} className="space-y-3">
