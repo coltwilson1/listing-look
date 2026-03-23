@@ -1109,7 +1109,6 @@ function FileDeliveryCard({ order, onUpdate, showToast }) {
   const [message, setMessage] = useState("");
   const [showEmail, setShowEmail] = useState(false);
   const [sending, setSending] = useState(false);
-  const inputRef = useRef(null);
 
   const contact = order.formData?.contact || {};
   const existing = order.deliveredFiles || [];
@@ -1162,14 +1161,11 @@ function FileDeliveryCard({ order, onUpdate, showToast }) {
       )}
 
       {/* Upload new */}
-      <div
-        className="border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-coral transition-colors mb-3"
-        onClick={() => inputRef.current?.click()}
-      >
-        <p className="font-sans text-[0.82rem] text-slate">Click to select files</p>
+      <label className="block border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-coral transition-colors mb-3">
+        <p className="font-sans text-[0.82rem] text-slate">Tap to select files</p>
         <p className="font-sans text-[0.72rem] text-slate/50 mt-0.5">PNG, JPG, PDF, MP4, ZIP · up to 10 files</p>
-        <input ref={inputRef} type="file" multiple accept=".png,.jpg,.jpeg,.pdf,.mp4,.zip" className="hidden" onChange={handleFilePick} />
-      </div>
+        <input type="file" multiple accept=".png,.jpg,.jpeg,.pdf,.mp4,.zip" className="hidden" onChange={handleFilePick} />
+      </label>
 
       {files.length > 0 && (
         <div className="space-y-1.5 mb-3">
