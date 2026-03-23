@@ -803,13 +803,21 @@ function ProfileView({ user, onUpdate }) {
   async function saveProfile(e) {
     e.preventDefault();
     if (!name.trim()) return setProfileMsg("Name is required.");
-    const result = await updateUser(user.email, {
-      name: name.trim(),
-      brokerage: brokerage.trim(),
-      mobilePhone: mobilePhone.trim(),
-      officePhone: officePhone.trim(),
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) return setProfileMsg("Not logged in.");
+    const res = await fetch("/api/profile/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        name: name.trim(),
+        brokerage: brokerage.trim(),
+        mobilePhone: mobilePhone.trim(),
+        officePhone: officePhone.trim(),
+      }),
     });
-    if (result.success) { setProfileMsg("Profile saved!"); onUpdate(); }
+    if (res.ok) { setProfileMsg("Profile saved!"); onUpdate(); }
+    else setProfileMsg("Save failed — please try again.");
   }
 
   async function changePassword(e) {
