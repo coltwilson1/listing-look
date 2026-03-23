@@ -457,7 +457,7 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
     color: s === "completed" ? "#10b981" : s === "awaiting-approval" ? "#E8825A" : s === "in-design" ? "#3b82f6" : s === "revision" ? "#f59e0b" : "#94a3b8",
   }));
   const maxCount = Math.max(...statusCounts.map((s) => s.count), 1);
-  const recent10 = orders.slice(0, 10);
+  const recent10 = orders.filter((o) => o.status !== "completed").slice(0, 10);
 
   return (
     <div className="max-w-[1100px] mx-auto px-6 py-8">
