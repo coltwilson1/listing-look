@@ -622,7 +622,7 @@ function Step3({
             { value: "mls",    label: "Use MLS photos — provide link below" },
             { value: "upload", label: "I will upload photos now" },
           ].map((opt) => (
-            <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
+            <label key={opt.value} className="flex items-center gap-3 cursor-pointer group" onClick={() => onPhotosChange("photoOption", opt.value)}>
               <div
                 className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-150 ${
                   photos.photoOption === opt.value
@@ -639,7 +639,6 @@ function Step3({
                 className={`font-sans text-[0.88rem] transition-colors ${
                   photos.photoOption === opt.value ? "text-deep font-medium" : "text-slate group-hover:text-deep"
                 }`}
-                onClick={() => onPhotosChange("photoOption", opt.value)}
               >
                 {opt.label}
               </span>
