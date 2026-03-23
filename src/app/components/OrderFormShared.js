@@ -83,7 +83,15 @@ export function ListingStep({ data, onChange, hidePhotoDelivery = false, errors 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Listing Price * {errors.price && <span className="text-coral normal-case font-normal tracking-normal ml-1">Required</span>}</label>
-          <input className={ic(errors.price)} placeholder="$485,000" {...field("price")} />
+          <input
+            className={ic(errors.price)}
+            placeholder="$485,000"
+            value={data.price || ""}
+            onChange={(e) => {
+              const digits = e.target.value.replace(/[^0-9]/g, "");
+              onChange("price", digits ? "$" + parseInt(digits, 10).toLocaleString() : "");
+            }}
+          />
         </div>
         <div>
           <label className={labelCls}>MLS #</label>
