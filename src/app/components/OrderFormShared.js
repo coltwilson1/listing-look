@@ -1,5 +1,26 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
+// ── Google Maps loader (singleton) ────────────────────────────────────────────
+let _mapsReady = false;
+let _mapsCallbacks = [];
+
+function loadGoogleMaps(cb) {
+  if (_mapsReady) { cb(); return; }
+  _mapsCallbacks.push(cb);
+  if (document.querySelector('script[src*="maps.googleapis.com"]')) return;
+  window.__tllMapsInit = () => {
+    _mapsReady = true;
+    _mapsCallbacks.forEach((fn) => fn());
+    _mapsCallbacks = [];
+  };
+  const s = document.createElement("script");
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&callback=__tllMapsInit`;
+  s.async = true;
+  document.head.appendChild(s);
+}
+
 // ── Shared input style helpers ────────────────────────────────────────────────
 
 export const labelCls =
@@ -86,11 +107,39 @@ export function ListingStep({ data, onChange, hidePhotoDelivery = false, errors 
     onChange: (e) => onChange(name, e.target.checked),
   });
 
+  const addressRef = useRef(null);
+  const acRef = useRef(null);
+
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) return;
+    loadGoogleMaps(() => {
+      if (!addressRef.current || acRef.current) return;
+      acRef.current = new window.google.maps.places.Autocomplete(addressRef.current, {
+        types: ["address"],
+        componentRestrictions: { country: "us" },
+        fields: ["formatted_address"],
+      });
+      acRef.current.addListener("place_changed", () => {
+        const place = acRef.current.getPlace();
+        if (place?.formatted_address) onChange("address", place.formatted_address);
+      });
+    });
+    return () => {
+      if (acRef.current) window.google?.maps?.event?.clearInstanceListeners(acRef.current);
+    };
+  }, []);
+
   return (
     <div className="step-animate grid grid-cols-1 gap-4">
       <div>
         <label className={labelCls}>Property Address * {errors.address && <span className="text-coral normal-case font-normal tracking-normal ml-1">Required</span>}</label>
-        <input className={ic(errors.address)} placeholder="123 Oak Street, Tampa, FL 33601" {...field("address")} />
+        <input
+          ref={addressRef}
+          className={ic(errors.address)}
+          placeholder="123 Oak Street, Tampa, FL 33601"
+          value={data.address || ""}
+          onChange={(e) => onChange("address", e.target.value)}
+        />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
