@@ -312,7 +312,7 @@ function AdminLoginScreen({ onLogin }) {
 function AdminSidebar({ view, navigate, awaitingCount, onLogout, open }) {
   const items = [
     { id: "dashboard",          label: "Dashboard",          icon: "◻" },
-    { id: "all-orders",         label: "All Orders",         icon: "≡" },
+    { id: "all-orders",         label: "Active Orders",      icon: "≡" },
     { id: "in-progress",        label: "In Progress",        icon: "⟳" },
     { id: "awaiting-approval",  label: "Awaiting Approval",  icon: "◉", badge: awaitingCount },
     { id: "completed",          label: "Completed",          icon: "✓" },
@@ -569,7 +569,8 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
 
   const filtered = orders
     .filter((o) => {
-      if (filterStatus && !filterStatus.includes(o.status)) return false;
+      if (filterStatus) { if (!filterStatus.includes(o.status)) return false; }
+      else if (o.status === "completed") return false;
       if (statusFilter && o.status !== statusFilter) return false;
       if (typeFilter && o.type !== typeFilter) return false;
       if (dateFrom && new Date(o.submittedAt) < new Date(dateFrom)) return false;
@@ -629,7 +630,7 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
         <h1 className="font-serif text-[1.9rem] text-deep">
           {filterStatus?.length === 1 && filterStatus[0] === "awaiting-approval" ? "Awaiting Approval" :
            filterStatus?.includes("submitted") ? "In Progress" :
-           filterStatus?.includes("completed") ? "Completed" : "All Orders"}
+           filterStatus?.includes("completed") ? "Completed" : "Active Orders"}
         </h1>
         <p className="font-sans text-[0.88rem] text-slate mt-0.5">{filtered.length} order{filtered.length !== 1 ? "s" : ""} shown</p>
       </div>
