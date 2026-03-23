@@ -435,6 +435,8 @@ function NotificationBell({ notifications, unreadCount, onMarkRead, onClickOrder
 
 // ── Dashboard View ─────────────────────────────────────────────────────────────
 function DashboardView({ orders, onSelectOrder, navigate }) {
+  const [activeStatus, setActiveStatus] = useState(null);
+
   const total     = orders.length;
   const newWeek   = orders.filter((o) => isThisWeek(o.submittedAt)).length;
   const inProg    = orders.filter((o) => ["submitted", "in-design", "revision"].includes(o.status)).length;
@@ -457,7 +459,11 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
     color: s === "completed" ? "#10b981" : s === "awaiting-approval" ? "#E8825A" : s === "in-design" ? "#3b82f6" : s === "revision" ? "#f59e0b" : "#94a3b8",
   }));
   const maxCount = Math.max(...statusCounts.map((s) => s.count), 1);
-  const recent10 = orders.filter((o) => o.status !== "completed").slice(0, 10);
+
+  const recent10 = (activeStatus
+    ? orders.filter((o) => o.status === activeStatus)
+    : orders.filter((o) => o.status !== "completed")
+  ).slice(0, 10);
 
   return (
     <div className="max-w-[1100px] mx-auto px-6 py-8">
@@ -483,18 +489,25 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
           <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-slate mb-5">Orders by Status</p>
           <div className="space-y-3.5">
             {statusCounts.map(({ key, label, count, color }) => (
-              <div key={key}>
-                <div className="flex justify-between mb-1">
-                  <span className="font-sans text-[0.78rem] text-deep">{label}</span>
+              <button
+                key={key}
+                type="button"
+                onClick={() => setActiveStatus(activeStatus === key ? null : key)}
+                className={`w-full text-left rounded-xl px-3 py-2 -mx-3 transition-all border-none cursor-pointer ${
+                  activeStatus === key ? "bg-light-gray" : "bg-transparent hover:bg-light-gray/60"
+                }`}
+              >
+                <div className="flex justify-between mb-1.5">
+                  <span className={`font-sans text-[0.78rem] font-medium ${activeStatus === key ? "text-deep" : "text-deep/80"}`}>{label}</span>
                   <span className="font-sans text-[0.78rem] font-bold text-deep">{count}</span>
                 </div>
                 <div className="h-2 bg-light-gray rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${(count / maxCount) * 100}%`, background: color }}
+                    style={{ width: `${(count / maxCount) * 100}%`, background: color, opacity: activeStatus && activeStatus !== key ? 0.35 : 1 }}
                   />
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -502,7 +515,16 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
         {/* Recent orders */}
         <div className="lg:col-span-2 bg-white rounded-2xl border border-border overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-            <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-slate">Recent Orders</p>
+            <div className="flex items-center gap-2">
+              <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-slate">
+                {activeStatus ? STATUS[activeStatus]?.label : "Recent Orders"}
+              </p>
+              {activeStatus && (
+                <button onClick={() => setActiveStatus(null)} className="font-sans text-[0.7rem] text-slate/50 hover:text-coral border-none bg-transparent cursor-pointer underline">
+                  clear
+                </button>
+              )}
+            </div>
             <button onClick={() => navigate("all-orders")} className="font-sans text-[0.78rem] text-coral hover:underline border-none bg-transparent cursor-pointer">
               View all →
             </button>
