@@ -159,19 +159,20 @@ export default function SocialMediaOrderModal({ open, onClose }) {
   // Load from localStorage + auto-fill from session user
   useEffect(() => {
     if (!open) return;
-    try {
-      const saved = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
-      if (saved.contact) setContact((p) => ({ ...p, ...saved.contact }));
-      if (saved.listing) setListing((p) => ({ ...p, ...saved.listing }));
-      if (saved.photos)  setPhotos((p)  => ({ ...p, ...saved.photos  }));
-      if (saved.pkg)     setPkg((p)     => ({ ...p, ...saved.pkg     }));
-      if (saved.design)  setDesign((p)  => ({ ...p, ...saved.design  }));
-    } catch {}
-    // Auto-fill from logged-in user
-    try {
-      const u = getCurrentUser();
-      if (u) { setSessionUser(u); applyUserToContact(u); }
-    } catch {}
+    (async () => {
+      try {
+        const saved = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
+        if (saved.contact) setContact((p) => ({ ...p, ...saved.contact }));
+        if (saved.listing) setListing((p) => ({ ...p, ...saved.listing }));
+        if (saved.photos)  setPhotos((p)  => ({ ...p, ...saved.photos  }));
+        if (saved.pkg)     setPkg((p)     => ({ ...p, ...saved.pkg     }));
+        if (saved.design)  setDesign((p)  => ({ ...p, ...saved.design  }));
+      } catch {}
+      try {
+        const u = await getCurrentUser();
+        if (u) { setSessionUser(u); applyUserToContact(u); }
+      } catch {}
+    })();
   }, [open]);
 
   // Save to localStorage

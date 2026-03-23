@@ -77,16 +77,18 @@ export default function PostcardOrderModal({ open, onClose }) {
 
   useEffect(() => {
     if (!open) return;
-    try {
-      const saved = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
-      if (saved.contact) setContact((p) => ({ ...p, ...saved.contact }));
-      if (saved.listing) setListing((p) => ({ ...p, ...saved.listing }));
-      if (saved.print) setPrint((p) => ({ ...p, ...saved.print }));
-    } catch {}
-    try {
-      const u = getCurrentUser();
-      if (u) { setSessionUser(u); applyUserToContact(u); }
-    } catch {}
+    (async () => {
+      try {
+        const saved = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
+        if (saved.contact) setContact((p) => ({ ...p, ...saved.contact }));
+        if (saved.listing) setListing((p) => ({ ...p, ...saved.listing }));
+        if (saved.print) setPrint((p) => ({ ...p, ...saved.print }));
+      } catch {}
+      try {
+        const u = await getCurrentUser();
+        if (u) { setSessionUser(u); applyUserToContact(u); }
+      } catch {}
+    })();
   }, [open]);
 
   useEffect(() => {
