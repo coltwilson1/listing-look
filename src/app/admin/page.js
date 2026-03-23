@@ -446,12 +446,12 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
   const revenueUnpaid = orders.filter((o) => !o.paid && o.status === "completed").reduce((s, o) => s + parsePrice(o.packagePrice), 0);
 
   const stats = [
-    { label: "Total Orders",           value: total,    sub: "all time" },
-    { label: "New This Week",           value: newWeek,  sub: "last 7 days" },
-    { label: "In Progress",             value: inProg,   sub: "active" },
-    { label: "Awaiting Approval",       value: awaiting, sub: "needs attention", alert: awaiting > 0 },
-    { label: "Completed This Month",    value: doneMonth, sub: "this month" },
-    { label: "Revenue Collected",       value: `$${revenuePaid}`, sub: `$${revenueUnpaid} uncollected` },
+    { label: "Total Orders",           value: total,     sub: "all time",           nav: "all-orders" },
+    { label: "New This Week",           value: newWeek,   sub: "last 7 days",        nav: "all-orders" },
+    { label: "In Progress",             value: inProg,    sub: "active",             nav: "in-progress" },
+    { label: "Awaiting Approval",       value: awaiting,  sub: "needs attention",    nav: "awaiting-approval", alert: awaiting > 0 },
+    { label: "Completed This Month",    value: doneMonth, sub: "this month",         nav: "completed" },
+    { label: "Revenue Collected",       value: `$${revenuePaid}`, sub: `$${revenueUnpaid} uncollected`, nav: "completed" },
   ];
 
   const statusCounts = ["submitted", "in-design", "awaiting-approval", "revision", "completed"].map((s) => ({
@@ -475,11 +475,16 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
       {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         {stats.map((s) => (
-          <div key={s.label} className={`bg-white rounded-2xl p-5 border ${s.alert ? "border-coral/40 bg-coral/5" : "border-border"}`}>
+          <button
+            key={s.label}
+            type="button"
+            onClick={() => navigate(s.nav)}
+            className={`text-left bg-white rounded-2xl p-5 border transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer ${s.alert ? "border-coral/40 bg-coral/5" : "border-border"}`}
+          >
             <div className={`font-serif text-[2rem] ${s.alert ? "text-coral" : "text-deep"}`}>{s.value}</div>
             <div className="font-sans text-[0.82rem] font-semibold text-deep mt-0.5">{s.label}</div>
             <div className="font-sans text-[0.72rem] text-slate/50 mt-0.5">{s.sub}</div>
-          </div>
+          </button>
         ))}
       </div>
 
