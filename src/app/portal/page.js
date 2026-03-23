@@ -828,24 +828,24 @@ function ProfileView({ user, onUpdate }) {
   async function handleAssetUpload(field, file) {
     if (!file) return;
     try {
-      const ext = file.name.split(".").pop();
-      const path = `${user.id}/${field}.${ext}`;
-      const { error: uploadErr } = await supabase.storage
-        .from("agent-profiles")
-        .upload(path, file, { upsert: true, contentType: file.type });
-      if (uploadErr) throw uploadErr;
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) return;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from("agent-profiles")
-        .getPublicUrl(path);
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("field", field);
 
-      await updateUser(user.email, { [field]: publicUrl });
+      const res = await fetch("/api/profile/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      if (!res.ok) { console.error("Upload failed:", await res.text()); return; }
+      const { url } = await res.json();
 
-      // Refresh preview URL locally
-      const newUrl = URL.createObjectURL(file);
-      if (assetUrlsRef.current[field]) { try { URL.revokeObjectURL(assetUrlsRef.current[field]); } catch {} }
-      assetUrlsRef.current = { ...assetUrlsRef.current, [field]: newUrl };
-      setAssetUrls((prev) => ({ ...prev, [field]: newUrl }));
+      // Refresh preview URL locally with the returned public URL
+      setAssetUrls((prev) => ({ ...prev, [field]: url }));
       onUpdate();
     } catch (err) {
       console.error("Failed to store asset:", err);
@@ -853,14 +853,6 @@ function ProfileView({ user, onUpdate }) {
   }
 
   async function handleAssetRemove(field) {
-    // Try to remove from storage (best-effort — ignore errors for old/missing files)
-    try {
-      const currentUrl = user[field];
-      if (currentUrl) {
-        const path = currentUrl.split("/agent-profiles/")[1];
-        if (path) await supabase.storage.from("agent-profiles").remove([path]);
-      }
-    } catch {}
     await updateUser(user.email, { [field]: "" });
     setAssetUrls((prev) => ({ ...prev, [field]: null }));
     onUpdate();
