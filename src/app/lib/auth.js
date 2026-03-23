@@ -4,13 +4,10 @@ import { supabase } from "./supabase";
 import { expandOrder, flattenUpdates, flattenOrder } from "./orderUtils";
 
 // ── Order ID generator ────────────────────────────────────────────────────────
-const ORDER_COUNTER_KEY = "tll_order_counter";
 export function generateOrderId() {
-  try {
-    const n = parseInt(localStorage.getItem(ORDER_COUNTER_KEY) || "0") + 1;
-    localStorage.setItem(ORDER_COUNTER_KEY, String(n));
-    return `TLL-${new Date().getFullYear()}-${String(n).padStart(4, "0")}`;
-  } catch { return `TLL-${Date.now()}`; }
+  const year = new Date().getFullYear();
+  const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `TLL-${year}-${rand}`;
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
