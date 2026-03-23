@@ -48,5 +48,16 @@ export async function POST(req) {
     return NextResponse.json({ error: `Profile update failed: ${profileErr.message}` }, { status: 500 });
   }
 
+  // Stamp the image URL directly onto all orders for this user
+  // (covers both linked orders via user_id and guest orders matched by email)
+  const orderColMap = { headshot: "client_headshot", logo: "client_logo", personalLogo: "client_personal_logo" };
+  const orderCol = orderColMap[field];
+  if (orderCol) {
+    await sb.from("orders").update({ [orderCol]: publicUrl }).eq("user_id", user.id);
+    await sb.from("orders").update({ [orderCol]: publicUrl })
+      .is("user_id", null)
+      .eq("client_email", user.email.toLowerCase());
+  }
+
   return NextResponse.json({ url: publicUrl });
 }
