@@ -736,10 +736,10 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
                 const isActionOpen = actionOrderId === o.id;
                 const isQuickOpen  = quickStatus[o.id];
                 return (
-                  <tr key={o.id} className="hover:bg-light-gray/50 transition-colors">
+                  <tr key={o.id} onClick={() => onSelectOrder(o)} className="hover:bg-light-gray/50 transition-colors cursor-pointer">
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-sans text-[0.8rem] font-semibold text-deep">{o.id}</span>
+                        <span className="font-sans text-[0.8rem] font-semibold text-coral underline underline-offset-2">{o.id}</span>
                         {msgs > 0 && <span className="bg-coral text-white text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full leading-none">{msgs}</span>}
                       </div>
                     </td>
@@ -770,7 +770,7 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
                     <td className="px-4 py-3.5 text-right">
                       <div className="relative inline-block" ref={isActionOpen ? actionRef : null}>
                         <button
-                          onClick={() => { setActionOrderId(isActionOpen ? null : o.id); setQuickStatus({}); }}
+                          onClick={(e) => { e.stopPropagation(); setActionOrderId(isActionOpen ? null : o.id); setQuickStatus({}); }}
                           className="font-sans text-[0.8rem] font-semibold text-slate border border-border px-3 py-1.5 rounded-xl hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer"
                         >
                           Actions ▾
