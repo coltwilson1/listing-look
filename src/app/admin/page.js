@@ -1317,19 +1317,13 @@ function PaymentCard({ order, onUpdate, showToast }) {
 
 // ── Messages Card ──────────────────────────────────────────────────────────────
 function MessagesCard({ order, onUpdate, showToast }) {
-  const [msg, setMsg]     = useState("");
+  const [msg, setMsg]   = useState("");
   const [sending, setSending] = useState(false);
-  const bottomRef = useRef(null);
-  const prevLenRef = useRef(null);
+  const bottomRef    = useRef(null);
+  const scrollBoxRef = useRef(null);
 
-  const notes = order.notes || [];
-
-  useEffect(() => {
-    if (prevLenRef.current !== null && notes.length > prevLenRef.current) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-    prevLenRef.current = notes.length;
-  }, [notes.length]);
+  const notes   = order.notes || [];
+  const unread  = notes.filter((n) => n.from === "client" && !n.adminRead).length;
 
   async function sendMessage(e) {
     e.preventDefault();
@@ -1343,13 +1337,34 @@ function MessagesCard({ order, onUpdate, showToast }) {
     onUpdate();
   }
 
+  function jumpToMessages() {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
   return (
     <div className="bg-white rounded-2xl border border-border p-5">
-      <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-slate mb-3">Messages</p>
+      <div className="flex items-center justify-between mb-3">
+        <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-slate">Messages</p>
+      </div>
+
+      {/* Unread banner */}
+      {unread > 0 && (
+        <button
+          type="button"
+          onClick={jumpToMessages}
+          className="w-full flex items-center justify-between gap-3 bg-coral/8 border border-coral/25 rounded-xl px-3.5 py-2.5 mb-3 hover:bg-coral/15 transition-colors cursor-pointer"
+        >
+          <span className="font-sans text-[0.82rem] text-coral font-semibold">
+            💬 {unread} unread message{unread > 1 ? "s" : ""} from {order.clientName?.split(" ")[0]}
+          </span>
+          <span className="font-sans text-[0.75rem] text-coral/70 whitespace-nowrap">Jump to ↓</span>
+        </button>
+      )}
+
       {notes.length === 0 ? (
         <p className="font-sans text-[0.82rem] text-slate/50 mb-4">No messages yet.</p>
       ) : (
-        <div className="space-y-2.5 mb-4 max-h-56 overflow-y-auto pr-1">
+        <div ref={scrollBoxRef} className="space-y-2.5 mb-4 max-h-56 overflow-y-auto pr-1">
           {notes.map((n, i) => (
             <div key={i} className={`rounded-xl px-3.5 py-2.5 ${n.from === "admin" ? "bg-deep/5 border border-deep/10" : "bg-light-gray"}`}>
               <div className="flex items-center justify-between mb-1">
