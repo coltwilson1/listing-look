@@ -20,49 +20,48 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
 
   // Check if already logged in
   useEffect(() => {
-    try {
-      const user = getCurrentUser();
-      if (user) {
-        addOrderToUser(user.email, order);
-        // ── TODO: send real confirmation email via API (e.g. Resend, SendGrid) ──
-        window.dispatchEvent(new CustomEvent("showToast", { detail: { message: `Confirmation email sent to ${email}` } }));
-        setAlreadyLoggedIn(true);
-        setDone(true);
-      }
-    } catch {}
+    async function check() {
+      try {
+        const user = await getCurrentUser();
+        if (user) {
+          await addOrderToUser(user.email, order);
+          window.dispatchEvent(new CustomEvent("showToast", { detail: { message: `Confirmation email sent to ${email}` } }));
+          setAlreadyLoggedIn(true);
+          setDone(true);
+        }
+      } catch {}
+    }
+    check();
   }, [email, order]);
 
-  function handleCreate(e) {
+  async function handleCreate(e) {
     e.preventDefault();
     setError("");
     if (!name.trim()) return setError("Please enter your name.");
     if (password.length < 6) return setError("Password must be at least 6 characters.");
     if (password !== confirmPassword) return setError("Passwords don't match.");
     setLoading(true);
-    const result = createAccount({ name: name.trim(), email, password }, order);
+    const result = await createAccount({ name: name.trim(), email, password }, order);
     setLoading(false);
     if (!result.success) return setError(result.error);
-    // ── TODO: send real confirmation email via API ──
     window.dispatchEvent(new CustomEvent("showToast", { detail: { message: `Confirmation email sent to ${email}` } }));
     setDone(true);
   }
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
     setError("");
     if (!loginEmail.trim() || !loginPassword) return setError("Please fill in all fields.");
     setLoading(true);
-    const result = login(loginEmail, loginPassword);
+    const result = await login(loginEmail, loginPassword);
     setLoading(false);
     if (!result.success) return setError(result.error);
-    addOrderToUser(result.user.email, order);
-    // ── TODO: send real confirmation email via API ──
+    await addOrderToUser(result.user.email, order);
     window.dispatchEvent(new CustomEvent("showToast", { detail: { message: `Confirmation email sent to ${email}` } }));
     setDone(true);
   }
 
   if (done && alreadyLoggedIn) {
-    // Logged-in fast path — show full confirmation with Venmo + portal link
     return (
       <div className="step-animate space-y-5">
         <div className="text-center">
@@ -73,7 +72,6 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
 
         {children && <div className="bg-light-gray rounded-2xl p-4">{children}</div>}
 
-        {/* Venmo payment */}
         <div className="bg-deep rounded-2xl p-5">
           <p className="font-sans text-[0.75rem] text-blush/70 uppercase tracking-[0.1em] mb-1.5">Complete Your Payment</p>
           <p className="font-sans text-[0.85rem] text-white/75 leading-relaxed mb-4">
@@ -106,7 +104,6 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
   }
 
   if (done) {
-    // New account created or logged in on success screen
     return (
       <div className="step-animate text-center py-4">
         <div className="w-16 h-16 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-4 text-3xl">🎉</div>
@@ -134,19 +131,16 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
 
   return (
     <div className="step-animate space-y-6">
-      {/* Success heading */}
       <div className="text-center">
         <div className="w-14 h-14 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-3 text-2xl">🎉</div>
         <h3 className="font-serif text-[1.5rem] text-deep mb-1">Your request has been submitted!</h3>
         <p className="font-sans text-[0.85rem] text-slate">We'll get started on your design within 48 hours.</p>
       </div>
 
-      {/* Order summary */}
       {children && (
         <div className="bg-light-gray rounded-2xl p-4">{children}</div>
       )}
 
-      {/* Account section */}
       <div className="border-t border-border pt-5">
         <h4 className="font-serif text-[1.15rem] text-deep mb-1">
           {mode === "create" ? "Create your free account to track your order" : "Log in to attach this order"}

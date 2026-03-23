@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import {
   getCurrentUser, login, logout, updateUser,
-  addNoteToOrder, updateOrderStatus, updateOrderById, hashPassword,
+  addNoteToOrder, updateOrderStatus, updateOrderById,
 } from "@/app/lib/auth";
+import { supabase } from "@/app/lib/supabase";
 import { getFile, storeFile } from "@/app/lib/fileStorage";
 import SocialMediaOrderModal from "@/app/components/SocialMediaOrderModal";
 import PostcardOrderModal from "@/app/components/PostcardOrderModal";
@@ -47,17 +48,18 @@ export default function PortalPage() {
   const [socialOpen, setSocialOpen]       = useState(false);
   const [postcardOpen, setPostcardOpen]   = useState(false);
 
-  function refreshUser() {
-    setUser(getCurrentUser());
+  async function refreshUser() {
+    const u = await getCurrentUser();
+    setUser(u);
+    return u;
   }
 
   useEffect(() => {
-    setUser(getCurrentUser());
-    setLoading(false);
+    getCurrentUser().then((u) => { setUser(u); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     window.location.href = "/";
   }
 
@@ -170,7 +172,7 @@ export default function PortalPage() {
               order={selectedOrder}
               user={user}
               onBack={() => setSelectedOrder(null)}
-              onRefresh={() => { refreshUser(); setSelectedOrder(getCurrentUser()?.orders.find((o) => o.id === selectedOrder.id) || null); }}
+              onRefresh={async () => { const u = await refreshUser(); setSelectedOrder(u?.orders.find((o) => o.id === selectedOrder.id) || null); }}
             />
           ) : view === "orders" ? (
             <OrdersView
@@ -186,8 +188,8 @@ export default function PortalPage() {
         </main>
       </div>
 
-      <SocialMediaOrderModal open={socialOpen} onClose={() => { setSocialOpen(false); refreshUser(); }} />
-      <PostcardOrderModal open={postcardOpen} onClose={() => { setPostcardOpen(false); refreshUser(); }} />
+      <SocialMediaOrderModal open={socialOpen} onClose={async () => { setSocialOpen(false); await refreshUser(); }} />
+      <PostcardOrderModal open={postcardOpen} onClose={async () => { setPostcardOpen(false); await refreshUser(); }} />
     </div>
   );
 }
@@ -200,11 +202,11 @@ function LoginScreen({ onLogin }) {
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const result = login(email, password);
+    const result = await login(email, password);
     setLoading(false);
     if (!result.success) return setError(result.error);
     onLogin(result.user);
@@ -420,25 +422,26 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const s = STATUS[order.status] || STATUS.submitted;
 
-  function submitNote(e) {
+  async function submitNote(e) {
     e.preventDefault();
     if (!note.trim()) return;
-    addNoteToOrder(user.email, order.id, { from: "client", text: note.trim(), createdAt: new Date().toISOString() });
+    await addNoteToOrder(user.email, order.id, { from: "client", text: note.trim(), createdAt: new Date().toISOString() });
     setNote("");
     onRefresh();
   }
 
-  function handleApprove() {
+  async function handleApprove() {
     setSubmitting(true);
-    updateOrderStatus(user.email, order.id, "completed");
-    setTimeout(() => { setSubmitting(false); onRefresh(); }, 400);
+    await updateOrderStatus(user.email, order.id, "completed");
+    setSubmitting(false);
+    onRefresh();
   }
 
-  function handleRevision(e) {
+  async function handleRevision(e) {
     e.preventDefault();
     if (!revText.trim()) return;
-    addNoteToOrder(user.email, order.id, { from: "client", text: `REVISION REQUEST: ${revText.trim()}`, createdAt: new Date().toISOString() });
-    updateOrderStatus(user.email, order.id, "revision");
+    await addNoteToOrder(user.email, order.id, { from: "client", text: `REVISION REQUEST: ${revText.trim()}`, createdAt: new Date().toISOString() });
+    await updateOrderStatus(user.email, order.id, "revision");
     setRevText("");
     setShowRevision(false);
     onRefresh();
@@ -673,9 +676,9 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
           )}
           <div className="flex gap-3">
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (!cancelConfirm) { setCancelConfirm(true); return; }
-                updateOrderById(order.id, {
+                await updateOrderById(order.id, {
                   status: "cancelled",
                   cancellationReason: cancelReason.trim(),
                   cancelledBy: "client",
@@ -766,10 +769,10 @@ function ProfileView({ user, onUpdate }) {
     };
   }, [user.email]);
 
-  function saveProfile(e) {
+  async function saveProfile(e) {
     e.preventDefault();
     if (!name.trim()) return setProfileMsg("Name is required.");
-    const result = updateUser(user.email, {
+    const result = await updateUser(user.email, {
       name: name.trim(),
       brokerage: brokerage.trim(),
       mobilePhone: mobilePhone.trim(),
@@ -778,22 +781,24 @@ function ProfileView({ user, onUpdate }) {
     if (result.success) { setProfileMsg("Profile saved!"); onUpdate(); }
   }
 
-  function changePassword(e) {
+  async function changePassword(e) {
     e.preventDefault();
     setPwMsg("");
-    if (hashPassword(currentPw) !== user.passwordHash) return setPwMsg("Current password is incorrect.");
     if (newPw.length < 6) return setPwMsg("New password must be at least 6 characters.");
     if (newPw !== confirmPw) return setPwMsg("New passwords don't match.");
-    const result = updateUser(user.email, { passwordHash: hashPassword(newPw) });
-    if (result.success) { setPwMsg("Password changed!"); setCurrentPw(""); setNewPw(""); setConfirmPw(""); }
+    const { error: signInErr } = await supabase.auth.signInWithPassword({ email: user.email, password: currentPw });
+    if (signInErr) return setPwMsg("Current password is incorrect.");
+    const { error: updateErr } = await supabase.auth.updateUser({ password: newPw });
+    if (updateErr) return setPwMsg(updateErr.message);
+    setPwMsg("Password changed!");
+    setCurrentPw(""); setNewPw(""); setConfirmPw("");
   }
 
   async function handleAssetUpload(field, file) {
     if (!file) return;
     try {
       await storeFile(`profile::${user.email}`, field, file);
-      // Update user metadata with filename so admin knows asset exists
-      updateUser(user.email, { [field]: file.name });
+      await updateUser(user.email, { [field]: file.name });
       // Refresh preview URL
       const newUrl = URL.createObjectURL(file);
       if (assetUrlsRef.current[field]) { try { URL.revokeObjectURL(assetUrlsRef.current[field]); } catch {} }
@@ -805,8 +810,8 @@ function ProfileView({ user, onUpdate }) {
     }
   }
 
-  function handleAssetRemove(field) {
-    updateUser(user.email, { [field]: "" });
+  async function handleAssetRemove(field) {
+    await updateUser(user.email, { [field]: "" });
     if (assetUrlsRef.current[field]) { try { URL.revokeObjectURL(assetUrlsRef.current[field]); } catch {} }
     assetUrlsRef.current = { ...assetUrlsRef.current, [field]: null };
     setAssetUrls((prev) => ({ ...prev, [field]: null }));

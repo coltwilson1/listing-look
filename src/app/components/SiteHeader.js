@@ -34,15 +34,13 @@ export default function SiteHeader() {
 
   // On mount, check for existing session
   useEffect(() => {
-    try {
-      setCurrentUser(getCurrentUser());
-    } catch {}
+    getCurrentUser().then(setCurrentUser).catch(() => {});
   }, []);
 
   // Listen for authChanged events to refresh user state
   useEffect(() => {
     const handler = () => {
-      try { setCurrentUser(getCurrentUser()); } catch {}
+      getCurrentUser().then(setCurrentUser).catch(() => {});
     };
     window.addEventListener("authChanged", handler);
     return () => window.removeEventListener("authChanged", handler);
@@ -55,11 +53,11 @@ export default function SiteHeader() {
     return () => document.removeEventListener("openAuthModal", handler);
   }, []);
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
     setLoginError("");
     setLoginLoading(true);
-    const result = login(loginEmail, loginPassword);
+    const result = await login(loginEmail, loginPassword);
     setLoginLoading(false);
     if (!result.success) return setLoginError(result.error);
     setCurrentUser(result.user);
@@ -68,7 +66,7 @@ export default function SiteHeader() {
     window.location.href = "/portal";
   }
 
-  function handleSignup(e) {
+  async function handleSignup(e) {
     e.preventDefault();
     setSignupError("");
     if (!signupFirstName.trim()) return setSignupError("First name is required.");
@@ -76,7 +74,7 @@ export default function SiteHeader() {
     if (signupPassword.length < 6) return setSignupError("Password must be at least 6 characters.");
     setSignupLoading(true);
     const fullName = [signupFirstName.trim(), signupLastName.trim()].filter(Boolean).join(" ");
-    const result = createAccount({ name: fullName, email: signupEmail, password: signupPassword, brokerage: signupBrokerage });
+    const result = await createAccount({ name: fullName, email: signupEmail, password: signupPassword, brokerage: signupBrokerage });
     setSignupLoading(false);
     if (!result.success) return setSignupError(result.error);
     setCurrentUser(result.user);
@@ -85,8 +83,8 @@ export default function SiteHeader() {
     window.location.href = "/portal";
   }
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     setCurrentUser(null);
     window.dispatchEvent(new Event("authChanged"));
   }
@@ -111,26 +109,17 @@ export default function SiteHeader() {
 
         <ul className="hidden md:flex gap-8 items-center list-none m-0 p-0">
           <li>
-            <a
-              href="#how-it-works"
-              className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors"
-            >
+            <a href="#how-it-works" className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors">
               How It Works
             </a>
           </li>
           <li>
-            <a
-              href="#services"
-              className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors"
-            >
+            <a href="#services" className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors">
               Services
             </a>
           </li>
           <li>
-            <a
-              href="#custom"
-              className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors"
-            >
+            <a href="#custom" className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors">
               Custom Order
             </a>
           </li>

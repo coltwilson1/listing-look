@@ -1,15 +1,41 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import {
-  getAllOrders, updateOrderById,
-  getAdminNotifications, markAdminNotificationsRead, addAdminNotification,
-} from "@/app/lib/auth";
 import { storeFile, getFile } from "@/app/lib/fileStorage";
 
 // ── Change this to update the admin password ───────────────────────────────────
 const ADMIN_PASSWORD    = "admin2025";
 const ADMIN_SESSION_KEY = "tll_admin_session";
+const AUTH_HEADER       = { "x-admin-password": ADMIN_PASSWORD };
+
+// ── API helpers ────────────────────────────────────────────────────────────────
+async function fetchOrders() {
+  try {
+    const r = await fetch("/api/admin/orders", { headers: AUTH_HEADER });
+    return r.ok ? r.json() : [];
+  } catch { return []; }
+}
+async function fetchNotifications() {
+  try {
+    const r = await fetch("/api/admin/notifications", { headers: AUTH_HEADER });
+    return r.ok ? r.json() : [];
+  } catch { return []; }
+}
+async function markNotifsRead() {
+  try {
+    await fetch("/api/admin/notifications/read", { method: "POST", headers: AUTH_HEADER });
+  } catch {}
+}
+async function apiUpdateOrder(id, updates) {
+  try {
+    const r = await fetch(`/api/admin/orders/${id}`, {
+      method: "PATCH",
+      headers: { ...AUTH_HEADER, "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
+    return r.ok;
+  } catch { return false; }
+}
 
 // ── Status config ──────────────────────────────────────────────────────────────
 const STATUS = {
@@ -71,8 +97,8 @@ export default function AdminPage() {
     setTimeout(() => setToast(null), 4000);
   }, []);
 
-  function loadOrders() { setOrders(getAllOrders()); }
-  function loadNotifications() { setNotifications(getAdminNotifications()); }
+  async function loadOrders() { setOrders(await fetchOrders()); }
+  async function loadNotifications() { setNotifications(await fetchNotifications()); }
 
   useEffect(() => {
     try {
@@ -107,22 +133,22 @@ export default function AdminPage() {
     setSelectedOrder(null);
   }
 
-  function openOrderDetail(order) {
-    // Mark client notes as admin-read
+  async function openOrderDetail(order) {
     const updatedNotes = (order.notes || []).map((n) =>
       n.from === "client" ? { ...n, adminRead: true } : n
     );
-    updateOrderById(order.id, { notes: updatedNotes });
+    await apiUpdateOrder(order.id, { notes: updatedNotes });
     loadOrders();
     setSelectedOrder({ ...order, notes: updatedNotes });
     setView("detail");
     setSidebarOpen(false);
   }
 
-  function handleOrderUpdate() {
-    loadOrders();
+  async function handleOrderUpdate() {
+    const all = await fetchOrders();
+    setOrders(all);
     if (selectedOrder) {
-      const fresh = getAllOrders().find((o) => o.id === selectedOrder.id);
+      const fresh = all.find((o) => o.id === selectedOrder.id);
       if (fresh) setSelectedOrder(fresh);
     }
   }
@@ -180,9 +206,9 @@ export default function AdminPage() {
           <NotificationBell
             notifications={notifications}
             unreadCount={unreadNotifs}
-            onMarkRead={() => { markAdminNotificationsRead(); loadNotifications(); }}
+            onMarkRead={async () => { await markNotifsRead(); loadNotifications(); }}
             onClickOrder={(id) => {
-              const o = getAllOrders().find((x) => x.id === id);
+              const o = orders.find((x) => x.id === id);
               if (o) openOrderDetail(o);
             }}
           />
@@ -581,16 +607,16 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
     );
   }
 
-  function markPaid(order) {
+  async function markPaid(order) {
     const newPaid = !order.paid;
-    updateOrderById(order.id, { paid: newPaid });
+    await apiUpdateOrder(order.id, { paid: newPaid });
     onUpdateOrder();
     setActionOrderId(null);
     showToast(newPaid ? `${order.clientName} marked as paid` : `Payment mark removed`);
   }
 
-  function applyQuickStatus(order, status) {
-    updateOrderById(order.id, { status });
+  async function applyQuickStatus(order, status) {
+    await apiUpdateOrder(order.id, { status });
     onUpdateOrder();
     setActionOrderId(null);
     setQuickStatus({});
@@ -752,8 +778,9 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
 function AdminOrderDetailView({ order, onBack, onUpdate, showToast }) {
   const [currentOrder, setCurrentOrder] = useState(order);
 
-  function refresh() {
-    const fresh = getAllOrders().find((o) => o.id === order.id);
+  async function refresh() {
+    const all = await fetchOrders();
+    const fresh = all.find((o) => o.id === order.id);
     if (fresh) setCurrentOrder(fresh);
     onUpdate();
   }
@@ -814,8 +841,8 @@ function AdminOrderDetailView({ order, onBack, onUpdate, showToast }) {
               <p className="font-sans text-[0.75rem] text-amber-600/70 mt-1">{fmtDate(revisionNote.createdAt)}</p>
             </div>
             <button
-              onClick={() => {
-                updateOrderById(currentOrder.id, { status: "in-design" });
+              onClick={async () => {
+                await apiUpdateOrder(currentOrder.id, { status: "in-design" });
                 refresh();
                 showToast("Revision acknowledged — status set to In Design");
               }}
@@ -980,13 +1007,6 @@ function ClientBrandAssetsCard({ order }) {
     a.click();
   }
 
-  // Read client user data from localStorage for contact info
-  let clientUser = null;
-  try {
-    const users = JSON.parse(localStorage.getItem("tll_users") || "[]");
-    clientUser = users.find((u) => u.email === clientEmail) || null;
-  } catch {}
-
   const hasAnyAsset = urls.headshot || urls.logo || urls.personalLogo;
 
   const ASSET_BOXES = [
@@ -1004,9 +1024,9 @@ function ClientBrandAssetsCard({ order }) {
         {[
           ["Name",          order.clientName],
           ["Email",         clientEmail],
-          ["Mobile Phone",  clientUser?.mobilePhone],
-          ["Office Phone",  clientUser?.officePhone],
-          ["Brokerage",     clientUser?.brokerage],
+          ["Mobile Phone",  order.clientMobilePhone],
+          ["Office Phone",  order.clientOfficePhone],
+          ["Brokerage",     order.clientBrokerage],
         ].map(([k, v]) => v ? (
           <div key={k}>
             <p className="font-sans text-[0.68rem] uppercase tracking-[0.08em] text-slate/60">{k}</p>
@@ -1054,10 +1074,12 @@ function StatusUpdaterCard({ order, onUpdate, showToast }) {
 
   useEffect(() => setStatus(order.status), [order.status]);
 
-  function save() {
+  async function save() {
     setSaving(true);
-    updateOrderById(order.id, { status });
-    setTimeout(() => { setSaving(false); onUpdate(); showToast(`Status updated to "${STATUS[status]?.label}"`); }, 300);
+    await apiUpdateOrder(order.id, { status });
+    setSaving(false);
+    onUpdate();
+    showToast(`Status updated to "${STATUS[status]?.label}"`);
   }
 
   return (
@@ -1108,7 +1130,7 @@ function FileDeliveryCard({ order, onUpdate, showToast }) {
     const metadata = files.map((f) => ({ name: f.name, size: f.size, type: f.type, deliveredAt: new Date().toISOString() }));
     const allFiles = [...existing, ...metadata];
     const newStatus = ["submitted", "in-design", "revision"].includes(order.status) ? "awaiting-approval" : order.status;
-    updateOrderById(order.id, {
+    await apiUpdateOrder(order.id, {
       deliveredFiles: allFiles,
       deliveryMessage: message || order.deliveryMessage || "",
       status: newStatus,
@@ -1204,16 +1226,18 @@ function PaymentCard({ order, onUpdate, showToast }) {
   const [venmo, setVenmo] = useState(order.venmoRef || "");
   const [saving, setSaving] = useState(false);
 
-  function togglePaid() {
+  async function togglePaid() {
     const newPaid = !order.paid;
-    updateOrderById(order.id, { paid: newPaid, venmoRef: venmo });
+    await apiUpdateOrder(order.id, { paid: newPaid, venmoRef: venmo });
     onUpdate();
     showToast(newPaid ? "Order marked as paid" : "Payment mark removed");
   }
-  function saveVenmo() {
+  async function saveVenmo() {
     setSaving(true);
-    updateOrderById(order.id, { venmoRef: venmo });
-    setTimeout(() => { setSaving(false); onUpdate(); showToast("Venmo reference saved"); }, 300);
+    await apiUpdateOrder(order.id, { venmoRef: venmo });
+    setSaving(false);
+    onUpdate();
+    showToast("Venmo reference saved");
   }
 
   return (
@@ -1266,18 +1290,16 @@ function MessagesCard({ order, onUpdate, showToast }) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [notes.length]);
 
-  function sendMessage(e) {
+  async function sendMessage(e) {
     e.preventDefault();
     if (!msg.trim()) return;
     setSending(true);
     const note = { from: "admin", text: msg.trim(), createdAt: new Date().toISOString(), adminRead: true };
     const updatedNotes = [...notes, note];
-    updateOrderById(order.id, { notes: updatedNotes });
-    setTimeout(() => {
-      setSending(false);
-      setMsg("");
-      onUpdate();
-    }, 300);
+    await apiUpdateOrder(order.id, { notes: updatedNotes });
+    setSending(false);
+    setMsg("");
+    onUpdate();
   }
 
   return (
@@ -1327,10 +1349,12 @@ function AdminNotesCard({ order, onUpdate, showToast }) {
   const [notes, setNotes] = useState(order.adminNotes || "");
   const [saving, setSaving] = useState(false);
 
-  function save() {
+  async function save() {
     setSaving(true);
-    updateOrderById(order.id, { adminNotes: notes });
-    setTimeout(() => { setSaving(false); onUpdate(); showToast("Internal notes saved"); }, 300);
+    await apiUpdateOrder(order.id, { adminNotes: notes });
+    setSaving(false);
+    onUpdate();
+    showToast("Internal notes saved");
   }
 
   return (
@@ -1363,25 +1387,23 @@ function CancelOrderCard({ order, onUpdate, showToast }) {
 
   const already = order.status === "cancelled";
 
-  function handleCancel() {
+  async function handleCancel() {
     if (!confirm) { setConfirm(true); return; }
     setCancelling(true);
-    updateOrderById(order.id, {
+    await apiUpdateOrder(order.id, {
       status: "cancelled",
       cancellationReason: reason.trim(),
       cancelledBy: "admin",
       cancelledAt: new Date().toISOString(),
     });
-    setTimeout(() => {
-      setCancelling(false);
-      setConfirm(false);
-      onUpdate();
-      showToast("Order cancelled");
-    }, 300);
+    setCancelling(false);
+    setConfirm(false);
+    onUpdate();
+    showToast("Order cancelled");
   }
 
-  function handleUncancel() {
-    updateOrderById(order.id, { status: "submitted", cancellationReason: "", cancelledBy: null, cancelledAt: null });
+  async function handleUncancel() {
+    await apiUpdateOrder(order.id, { status: "submitted", cancellationReason: "", cancelledBy: null, cancelledAt: null });
     setReason("");
     onUpdate();
     showToast("Order restored to Submitted");
