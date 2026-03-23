@@ -15,7 +15,7 @@ export async function POST(req) {
 
   const supabase = serviceClient();
 
-  await supabase.from("orders").insert({
+  const { error: orderError } = await supabase.from("orders").insert({
     ...flattenOrder(order),
     user_id: null,
     client_name: clientName || "",
@@ -24,6 +24,11 @@ export async function POST(req) {
     client_mobile_phone: clientPhone || "",
     client_office_phone: "",
   });
+
+  if (orderError) {
+    console.error("Order insert failed:", orderError);
+    return NextResponse.json({ error: orderError.message }, { status: 500 });
+  }
 
   await supabase.from("admin_notifications").insert({
     id: `n${Date.now()}${Math.random().toString(36).slice(2, 6)}`,
