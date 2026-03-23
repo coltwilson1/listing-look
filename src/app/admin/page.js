@@ -1042,7 +1042,7 @@ function ClientBrandAssetsCard({ order }) {
       <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-5">
         {[
           ["Name",          order.clientName],
-          ["Email",         clientEmail],
+          ["Email",         order.clientEmail],
           ["Mobile Phone",  order.clientMobilePhone],
           ["Office Phone",  order.clientOfficePhone],
           ["Brokerage",     order.clientBrokerage],
