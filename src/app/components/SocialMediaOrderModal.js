@@ -272,12 +272,20 @@ export default function SocialMediaOrderModal({ open, onClose }) {
     setTimeout(async () => {
       const order = buildSocialOrder({ contact, listing, photos, pkg, design });
       try {
-        await fetch("/api/orders/submit", {
+        const res = await fetch("/api/orders/submit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ order, clientName: contact.name, clientEmail: contact.email, clientPhone: contact.phone }),
         });
-      } catch {}
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          console.error("[TLL] Order save failed:", res.status, body);
+          alert(`Order save failed (${res.status}): ${body.error || "unknown error"}`);
+        }
+      } catch (err) {
+        console.error("[TLL] Order submit fetch error:", err);
+        alert("Order submit error: " + err.message);
+      }
       setBuiltOrder(order);
       setSubmitting(false);
       setSubmitted(true);
