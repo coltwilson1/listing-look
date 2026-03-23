@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ContactStep, ListingStep, labelCls, inputCls, selectCls } from "./OrderFormShared";
+import { ContactStep, ListingStep, labelCls, inputCls, selectCls, sc } from "./OrderFormShared";
 import { buildPostcardOrder, getCurrentUser } from "@/app/lib/auth";
 import SuccessWithAccount from "./SuccessWithAccount";
 import OrderFormLoginBanner from "./OrderFormLoginBanner";
@@ -60,6 +60,7 @@ export default function PostcardOrderModal({ open, onClose }) {
 
   const headshotRef = useRef(null);
   const logoRef = useRef(null);
+  const scrollRef = useRef(null);
   const [sessionUser, setSessionUser] = useState(null);
 
   function applyUserToContact(u) {
@@ -136,7 +137,7 @@ export default function PostcardOrderModal({ open, onClose }) {
   }
 
   function handleNext() {
-    if (!validate()) return;
+    if (!validate()) { scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" }); return; }
     if (step < 3) { setStep((s) => s + 1); setErrors({}); return; }
     setSubmitting(true);
     setTimeout(async () => {
@@ -259,7 +260,7 @@ export default function PostcardOrderModal({ open, onClose }) {
         </div>
 
         {/* ── Body (scrollable) ── */}
-        <div className="overflow-y-auto flex-1 px-5 py-6 sm:px-8 sm:py-7">
+        <div ref={scrollRef} className="overflow-y-auto flex-1 px-5 py-6 sm:px-8 sm:py-7">
           {submitted && builtOrder ? (
             <SuccessWithAccount
               contactName={contact.name}
@@ -301,10 +302,10 @@ export default function PostcardOrderModal({ open, onClose }) {
                   ) : (
                     <OrderFormLoginBanner onLogin={handleFormLogin} />
                   )}
-                  <ContactStep data={contact} onChange={setContactField} />
+                  <ContactStep data={contact} onChange={setContactField} errors={errors} />
                 </>
               )}
-              {step === 2 && <ListingStep data={listing} onChange={setListingField} />}
+              {step === 2 && <ListingStep data={listing} onChange={setListingField} errors={errors} />}
               {step === 3 && (
                 <PrintStep
                   data={print}
@@ -369,7 +370,7 @@ function PrintStep({ data, onChange, errors, headshotRef, logoRef }) {
       {/* Design tiles */}
       <div>
         <p className={labelCls}>Choose a Design Style {errors.designId && <span className="text-coral normal-case font-normal tracking-normal ml-2">{errors.designId}</span>}</p>
-        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mt-2">
+        <div className={`grid grid-cols-4 sm:grid-cols-6 gap-2 mt-2 rounded-2xl transition-all ${errors.designId ? "ring-2 ring-coral/50 bg-coral/5 p-2" : ""}`}>
           {DESIGN_TILES.map((t) => (
             <button
               key={t.id}
@@ -405,7 +406,7 @@ function PrintStep({ data, onChange, errors, headshotRef, logoRef }) {
             Postcard Type {errors.postcardType && <span className="text-coral normal-case font-normal tracking-normal ml-2">Required</span>}
           </label>
           <select
-            className={selectCls}
+            className={sc(errors.postcardType)}
             value={data.postcardType}
             onChange={(e) => onChange("postcardType", e.target.value)}
           >
@@ -443,7 +444,7 @@ function PrintStep({ data, onChange, errors, headshotRef, logoRef }) {
             Mailing Quantity {errors.quantity && <span className="text-coral normal-case font-normal tracking-normal ml-2">Required</span>}
           </label>
           <select
-            className={selectCls}
+            className={sc(errors.quantity)}
             value={data.quantity}
             onChange={(e) => onChange("quantity", e.target.value)}
           >

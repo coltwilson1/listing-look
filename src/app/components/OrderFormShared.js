@@ -10,9 +10,16 @@ export const inputCls =
 
 export const selectCls = inputCls + " cursor-pointer";
 
+// Error variant — coral border + tinted background
+const inputErrCls =
+  "w-full font-sans text-[0.9rem] text-deep bg-coral/5 border-2 border-coral rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-coral/20 transition-all placeholder:text-slate/40";
+
+export function ic(hasErr) { return hasErr ? inputErrCls : inputCls; }
+export function sc(hasErr) { return hasErr ? inputErrCls + " cursor-pointer" : selectCls; }
+
 // ── Step 1 — Contact Info ─────────────────────────────────────────────────────
 
-export function ContactStep({ data, onChange }) {
+export function ContactStep({ data, onChange, errors = {} }) {
   const field = (name) => ({
     value: data[name] || "",
     onChange: (e) => onChange(name, e.target.value),
@@ -22,8 +29,8 @@ export function ContactStep({ data, onChange }) {
     <div className="step-animate grid grid-cols-1 gap-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className={labelCls}>Full Name *</label>
-          <input className={inputCls} placeholder="Jane Smith" {...field("name")} />
+          <label className={labelCls}>Full Name * {errors.name && <span className="text-coral normal-case font-normal tracking-normal ml-1">Required</span>}</label>
+          <input className={ic(errors.name)} placeholder="Jane Smith" {...field("name")} />
         </div>
         <div>
           <label className={labelCls}>Brokerage / Firm</label>
@@ -32,12 +39,12 @@ export function ContactStep({ data, onChange }) {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className={labelCls}>Phone *</label>
-          <input className={inputCls} type="tel" placeholder="(555) 000-0000" {...field("phone")} />
+          <label className={labelCls}>Phone * {errors.phone && <span className="text-coral normal-case font-normal tracking-normal ml-1">Required</span>}</label>
+          <input className={ic(errors.phone)} type="tel" placeholder="(555) 000-0000" {...field("phone")} />
         </div>
         <div>
-          <label className={labelCls}>Email *</label>
-          <input className={inputCls} type="email" placeholder="jane@firm.com" {...field("email")} />
+          <label className={labelCls}>Email * {errors.email && <span className="text-coral normal-case font-normal tracking-normal ml-1">Required</span>}</label>
+          <input className={ic(errors.email)} type="email" placeholder="jane@firm.com" {...field("email")} />
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -56,7 +63,7 @@ export function ContactStep({ data, onChange }) {
 
 // ── Step 2 — Listing Details ──────────────────────────────────────────────────
 
-export function ListingStep({ data, onChange, hidePhotoDelivery = false }) {
+export function ListingStep({ data, onChange, hidePhotoDelivery = false, errors = {} }) {
   const field = (name) => ({
     value: data[name] || "",
     onChange: (e) => onChange(name, e.target.value),
@@ -70,13 +77,13 @@ export function ListingStep({ data, onChange, hidePhotoDelivery = false }) {
   return (
     <div className="step-animate grid grid-cols-1 gap-4">
       <div>
-        <label className={labelCls}>Property Address *</label>
-        <input className={inputCls} placeholder="123 Oak Street, Tampa, FL 33601" {...field("address")} />
+        <label className={labelCls}>Property Address * {errors.address && <span className="text-coral normal-case font-normal tracking-normal ml-1">Required</span>}</label>
+        <input className={ic(errors.address)} placeholder="123 Oak Street, Tampa, FL 33601" {...field("address")} />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className={labelCls}>Listing Price *</label>
-          <input className={inputCls} placeholder="$485,000" {...field("price")} />
+          <label className={labelCls}>Listing Price * {errors.price && <span className="text-coral normal-case font-normal tracking-normal ml-1">Required</span>}</label>
+          <input className={ic(errors.price)} placeholder="$485,000" {...field("price")} />
         </div>
         <div>
           <label className={labelCls}>MLS #</label>

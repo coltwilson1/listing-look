@@ -155,6 +155,7 @@ export default function SocialMediaOrderModal({ open, onClose }) {
   const [photoFiles, setPhotoFiles] = useState([]);
   const [photoUrls, setPhotoUrls]   = useState([]);
   const photoInputRef = useRef(null);
+  const scrollRef     = useRef(null);
 
   // Load from localStorage + auto-fill from session user
   useEffect(() => {
@@ -267,7 +268,7 @@ export default function SocialMediaOrderModal({ open, onClose }) {
   }
 
   function handleNext() {
-    if (!validate()) return;
+    if (!validate()) { scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" }); return; }
     if (step < 4) { setStep((s) => s + 1); setErrors({}); return; }
     setSubmitting(true);
     setTimeout(async () => {
@@ -396,7 +397,7 @@ export default function SocialMediaOrderModal({ open, onClose }) {
         </div>
 
         {/* ── Body (scrollable) ── */}
-        <div className="overflow-y-auto flex-1 px-5 py-6 sm:px-8 sm:py-7">
+        <div ref={scrollRef} className="overflow-y-auto flex-1 px-5 py-6 sm:px-8 sm:py-7">
           {submitted && builtOrder ? (
             <SuccessWithAccount
               contactName={contact.name}
@@ -438,7 +439,7 @@ export default function SocialMediaOrderModal({ open, onClose }) {
                   ) : (
                     <OrderFormLoginBanner onLogin={handleFormLogin} />
                   )}
-                  <ContactStep data={contact} onChange={setContactField} />
+                  <ContactStep data={contact} onChange={setContactField} errors={errors} />
                 </>
               )}
 
@@ -534,7 +535,7 @@ function Step2({ listing, onChange, errors }) {
             <span className="text-coral normal-case font-normal tracking-normal ml-2">Required</span>
           )}
         </p>
-        <div className="grid grid-cols-3 gap-2.5 mt-2">
+        <div className={`grid grid-cols-3 gap-2.5 mt-2 rounded-2xl transition-all ${errors.graphicType ? "ring-2 ring-coral/50 bg-coral/5 p-2" : ""}`}>
           {GRAPHIC_TYPES.map((t) => (
             <button
               key={t.id}
@@ -580,7 +581,7 @@ function Step2({ listing, onChange, errors }) {
       </div>
 
       {/* Listing detail fields — shared component, no photo delivery */}
-      <ListingStep data={listing} onChange={onChange} hidePhotoDelivery />
+      <ListingStep data={listing} onChange={onChange} hidePhotoDelivery errors={errors} />
 
       {/* Additional notes */}
       <div>
@@ -617,7 +618,7 @@ function Step3({
             <span className="text-coral normal-case font-normal tracking-normal ml-2">{errors.photoOption}</span>
           )}
         </p>
-        <div className="space-y-2 mt-2">
+        <div className={`space-y-2 mt-2 rounded-2xl transition-all ${errors.photoOption ? "ring-2 ring-coral/50 bg-coral/5 p-3" : ""}`}>
           {[
             { value: "mls",    label: "Use MLS photos — provide link below" },
             { value: "upload", label: "I will upload photos now" },
@@ -726,7 +727,7 @@ function Step3({
             <span className="text-coral normal-case font-normal tracking-normal ml-2">{errors.packageId}</span>
           )}
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+        <div className={`grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2 rounded-2xl transition-all ${errors.packageId ? "ring-2 ring-coral/50 bg-coral/5 p-2" : ""}`}>
           {packages.map((p) => (
             <button
               key={p.id}
@@ -842,7 +843,7 @@ function Step4({ designId, onChange, errors }) {
           <span className="text-coral normal-case font-normal tracking-normal ml-2">{errors.designId}</span>
         )}
       </p>
-      <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+      <div className={`grid grid-cols-4 sm:grid-cols-6 gap-2 rounded-2xl transition-all ${errors.designId ? "ring-2 ring-coral/50 bg-coral/5 p-2" : ""}`}>
         {DESIGN_TILES.map((t) => (
           <button
             key={t.id}
