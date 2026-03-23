@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   getCurrentUser, login, logout, updateUser,
-  addNoteToOrder, updateOrderStatus, updateOrderById,
+  updateOrderStatus, updateOrderById,
 } from "@/app/lib/auth";
 import { supabase } from "@/app/lib/supabase";
 import { getFile, storeFile } from "@/app/lib/fileStorage";
@@ -412,6 +412,18 @@ function OrderCard({ order, onClick }) {
 
 // ── Order Detail View ─────────────────────────────────────────────────────────
 
+async function postNote(orderId, note) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  if (!token) return false;
+  const res = await fetch("/api/orders/note", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+    body: JSON.stringify({ orderId, note }),
+  });
+  return res.ok;
+}
+
 function OrderDetailView({ order, user, onBack, onRefresh }) {
   const [note, setNote]               = useState("");
   const [showRevision, setShowRevision] = useState(false);
@@ -422,10 +434,16 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const s = STATUS[order.status] || STATUS.submitted;
 
+  // Poll for new messages every 12 seconds
+  useEffect(() => {
+    const id = setInterval(() => onRefresh(), 12000);
+    return () => clearInterval(id);
+  }, [onRefresh]);
+
   async function submitNote(e) {
     e.preventDefault();
     if (!note.trim()) return;
-    await addNoteToOrder(user.email, order.id, { from: "client", text: note.trim(), createdAt: new Date().toISOString() });
+    await postNote(order.id, { from: "client", text: note.trim(), createdAt: new Date().toISOString() });
     setNote("");
     onRefresh();
   }
@@ -440,7 +458,7 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
   async function handleRevision(e) {
     e.preventDefault();
     if (!revText.trim()) return;
-    await addNoteToOrder(user.email, order.id, { from: "client", text: `REVISION REQUEST: ${revText.trim()}`, createdAt: new Date().toISOString() });
+    await postNote(order.id, { from: "client", text: `REVISION REQUEST: ${revText.trim()}`, createdAt: new Date().toISOString() });
     await updateOrderStatus(user.email, order.id, "revision");
     setRevText("");
     setShowRevision(false);
