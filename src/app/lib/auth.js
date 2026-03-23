@@ -55,7 +55,9 @@ export async function getCurrentUser() {
 
   const [{ data: profile }, { data: orders }] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).single(),
-    supabase.from("orders").select("*").eq("user_id", user.id).order("submitted_at", { ascending: false }),
+    supabase.from("orders").select("*")
+      .or(`user_id.eq.${user.id},and(user_id.is.null,client_email.eq.${user.email.toLowerCase()})`)
+      .order("submitted_at", { ascending: false }),
   ]);
 
   return {
