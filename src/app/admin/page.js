@@ -1320,11 +1320,15 @@ function MessagesCard({ order, onUpdate, showToast }) {
   const [msg, setMsg]     = useState("");
   const [sending, setSending] = useState(false);
   const bottomRef = useRef(null);
+  const prevLenRef = useRef(null);
 
   const notes = order.notes || [];
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (prevLenRef.current !== null && notes.length > prevLenRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    prevLenRef.current = notes.length;
   }, [notes.length]);
 
   async function sendMessage(e) {
