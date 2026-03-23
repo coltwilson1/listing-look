@@ -40,7 +40,19 @@ export function ContactStep({ data, onChange, errors = {} }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Phone * {errors.phone && <span className="text-coral normal-case font-normal tracking-normal ml-1">Required</span>}</label>
-          <input className={ic(errors.phone)} type="tel" placeholder="(555) 000-0000" {...field("phone")} />
+          <input
+            className={ic(errors.phone)}
+            type="tel"
+            placeholder="(555) 000-0000"
+            value={data.phone || ""}
+            onChange={(e) => {
+              const d = e.target.value.replace(/\D/g, "").slice(0, 10);
+              const fmt = d.length <= 3 ? (d ? `(${d}` : "")
+                : d.length <= 6 ? `(${d.slice(0,3)}) ${d.slice(3)}`
+                : `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+              onChange("phone", fmt);
+            }}
+          />
         </div>
         <div>
           <label className={labelCls}>Email * {errors.email && <span className="text-coral normal-case font-normal tracking-normal ml-1">Required</span>}</label>
