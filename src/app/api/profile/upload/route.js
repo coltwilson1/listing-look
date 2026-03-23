@@ -42,7 +42,11 @@ export async function POST(req) {
   const col = colMap[field];
   if (!col) return NextResponse.json({ error: "Invalid field" }, { status: 400 });
 
-  await sb.from("profiles").update({ [col]: publicUrl }).eq("id", user.id);
+  const { error: profileErr } = await sb.from("profiles").update({ [col]: publicUrl }).eq("id", user.id);
+  if (profileErr) {
+    console.error("Failed to save profile URL:", profileErr.message);
+    return NextResponse.json({ error: `Profile update failed: ${profileErr.message}` }, { status: 500 });
+  }
 
   return NextResponse.json({ url: publicUrl });
 }

@@ -849,7 +849,11 @@ function ProfileView({ user, onUpdate }) {
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
       });
-      if (!res.ok) { console.error("Upload failed:", await res.text()); return; }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setProfileMsg(err.error || "Upload failed — please try again.");
+        return;
+      }
       const { url } = await res.json();
 
       // Refresh preview URL locally with the returned public URL
