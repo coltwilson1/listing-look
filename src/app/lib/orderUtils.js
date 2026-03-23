@@ -1,5 +1,37 @@
 // Shared order field mapping — safe to import in both client and server (API routes)
 
+export function flattenOrder(order) {
+  return {
+    id: order.id,
+    type: order.type,
+    type_label: order.typeLabel,
+    status: order.status || "submitted",
+    address: order.address,
+    listing_price: order.listingPrice,
+    package: order.package,
+    package_price: order.packagePrice,
+    graphic_type: order.graphicType,
+    graphic_type_label: order.graphicTypeLabel,
+    design_id: order.designId,
+    animation_style: order.animationStyle,
+    music_style: order.musicStyle,
+    postcard_type: order.postcardType,
+    postcard_type_label: order.postcardTypeLabel,
+    quantity: order.quantity,
+    paid: order.paid || false,
+    venmo_ref: order.venmoRef || "",
+    delivered_files: order.deliveredFiles || [],
+    delivery_message: order.deliveryMessage || "",
+    admin_notes: order.adminNotes || "",
+    notes: order.notes || [],
+    form_data: order.formData || null,
+    submitted_at: order.submittedAt || new Date().toISOString(),
+    cancellation_reason: order.cancellationReason || "",
+    cancelled_by: order.cancelledBy || "",
+    cancelled_at: order.cancelledAt || null,
+  };
+}
+
 export function expandOrder(row) {
   return {
     id: row.id,

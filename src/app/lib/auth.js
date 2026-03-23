@@ -1,7 +1,7 @@
 "use client";
 
 import { supabase } from "./supabase";
-import { expandOrder, flattenUpdates } from "./orderUtils";
+import { expandOrder, flattenUpdates, flattenOrder } from "./orderUtils";
 
 // ── Order ID generator ────────────────────────────────────────────────────────
 const ORDER_COUNTER_KEY = "tll_order_counter";
@@ -11,39 +11,6 @@ export function generateOrderId() {
     localStorage.setItem(ORDER_COUNTER_KEY, String(n));
     return `TLL-${new Date().getFullYear()}-${String(n).padStart(4, "0")}`;
   } catch { return `TLL-${Date.now()}`; }
-}
-
-// ── Flatten a camelCase order object to DB snake_case ─────────────────────────
-function flattenOrder(order) {
-  return {
-    id: order.id,
-    type: order.type,
-    type_label: order.typeLabel,
-    status: order.status || "submitted",
-    address: order.address,
-    listing_price: order.listingPrice,
-    package: order.package,
-    package_price: order.packagePrice,
-    graphic_type: order.graphicType,
-    graphic_type_label: order.graphicTypeLabel,
-    design_id: order.designId,
-    animation_style: order.animationStyle,
-    music_style: order.musicStyle,
-    postcard_type: order.postcardType,
-    postcard_type_label: order.postcardTypeLabel,
-    quantity: order.quantity,
-    paid: order.paid || false,
-    venmo_ref: order.venmoRef || "",
-    delivered_files: order.deliveredFiles || [],
-    delivery_message: order.deliveryMessage || "",
-    admin_notes: order.adminNotes || "",
-    notes: order.notes || [],
-    form_data: order.formData || null,
-    submitted_at: order.submittedAt || new Date().toISOString(),
-    cancellation_reason: order.cancellationReason || "",
-    cancelled_by: order.cancelledBy || "",
-    cancelled_at: order.cancelledAt || null,
-  };
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -58,19 +25,13 @@ export async function createAccount({ name, email, password, brokerage = "" }, i
   await supabase.from("profiles").insert({ id: userId, name, brokerage });
 
   if (initialOrder) {
-    await supabase.from("orders").insert({
-      ...flattenOrder(initialOrder),
+    // Order was already saved by /api/orders/submit — just link it to the new user
+    await supabase.from("orders").update({
       user_id: userId,
       client_name: name,
       client_email: email.toLowerCase(),
       client_brokerage: brokerage,
-    });
-    await addAdminNotification({
-      type: "new-order",
-      orderId: initialOrder.id,
-      clientName: name,
-      text: `New order from ${name} — ${initialOrder.typeLabel}`,
-    });
+    }).eq("id", initialOrder.id);
   }
 
   const user = await getCurrentUser();
@@ -138,22 +99,15 @@ export async function addOrderToUser(userEmail, order) {
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
   const clientName = profile?.name || userEmail;
 
-  await supabase.from("orders").insert({
-    ...flattenOrder(order),
+  // Order was already saved by /api/orders/submit — update it to link to this user
+  await supabase.from("orders").update({
     user_id: user.id,
     client_name: clientName,
     client_email: userEmail.toLowerCase(),
     client_brokerage: profile?.brokerage || "",
     client_mobile_phone: profile?.mobile_phone || "",
     client_office_phone: profile?.office_phone || "",
-  });
-
-  await addAdminNotification({
-    type: "new-order",
-    orderId: order.id,
-    clientName,
-    text: `New order from ${clientName} — ${order.typeLabel}`,
-  });
+  }).eq("id", order.id);
 }
 
 export async function addNoteToOrder(userEmail, orderId, note) {

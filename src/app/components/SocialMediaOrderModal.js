@@ -269,8 +269,15 @@ export default function SocialMediaOrderModal({ open, onClose }) {
     if (!validate()) return;
     if (step < 4) { setStep((s) => s + 1); setErrors({}); return; }
     setSubmitting(true);
-    setTimeout(() => {
+    setTimeout(async () => {
       const order = buildSocialOrder({ contact, listing, photos, pkg, design });
+      try {
+        await fetch("/api/orders/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order, clientName: contact.name, clientEmail: contact.email, clientPhone: contact.phone }),
+        });
+      } catch {}
       setBuiltOrder(order);
       setSubmitting(false);
       setSubmitted(true);
