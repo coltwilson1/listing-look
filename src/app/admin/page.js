@@ -446,12 +446,12 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
   const revenueUnpaid = orders.filter((o) => !o.paid && o.status === "completed").reduce((s, o) => s + parsePrice(o.packagePrice), 0);
 
   const stats = [
-    { label: "Total Orders",           value: total,     sub: "all time",           nav: "all-orders" },
-    { label: "New This Week",           value: newWeek,   sub: "last 7 days",        nav: "all-orders" },
-    { label: "In Progress",             value: inProg,    sub: "active",             nav: "in-progress" },
-    { label: "Awaiting Approval",       value: awaiting,  sub: "needs attention",    nav: "awaiting-approval", alert: awaiting > 0 },
-    { label: "Completed This Month",    value: doneMonth, sub: "this month",         nav: "completed" },
-    { label: "Revenue Collected",       value: `$${revenuePaid}`, sub: `$${revenueUnpaid} uncollected`, nav: "completed" },
+    { label: "Total Orders",        value: total,              sub: "all time",           filter: null },
+    { label: "New This Week",       value: newWeek,            sub: "last 7 days",        filter: "new-week" },
+    { label: "In Progress",         value: inProg,             sub: "active",             filter: "in-progress" },
+    { label: "Awaiting Approval",   value: awaiting,           sub: "needs attention",    filter: "awaiting-approval", alert: awaiting > 0 },
+    { label: "Completed This Month",value: doneMonth,          sub: "this month",         filter: "completed" },
+    { label: "Revenue Collected",   value: `$${revenuePaid}`,  sub: `$${revenueUnpaid} uncollected`, filter: "paid" },
   ];
 
   const statusCounts = ["submitted", "in-design", "awaiting-approval", "revision", "completed"].map((s) => ({
@@ -460,10 +460,13 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
   }));
   const maxCount = Math.max(...statusCounts.map((s) => s.count), 1);
 
-  const recent10 = (activeStatus
-    ? orders.filter((o) => o.status === activeStatus)
-    : orders.filter((o) => o.status !== "completed")
-  ).slice(0, 10);
+  const recent10 = orders.filter((o) => {
+    if (!activeStatus)                   return o.status !== "completed";
+    if (activeStatus === "new-week")     return isThisWeek(o.submittedAt);
+    if (activeStatus === "in-progress")  return ["submitted", "in-design", "revision"].includes(o.status);
+    if (activeStatus === "paid")         return o.paid;
+    return o.status === activeStatus;
+  }).slice(0, 10);
 
   return (
     <div className="max-w-[1100px] mx-auto px-6 py-8">
@@ -474,18 +477,24 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        {stats.map((s) => (
-          <button
-            key={s.label}
-            type="button"
-            onClick={() => navigate(s.nav)}
-            className={`text-left bg-white rounded-2xl p-5 border transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer ${s.alert ? "border-coral/40 bg-coral/5" : "border-border"}`}
-          >
-            <div className={`font-serif text-[2rem] ${s.alert ? "text-coral" : "text-deep"}`}>{s.value}</div>
-            <div className="font-sans text-[0.82rem] font-semibold text-deep mt-0.5">{s.label}</div>
-            <div className="font-sans text-[0.72rem] text-slate/50 mt-0.5">{s.sub}</div>
-          </button>
-        ))}
+        {stats.map((s) => {
+          const isActive = activeStatus === s.filter;
+          return (
+            <button
+              key={s.label}
+              type="button"
+              onClick={() => setActiveStatus(isActive ? null : s.filter)}
+              className={`text-left rounded-2xl p-5 border transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer ${
+                isActive ? "border-coral bg-coral/5 shadow-md" :
+                s.alert ? "border-coral/40 bg-coral/5 bg-white" : "border-border bg-white"
+              }`}
+            >
+              <div className={`font-serif text-[2rem] ${isActive || s.alert ? "text-coral" : "text-deep"}`}>{s.value}</div>
+              <div className="font-sans text-[0.82rem] font-semibold text-deep mt-0.5">{s.label}</div>
+              <div className="font-sans text-[0.72rem] text-slate/50 mt-0.5">{s.sub}</div>
+            </button>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -522,7 +531,11 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
             <div className="flex items-center gap-2">
               <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-slate">
-                {activeStatus ? STATUS[activeStatus]?.label : "Recent Orders"}
+                {!activeStatus ? "Recent Orders" :
+                 activeStatus === "new-week" ? "New This Week" :
+                 activeStatus === "in-progress" ? "In Progress" :
+                 activeStatus === "paid" ? "Revenue Collected" :
+                 STATUS[activeStatus]?.label ?? "Filtered Orders"}
               </p>
               {activeStatus && (
                 <button onClick={() => setActiveStatus(null)} className="font-sans text-[0.7rem] text-slate/50 hover:text-coral border-none bg-transparent cursor-pointer underline">
