@@ -181,6 +181,7 @@ export default function PortalPage() {
               onSelectOrder={(o) => setSelectedOrder(o)}
               onNewSocial={() => setSocialOpen(true)}
               onNewPostcard={() => setPostcardOpen(true)}
+              onGoToProfile={() => setView("profile")}
             />
           ) : (
             <ProfileView user={user} onUpdate={() => refreshUser()} />
@@ -251,13 +252,14 @@ function LoginScreen({ onLogin }) {
 
 // ── Orders View ───────────────────────────────────────────────────────────────
 
-function OrdersView({ user, firstName, onSelectOrder, onNewSocial, onNewPostcard }) {
+function OrdersView({ user, firstName, onSelectOrder, onNewSocial, onNewPostcard, onGoToProfile }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const orders = user.orders || [];
   const total    = orders.length;
   const inProg   = orders.filter((o) => ["in-design", "awaiting-approval", "revision"].includes(o.status)).length;
   const completed = orders.filter((o) => o.status === "completed").length;
+  const profileIncomplete = !user.headshot || !user.logo || !user.brokerage || !user.mobilePhone;
 
   useEffect(() => {
     if (!dropdownOpen) return;
@@ -304,6 +306,25 @@ function OrdersView({ user, firstName, onSelectOrder, onNewSocial, onNewPostcard
           )}
         </div>
       </div>
+
+      {/* Profile completion banner */}
+      {profileIncomplete && (
+        <div className="flex items-center justify-between gap-4 bg-coral/8 border border-coral/25 rounded-2xl px-5 py-4 mb-6 flex-wrap gap-y-3">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">👤</span>
+            <div>
+              <p className="font-sans text-[0.88rem] font-semibold text-deep">Complete your marketing profile</p>
+              <p className="font-sans text-[0.8rem] text-slate mt-0.5">Add your headshot, logo, and contact info so we can auto-fill your future orders.</p>
+            </div>
+          </div>
+          <button
+            onClick={onGoToProfile}
+            className="flex-shrink-0 font-sans text-[0.82rem] font-semibold bg-coral text-white px-5 py-2 rounded-full hover:bg-coral-dark transition-colors border-none cursor-pointer"
+          >
+            Go to My Profile →
+          </button>
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="grid grid-cols-3 gap-4 mb-10">
