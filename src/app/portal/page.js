@@ -780,9 +780,13 @@ function ProfileView({ user, onUpdate }) {
   const [confirmPw, setConfirmPw]     = useState("");
   const [profileMsg, setProfileMsg]   = useState("");
   const [pwMsg, setPwMsg]             = useState("");
+  const [assetMsg, setAssetMsg]       = useState("");
+  const [savingAssets, setSavingAssets] = useState(false);
 
-  // Brand asset preview URLs loaded from IndexedDB
+  // Brand asset preview URLs loaded from user profile (Supabase Storage public URLs)
   const [assetUrls, setAssetUrls] = useState({ headshot: null, logo: null, personalLogo: null });
+  // Pending files selected but not yet uploaded
+  const [pendingAssets, setPendingAssets] = useState({ headshot: null, logo: null, personalLogo: null });
   const assetUrlsRef = useRef({});
   const headshotRef    = useRef(null);
   const logoRef        = useRef(null);
@@ -833,39 +837,56 @@ function ProfileView({ user, onUpdate }) {
     setCurrentPw(""); setNewPw(""); setConfirmPw("");
   }
 
-  async function handleAssetUpload(field, file) {
+  function handleAssetSelect(field, file) {
     if (!file) return;
+    const localUrl = URL.createObjectURL(file);
+    setPendingAssets((prev) => ({ ...prev, [field]: { file, localUrl } }));
+    setAssetUrls((prev) => ({ ...prev, [field]: localUrl }));
+    setAssetMsg("");
+  }
+
+  async function saveAssets() {
+    const fields = Object.keys(pendingAssets).filter((f) => pendingAssets[f]);
+    if (fields.length === 0) return;
+    setSavingAssets(true);
+    setAssetMsg("");
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
-      if (!token) return;
+      if (!token) { setAssetMsg("Not logged in."); setSavingAssets(false); return; }
 
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("field", field);
-
-      const res = await fetch("/api/profile/upload", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        setProfileMsg(err.error || "Upload failed — please try again.");
-        return;
+      for (const field of fields) {
+        const { file } = pendingAssets[field];
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("field", field);
+        const res = await fetch("/api/profile/upload", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          setAssetMsg(err.error || "Upload failed — please try again.");
+          setSavingAssets(false);
+          return;
+        }
+        const { url } = await res.json();
+        setAssetUrls((prev) => ({ ...prev, [field]: url }));
       }
-      const { url } = await res.json();
-
-      // Refresh preview URL locally with the returned public URL
-      setAssetUrls((prev) => ({ ...prev, [field]: url }));
+      setPendingAssets({ headshot: null, logo: null, personalLogo: null });
+      setAssetMsg("Brand assets saved!");
       onUpdate();
     } catch (err) {
-      console.error("Failed to store asset:", err);
+      setAssetMsg("Upload failed — please try again.");
+      console.error(err);
     }
+    setSavingAssets(false);
   }
 
   async function handleAssetRemove(field) {
     await updateUser(user.email, { [field]: "" });
+    setPendingAssets((prev) => ({ ...prev, [field]: null }));
     setAssetUrls((prev) => ({ ...prev, [field]: null }));
     onUpdate();
   }
@@ -964,10 +985,21 @@ function ProfileView({ user, onUpdate }) {
                 type="file"
                 className="sr-only"
                 accept="image/*"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleAssetUpload(asset.field, f); e.target.value = ""; }}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleAssetSelect(asset.field, f); e.target.value = ""; }}
               />
             </div>
           ))}
+        </div>
+        <div className="mt-5 flex items-center gap-4">
+          <button
+            type="button"
+            onClick={saveAssets}
+            disabled={savingAssets || !Object.values(pendingAssets).some(Boolean)}
+            className="font-sans bg-coral text-white font-semibold px-7 py-2.5 rounded-full hover:bg-coral-dark transition-colors border-none cursor-pointer text-[0.9rem] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {savingAssets ? "Saving…" : "Save Changes"}
+          </button>
+          {assetMsg && <p className="font-sans text-[0.82rem] text-coral">{assetMsg}</p>}
         </div>
       </div>
 
