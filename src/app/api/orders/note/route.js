@@ -60,3 +60,36 @@ export async function POST(req) {
 
   return NextResponse.json({ ok: true });
 }
+
+// Mark all admin messages on an order as read by the client
+export async function PATCH(req) {
+  const authHeader = req.headers.get("authorization");
+  const { orderId } = await req.json();
+  if (!orderId) return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
+
+  const supabase = serviceClient();
+
+  let userEmail = null;
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    const { data: { user } } = await supabase.auth.getUser(token);
+    userEmail = user?.email?.toLowerCase();
+  }
+  if (!userEmail) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("notes, client_email")
+    .eq("id", orderId)
+    .single();
+  if (!order || order.client_email !== userEmail) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  }
+
+  const updatedNotes = (order.notes || []).map((n) =>
+    n.from === "admin" ? { ...n, clientRead: true } : n
+  );
+  await supabase.from("orders").update({ notes: updatedNotes }).eq("id", orderId);
+
+  return NextResponse.json({ ok: true });
+}

@@ -1294,7 +1294,7 @@ function MessagesCard({ order, onUpdate, showToast }) {
     e.preventDefault();
     if (!msg.trim()) return;
     setSending(true);
-    const note = { from: "admin", text: msg.trim(), createdAt: new Date().toISOString(), adminRead: true };
+    const note = { from: "admin", text: msg.trim(), createdAt: new Date().toISOString(), adminRead: true, clientRead: false };
     const updatedNotes = [...notes, note];
     await apiUpdateOrder(order.id, { notes: updatedNotes });
     setSending(false);

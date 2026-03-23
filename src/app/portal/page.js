@@ -346,6 +346,7 @@ function OrderCard({ order, onClick }) {
   const s = STATUS[order.status] || STATUS.submitted;
   const isAwaiting = order.status === "awaiting-approval";
   const isCompleted = order.status === "completed";
+  const unread = (order.notes || []).filter((n) => n.from === "admin" && !n.clientRead).length;
 
   return (
     <div
@@ -356,6 +357,11 @@ function OrderCard({ order, onClick }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.1em] text-coral">{order.typeLabel}</span>
+            {unread > 0 && (
+              <span className="inline-flex items-center gap-1 bg-coral text-white font-sans text-[0.65rem] font-bold px-2 py-0.5 rounded-full">
+                💬 {unread} new
+              </span>
+            )}
             {order.graphicTypeLabel && (
               <span className="font-sans text-[0.7rem] text-slate/60">· {order.graphicTypeLabel}</span>
             )}
@@ -433,6 +439,23 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
   const [cancelReason, setCancelReason] = useState("");
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const s = STATUS[order.status] || STATUS.submitted;
+
+  // Mark admin messages as read when order is opened
+  useEffect(() => {
+    const hasUnread = (order.notes || []).some((n) => n.from === "admin" && !n.clientRead);
+    if (!hasUnread) return;
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) return;
+      await fetch("/api/orders/note", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ orderId: order.id }),
+      });
+      onRefresh();
+    })();
+  }, [order.id]);
 
   // Poll for new messages every 12 seconds
   useEffect(() => {
