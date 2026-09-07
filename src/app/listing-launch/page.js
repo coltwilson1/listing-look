@@ -117,20 +117,67 @@ function GraphicCard({ type, graphicText, listing, agent, color }) {
 
 // ── Caption card ──────────────────────────────────────────────────────────────
 
-function CaptionCard({ label, caption, color }) {
+function CaptionCard({ label, caption, color, onUpdate, onRegenerate, regenerating }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(caption);
   const [copied, setCopied] = useState(false);
-  function copy() {
-    navigator.clipboard.writeText(caption).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
+
+  // Keep draft in sync when caption changes externally (e.g. after regenerate)
+  const prevCaption = useRef(caption);
+  if (prevCaption.current !== caption) {
+    prevCaption.current = caption;
+    setDraft(caption);
   }
+
+  function copy() {
+    navigator.clipboard.writeText(draft).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
+  }
+  function save() { onUpdate(draft); setEditing(false); }
+  function cancel() { setDraft(caption); setEditing(false); }
+
   return (
-    <div className="bg-white rounded-2xl border border-border p-5">
-      <div className="flex items-center justify-between mb-3">
+    <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-border">
         <span className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em]" style={{ color }}>{label}</span>
-        <button onClick={copy} className="font-sans text-[0.75rem] text-slate hover:text-coral transition-colors border-none bg-transparent cursor-pointer">
-          {copied ? "✓ Copied!" : "Copy"}
-        </button>
+        <div className="flex items-center gap-1">
+          {editing ? (
+            <>
+              <button onClick={save} className="font-sans text-[0.75rem] font-semibold text-white bg-coral px-3 py-1 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors">Save</button>
+              <button onClick={cancel} className="font-sans text-[0.75rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-3 py-1 bg-transparent cursor-pointer">Cancel</button>
+            </>
+          ) : (
+            <>
+              <button onClick={copy} className="font-sans text-[0.75rem] text-slate hover:text-coral transition-colors border-none bg-transparent cursor-pointer px-2 py-1">
+                {copied ? "✓ Copied" : "Copy"}
+              </button>
+              <button onClick={() => { setDraft(caption); setEditing(true); }} className="font-sans text-[0.75rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-3 py-1 bg-transparent cursor-pointer">
+                ✏️ Edit
+              </button>
+              <button
+                onClick={onRegenerate}
+                disabled={regenerating}
+                className="font-sans text-[0.75rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-3 py-1 bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              >
+                {regenerating ? <><span className="w-3 h-3 rounded-full border border-slate border-t-transparent animate-spin inline-block" /> Generating…</> : "↻ Regenerate"}
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      <p className="font-sans text-[0.85rem] text-slate leading-[1.7] whitespace-pre-line">{caption}</p>
+
+      {/* Body */}
+      {editing ? (
+        <textarea
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          rows={8}
+          className="w-full px-5 py-4 font-sans text-[0.85rem] text-slate leading-[1.7] border-none outline-none resize-y bg-light-gray/50"
+          autoFocus
+        />
+      ) : (
+        <p className="font-sans text-[0.85rem] text-slate leading-[1.7] whitespace-pre-line px-5 py-4">{draft || caption}</p>
+      )}
     </div>
   );
 }
@@ -300,6 +347,8 @@ export default function ListingLaunchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
+  const [captions, setCaptions] = useState({});
+  const [captionRegenerating, setCaptionRegenerating] = useState({});
   const [activeTab, setActiveTab] = useState("landing");
   const [svgGraphics, setSvgGraphics] = useState({});
   const [graphicLoadings, setGraphicLoadings] = useState({});
@@ -368,6 +417,7 @@ export default function ListingLaunchPage() {
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Generation failed");
       setResult(data);
+      setCaptions(data.generated?.captions || {});
       setStep(4);
     } catch (e) {
       setError(e.message);
@@ -448,7 +498,7 @@ export default function ListingLaunchPage() {
               <h1 className="font-serif text-[2rem] text-deep">{l.address}</h1>
               <p className="font-sans text-[0.88rem] text-slate mt-1">${parseInt(l.price).toLocaleString()} · {l.beds} bd · {l.baths} ba · {parseInt(l.sqft || 0).toLocaleString()} sqft</p>
             </div>
-            <button onClick={() => { setStep(0); setResult(null); }} className="font-sans text-[0.85rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-4 py-2 bg-transparent cursor-pointer">
+            <button onClick={() => { setStep(0); setResult(null); setCaptions({}); }} className="font-sans text-[0.85rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-4 py-2 bg-transparent cursor-pointer">
               ← New Listing
             </button>
           </div>
@@ -642,9 +692,30 @@ export default function ListingLaunchPage() {
 
           {activeTab === "captions" && (
             <div className="space-y-4">
-              <p className="font-sans text-[0.85rem] text-slate mb-2">Ready-to-post captions for every stage. Click "Copy" to grab any caption.</p>
+              <p className="font-sans text-[0.85rem] text-slate mb-2">Ready-to-post captions for every stage — edit inline or regenerate any individual caption.</p>
               {GRAPHIC_TYPES.map(({ key, label, color }) => (
-                <CaptionCard key={key} label={label} caption={generated.captions?.[key] || ""} color={color} />
+                <CaptionCard
+                  key={key}
+                  label={label}
+                  caption={captions[key] || ""}
+                  color={color}
+                  onUpdate={text => setCaptions(prev => ({ ...prev, [key]: text }))}
+                  regenerating={!!captionRegenerating[key]}
+                  onRegenerate={async () => {
+                    setCaptionRegenerating(prev => ({ ...prev, [key]: true }));
+                    try {
+                      const res = await fetch("/api/listing-launch/caption", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ agent, listing: l, stage: key }),
+                      });
+                      const data = await res.json();
+                      if (data.ok) setCaptions(prev => ({ ...prev, [key]: data.caption }));
+                    } catch {} finally {
+                      setCaptionRegenerating(prev => ({ ...prev, [key]: false }));
+                    }
+                  }}
+                />
               ))}
             </div>
           )}
