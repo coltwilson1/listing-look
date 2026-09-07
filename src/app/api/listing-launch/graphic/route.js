@@ -14,9 +14,12 @@ PROPERTY:
 - Price: $${parseInt(listing.price).toLocaleString()}
 - Beds: ${listing.beds}  Baths: ${listing.baths}  Sqft: ${parseInt(listing.sqft || 0).toLocaleString()}
 
-AGENT:
-- Name: ${agent.name}
+AGENT (all 4 items MUST appear on the graphic — TREC Rule 1260-02):
+- Agent Name: ${agent.name}
 - Brokerage: ${agent.brokerage}
+- TN License #: ${agent.license}
+- Contact (phone/website): ${agent.phone}
+- Responsible Broker: ${agent.brokerName}
 
 DESIGN REQUIREMENTS:
 - SVG viewBox: "0 0 1080 1080" — square format for Instagram
@@ -29,7 +32,13 @@ DESIGN REQUIREMENTS:
 - Property address clearly displayed
 - Price in coral and large
 - Beds / Baths / Sqft as a clean spec line
-- Agent name and brokerage at bottom
+- Agent name and brokerage prominently at bottom
+- REQUIRED COMPLIANCE BLOCK (mandatory per TREC Rule 1260-02 — must be visible on the graphic):
+  * Agent's TN License number: "${agent.license}"
+  * Brokerage name: "${agent.brokerage}"
+  * Contact info: "${agent.phone}"
+  * Responsible Broker: "${agent.brokerName}"
+  Place these in a small but legible compliance footer at the very bottom of the graphic, all on one or two lines, smaller text (around 18-22px in SVG units)
 - Decorative geometric shapes or abstract elements that feel modern and premium — use rectangles, circles, lines, polygons with opacity/transparency to add visual interest
 - A subtle coral accent bar or border element
 - The design should feel like a premium real estate brand, not generic
