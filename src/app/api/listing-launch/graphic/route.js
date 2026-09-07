@@ -5,26 +5,18 @@ import path from "path";
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const STAGE_CONFIG = {
-  justListed: {
-    headline: "JUST LISTED",
-    accent: "#E8825A",
-    vibe: "exciting new listing announcement",
-  },
-  underContract: {
-    headline: "UNDER CONTRACT",
-    accent: "#3b82f6",
-    vibe: "celebratory under contract announcement",
-  },
-  priceReduced: {
-    headline: "PRICE REDUCED",
-    accent: "#f59e0b",
-    vibe: "urgent price reduction opportunity",
-  },
-  sold: {
-    headline: "SOLD",
-    accent: "#10b981",
-    vibe: "celebratory sold announcement",
-  },
+  justListed:     { headline: "Just Listed",     badge: "NEW PROPERTY",   showPrice: true  },
+  underContract:  { headline: "Under Contract",  badge: "UNDER CONTRACT", showPrice: false },
+  priceReduced:   { headline: "Price Reduced",   badge: "NEW PRICE",      showPrice: true  },
+  sold:           { headline: "Just Sold!",      badge: "SOLD",           showPrice: false },
+};
+
+const SCHEME_MAP = {
+  forest:   { bg: "#1a3d35", accent: "#c9a84c", overlay: "rgba(15,40,32,0.72)" },
+  navy:     { bg: "#1C1C2E", accent: "#E8825A", overlay: "rgba(15,15,35,0.72)" },
+  midnight: { bg: "#0f0f0f", accent: "#e2e8f0", overlay: "rgba(0,0,0,0.75)"    },
+  warm:     { bg: "#2a1810", accent: "#d4835a", overlay: "rgba(30,12,5,0.72)"  },
+  slate:    { bg: "#1a2233", accent: "#60a5fa", overlay: "rgba(10,15,30,0.72)" },
 };
 
 function getLogoBase64(style) {
@@ -36,64 +28,82 @@ function getLogoBase64(style) {
       : "KellerWilliams_Realty_GreaterChattanooga_Logo_GRY-rev.png";
     const logoPath = path.join(process.cwd(), "public", "logos", "KW Logos", folder, file);
     return fs.readFileSync(logoPath).toString("base64");
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
-function injectLogo(svg, logoBase64) {
-  if (!logoBase64) return svg;
-  const logoEl = `<image href="data:image/png;base64,${logoBase64}" x="36" y="30" width="340" height="90" preserveAspectRatio="xMinYMin meet"/>`;
-  return svg.replace("</svg>", `${logoEl}\n</svg>`);
+function injectAssets(svg, logoBase64, photoBase64) {
+  let injected = svg;
+
+  // Inject photo as very first element (background layer)
+  if (photoBase64) {
+    const photoEl = `<image href="data:image/jpeg;base64,${photoBase64}" x="0" y="0" width="1080" height="1080" preserveAspectRatio="xMidYMid slice"/>`;
+    injected = injected.replace(/(<svg[^>]*>)/, `$1\n${photoEl}`);
+  }
+
+  // Inject KW logo top-left at very end (top layer)
+  if (logoBase64) {
+    const logoEl = `<image href="data:image/png;base64,${logoBase64}" x="36" y="30" width="300" height="80" preserveAspectRatio="xMinYMin meet"/>`;
+    injected = injected.replace("</svg>", `${logoEl}\n</svg>`);
+  }
+
+  return injected;
 }
 
 export async function POST(req) {
   try {
-    const { agent, listing, stage = "justListed" } = await req.json();
+    const { agent, listing, stage = "justListed", primaryPhoto } = await req.json();
     const config = STAGE_CONFIG[stage] || STAGE_CONFIG.justListed;
+    const scheme = SCHEME_MAP[agent.colorScheme] || SCHEME_MAP.forest;
     const logoBase64 = getLogoBase64(agent.style);
+    const hasPhoto = !!primaryPhoto;
 
-    const showPrice = stage === "justListed" || stage === "priceReduced";
-    const priceNote = showPrice ? `- Price: $${parseInt(listing.price).toLocaleString()}` : "";
+    const priceText = `$${parseInt(listing.price).toLocaleString()}`;
 
-    const prompt = `Design a professional real estate "${config.headline}" social media graphic as clean SVG code. The mood is ${config.vibe}.
+    const prompt = `Design a premium real estate social media graphic as clean SVG code. Style: "${config.headline}" announcement.
 
 PROPERTY:
-- Address: ${listing.address}
-- City, State ZIP: ${listing.city}, ${listing.state} ${listing.zip}
-${priceNote}
-- Beds: ${listing.beds}  Baths: ${listing.baths}  Sqft: ${parseInt(listing.sqft || 0).toLocaleString()}
+- Address: ${listing.address}, ${listing.city}, ${listing.state} ${listing.zip}
+${config.showPrice ? `- Price: ${priceText}` : ""}
+- ${listing.beds} bed · ${listing.baths} bath · ${parseInt(listing.sqft || 0).toLocaleString()} sqft
 
-AGENT:
-- Agent Name: ${agent.name}
-- TN License #: ${agent.license}
-- Mobile Phone: ${agent.mobilePhone}
+AGENT: ${agent.name} | License #${agent.license} | ${agent.mobilePhone}
 
-DESIGN REQUIREMENTS:
-- SVG viewBox: "0 0 1080 1080" — square Instagram format
-- Primary background: deep navy #1C1C2E
-- Hero accent color: ${config.accent}
-- Text: white (#FFFFFF) with opacity variations
-- System fonts only: Arial, Georgia, serif, sans-serif — NO external fonts
-- NO <image> tags, NO external references, NO xlink
-- IMPORTANT: Leave the top-left area (x: 0–420, y: 0–130) completely clear — the KW logo will be placed there
-- Large bold "${config.headline}" text as the hero element (centered, below y: 150)
-- Property address clearly displayed
-${showPrice ? `- Price in ${config.accent} color and large` : ""}
-- Beds / Baths / Sqft spec line
-- Agent name near bottom — font size must NOT exceed 26px
-- Compliance footer at very bottom (~18px, white 60% opacity):
-  "${agent.name} | License #${agent.license} | ${agent.mobilePhone}"
-- Below compliance: "Each office is independently owned and operated." (~16px, white 50% opacity)
-- Decorative geometric shapes — rectangles, circles, lines, polygons with opacity for visual depth
-- A subtle ${config.accent} accent bar or border element
-- Premium, scroll-stopping Instagram design
+DESIGN SPEC — SVG viewBox "0 0 1080 1080", square Instagram format:
 
-Return ONLY the complete SVG code starting with <svg and ending with </svg>. No explanation, no markdown.`;
+${hasPhoto
+  ? `PHOTO BACKGROUND MODE: A listing photo will be injected as the first SVG element (background).
+- Do NOT include any background rect or solid fill
+- DO include a full-size gradient overlay rect immediately after the opening <svg> tag:
+  <defs><linearGradient id="ov" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${scheme.bg}" stop-opacity="0.45"/><stop offset="55%" stop-color="${scheme.bg}" stop-opacity="0.65"/><stop offset="100%" stop-color="${scheme.bg}" stop-opacity="0.92"/></linearGradient></defs><rect width="1080" height="1080" fill="url(#ov)"/>
+- All text must be white or light — it sits over a darkened photo`
+  : `SOLID BACKGROUND MODE:
+- Full background rect: fill="${scheme.bg}"
+- Add subtle geometric shapes and depth elements for visual interest`}
+
+LAYOUT (inspired by premium Canva real estate templates):
+1. TOP AREA (y: 0–140) — Leave clear for KW logo (injected separately)
+2. BADGE (y: ~160) — Small pill badge centered: "${config.badge}" — rounded rect with ${scheme.accent} stroke, white text, ~22px font
+3. MAIN HEADLINE (y: ~230–400) — Large elegant headline: "${config.headline}" — Georgia/serif font, ~110–130px, white, centered
+4. SPEC BAR (y: ~430) — Semi-transparent dark rounded pill: "${listing.beds} bed  |  ${listing.baths} bath  |  ${parseInt(listing.sqft || 0).toLocaleString()} sqft" — white text ~26px
+5. BOTTOM STRIP (y: ~820–1000):
+   - Location pin (▼ or ● symbol) + address text, left-aligned, white ~28px
+   ${config.showPrice ? `- Price "${priceText}" right-aligned, ${scheme.accent} color, bold ~52px` : ""}
+   - Thin horizontal rule line above the bottom strip
+6. COMPLIANCE FOOTER (y: ~1030–1055) — white 55% opacity ~16px:
+   "${agent.name} | License #${agent.license} | ${agent.mobilePhone}"
+   "Each office is independently owned and operated." on the line below at ~14px
+
+STYLE NOTES:
+- Accent color: ${scheme.accent}
+- Elegant, high-end real estate aesthetic — NOT generic
+- System fonts only: Georgia, Arial, sans-serif — NO external references, NO xlink, NO <image> tags
+- Agent name near bottom must NOT exceed 24px
+
+Return ONLY complete SVG starting with <svg and ending with </svg>. No markdown, no explanation.`;
 
     const message = await client.messages.create({
       model: "claude-opus-4-5",
-      max_tokens: 4000,
+      max_tokens: 5000,
       messages: [{ role: "user", content: prompt }],
     });
 
@@ -106,7 +116,7 @@ Return ONLY the complete SVG code starting with <svg and ending with </svg>. No 
       else throw new Error("No valid SVG in response");
     }
 
-    svg = injectLogo(svg, logoBase64);
+    svg = injectAssets(svg, logoBase64, primaryPhoto || null);
 
     return Response.json({ ok: true, svg });
   } catch (err) {

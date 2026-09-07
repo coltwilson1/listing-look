@@ -33,6 +33,39 @@ const STYLES = [
   { id: "energetic", label: "Energetic", desc: "Bold, exciting, high-energy" },
 ];
 
+const COLOR_SCHEMES = [
+  { id: "forest",    label: "Forest",    bg: "#1a3d35", accent: "#c9a84c", swatch: ["#1a3d35", "#c9a84c"] },
+  { id: "navy",      label: "Navy",      bg: "#1C1C2E", accent: "#E8825A", swatch: ["#1C1C2E", "#E8825A"] },
+  { id: "midnight",  label: "Midnight",  bg: "#0f0f0f", accent: "#e2e8f0", swatch: ["#0f0f0f", "#e2e8f0"] },
+  { id: "warm",      label: "Warm",      bg: "#2a1810", accent: "#d4835a", swatch: ["#2a1810", "#d4835a"] },
+  { id: "slate",     label: "Slate",     bg: "#1a2233", accent: "#60a5fa", swatch: ["#1a2233", "#60a5fa"] },
+];
+
+async function compressPhoto(file) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const MAX = 1080;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result.split(",")[1]);
+        reader.readAsDataURL(blob);
+      }, "image/jpeg", 0.78);
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  });
+}
+
 const STEPS = ["You", "Property", "Details", "Generate"];
 
 function ProgressBar({ step }) {
@@ -185,8 +218,10 @@ export default function ListingLaunchPage() {
 
   const [kwError, setKwError] = useState("");
   const [phoneErrors, setPhoneErrors] = useState({ officePhone: false, mobilePhone: false });
-  const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional" });
+  const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional", colorScheme: "forest" });
   const [listing, setListing] = useState({ address: "", city: "", state: "", zip: "", price: "", beds: "", baths: "", sqft: "", yearBuilt: "", features: "", notes: "" });
+  const [photos, setPhotos] = useState([]); // array of { name, base64 }
+  const photoInputRef = useRef(null);
 
   const addressRef = useRef(null);
   const acRef = useRef(null);
@@ -254,7 +289,7 @@ export default function ListingLaunchPage() {
       const res = await fetch("/api/listing-launch/graphic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agent: a, listing: l, stage }),
+        body: JSON.stringify({ agent: a, listing: l, stage, primaryPhoto: photos[0]?.base64 || null }),
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Graphic generation failed");
@@ -500,6 +535,24 @@ export default function ListingLaunchPage() {
                   ))}
                 </div>
               </div>
+              <div>
+                <label className={lCls}>Graphic Color Scheme</label>
+                <div className="flex gap-3 mt-1 flex-wrap">
+                  {COLOR_SCHEMES.map(cs => (
+                    <button
+                      key={cs.id}
+                      onClick={() => setAgent(a => ({ ...a, colorScheme: cs.id }))}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 transition-all cursor-pointer bg-transparent ${agent.colorScheme === cs.id ? "border-coral" : "border-border hover:border-slate/30"}`}
+                    >
+                      <span className="flex rounded-full overflow-hidden w-5 h-5 flex-shrink-0">
+                        <span className="flex-1" style={{ background: cs.swatch[0] }} />
+                        <span className="flex-1" style={{ background: cs.swatch[1] }} />
+                      </span>
+                      <span className={`font-sans text-[0.8rem] font-semibold ${agent.colorScheme === cs.id ? "text-coral" : "text-deep"}`}>{cs.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
               {kwError && (
                 <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
                   <p className="font-sans text-[0.85rem] text-red-600">{kwError}</p>
@@ -604,6 +657,49 @@ export default function ListingLaunchPage() {
                   value={listing.notes}
                   onChange={e => setListing(l => ({ ...l, notes: e.target.value }))}
                 />
+              </div>
+              <div>
+                <label className={lCls}>Listing Photos <span className="text-coral normal-case font-normal tracking-normal">— used as graphic backgrounds</span></label>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  hidden
+                  onChange={async (e) => {
+                    const files = Array.from(e.target.files).slice(0, 5);
+                    const compressed = await Promise.all(files.map(async f => ({ name: f.name, base64: await compressPhoto(f) })));
+                    setPhotos(prev => [...prev, ...compressed].slice(0, 5));
+                    e.target.value = "";
+                  }}
+                />
+                {photos.length === 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => photoInputRef.current?.click()}
+                    className="w-full border-2 border-dashed border-border rounded-xl py-6 text-center cursor-pointer hover:border-coral transition-colors bg-transparent mt-1"
+                  >
+                    <div className="font-sans text-[0.88rem] text-slate">Click to upload photos</div>
+                    <div className="font-sans text-[0.75rem] text-slate/50 mt-1">JPG, PNG — up to 5 photos. First photo used as graphic background.</div>
+                  </button>
+                ) : (
+                  <div className="mt-1">
+                    <div className="flex gap-2 flex-wrap">
+                      {photos.map((p, i) => (
+                        <div key={i} className="relative">
+                          <img src={`data:image/jpeg;base64,${p.base64}`} alt={p.name} className="w-20 h-20 object-cover rounded-xl border border-border" />
+                          {i === 0 && <span className="absolute top-1 left-1 bg-coral text-white font-sans text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full">Main</span>}
+                          <button onClick={() => setPhotos(prev => prev.filter((_, j) => j !== i))} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-deep text-white rounded-full text-[0.65rem] font-bold border-none cursor-pointer flex items-center justify-center">×</button>
+                        </div>
+                      ))}
+                      {photos.length < 5 && (
+                        <button type="button" onClick={() => photoInputRef.current?.click()} className="w-20 h-20 border-2 border-dashed border-border rounded-xl flex items-center justify-center cursor-pointer hover:border-coral transition-colors bg-transparent">
+                          <span className="text-slate text-[1.5rem]">+</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep(1)} className="flex-1 border border-border text-slate font-sans font-semibold py-3.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors">← Back</button>
