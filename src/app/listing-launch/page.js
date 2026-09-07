@@ -27,6 +27,12 @@ function phoneComplete(val) {
   return val.replace(/\D/g, "").length === 10;
 }
 
+function formatPrice(raw) {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return "";
+  return "$" + parseInt(digits).toLocaleString();
+}
+
 const STYLES = [
   { id: "professional", label: "Professional", desc: "Polished, elegant, trust-building" },
   { id: "conversational", label: "Conversational", desc: "Warm, personable, relatable" },
@@ -654,7 +660,7 @@ export default function ListingLaunchPage() {
                 </div>
                 <div>
                   <label className={lCls}>List Price</label>
-                  <input className={iCls} placeholder="450000" type="number" value={listing.price} onChange={e => setListing(l => ({ ...l, price: e.target.value }))} />
+                  <input className={iCls} placeholder="$450,000" inputMode="numeric" value={listing.price} onChange={e => setListing(l => ({ ...l, price: formatPrice(e.target.value) }))} />
                 </div>
               </div>
               <div className="flex gap-3">
