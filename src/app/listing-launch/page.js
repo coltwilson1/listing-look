@@ -382,7 +382,7 @@ export default function ListingLaunchPage() {
 
   const [kwError, setKwError] = useState("");
   const [phoneErrors, setPhoneErrors] = useState({ officePhone: false, mobilePhone: false });
-  const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional", primaryColor: "#C8102E", accentColor: "#ffffff", labelColor: "", bodyColor: "#475569", footerTextColor: "#ffffff" });
+  const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", gaLicense: "", officePhone: "", mobilePhone: "", style: "professional", primaryColor: "#C8102E", accentColor: "#ffffff", labelColor: "", bodyColor: "#475569", footerTextColor: "#ffffff" });
   const [themeOpen, setThemeOpen] = useState(false);
   const [listing, setListing] = useState({ address: "", city: "", state: "", zip: "", price: "", beds: "", baths: "", sqft: "", yearBuilt: "", features: "", notes: "" });
   const [primaryPhoto, setPrimaryPhoto] = useState(null);     // { name, base64 } — graphic background
@@ -876,9 +876,15 @@ export default function ListingLaunchPage() {
                   <option value="Keller Williams Realty - Greater Chattanooga">Keller Williams Realty - Greater Chattanooga</option>
                 </select>
               </div>
-              <div>
-                <label className={lCls}>TN License # <span className="text-coral">*</span></label>
-                <input className={iCls} placeholder="e.g. 123456" value={agent.license} onChange={e => setAgent(a => ({ ...a, license: e.target.value }))} />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={lCls}>TN License # <span className="text-coral">*</span></label>
+                  <input className={iCls} placeholder="e.g. 123456" maxLength={7} value={agent.license} onChange={e => setAgent(a => ({ ...a, license: e.target.value }))} />
+                </div>
+                <div>
+                  <label className={lCls}>GA License # <span className="font-normal text-slate/50 normal-case tracking-normal">(optional)</span></label>
+                  <input className={iCls} placeholder="e.g. 123456" maxLength={7} value={agent.gaLicense} onChange={e => setAgent(a => ({ ...a, gaLicense: e.target.value }))} />
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
