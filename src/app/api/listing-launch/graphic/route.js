@@ -25,6 +25,8 @@ const SCHEME_MAP = {
   rose:     { bg: "#2d1a1f", accent: "#f9a8c9", overlay: "rgba(35,10,18,0.74)" },
   emerald:  { bg: "#0f2d1f", accent: "#34d399", overlay: "rgba(5,28,15,0.74)"  },
   desert:   { bg: "#3d2a1a", accent: "#e8c06a", overlay: "rgba(40,22,8,0.73)"  },
+  kwred:    { bg: "#1a0305", accent: "#C8102E", overlay: "rgba(20,2,5,0.76)"   },
+  crimson:  { bg: "#2a0000", accent: "#ffffff", overlay: "rgba(30,0,0,0.76)"   },
 };
 
 function getLogoBase64(style) {

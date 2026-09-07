@@ -47,6 +47,8 @@ const COLOR_SCHEMES = [
   { id: "rose",      label: "Rose",      swatch: ["#2d1a1f", "#f9a8c9"] },
   { id: "emerald",   label: "Emerald",   swatch: ["#0f2d1f", "#34d399"] },
   { id: "desert",    label: "Desert",    swatch: ["#3d2a1a", "#e8c06a"] },
+  { id: "kwred",     label: "KW Red",    swatch: ["#1a0305", "#C8102E"] },
+  { id: "crimson",   label: "Crimson",   swatch: ["#2a0000", "#ffffff"] },
 ];
 
 async function compressPhoto(file) {
