@@ -214,22 +214,6 @@ function Hero({ content: c }) {
   );
 }
 
-// ── Stats ─────────────────────────────────────────────────────────────────────
-
-function Stats({ content: stats }) {
-  return (
-    <div className="bg-deep py-12 px-8">
-      <div className="max-w-[1000px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-        {stats.map(({ num, label }, i) => (
-          <div key={i}>
-            <span className="font-serif text-[2.8rem] text-blush block">{num}</span>
-            <span className="font-sans text-[0.9rem] text-white/60 mt-1 block">{label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 // ── How It Works ──────────────────────────────────────────────────────────────
 
@@ -454,7 +438,6 @@ export default async function HomePage() {
     <main>
       <SiteHeader />
       <Hero content={cms.hero} />
-      <Stats content={cms.stats} />
       <HowItWorks content={cms.howItWorks} />
       <ServicesWithModals content={cms.services} />
       <CustomSection content={cms.customOrder} />
