@@ -3,9 +3,10 @@ import Anthropic from "@anthropic-ai/sdk";
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const STAGE_INSTRUCTIONS = {
+  forSale:       "For Sale — inviting, paint the lifestyle this home offers. Include price and key details. 3-4 sentences + 5 relevant hashtags.",
   justListed:    "Just Listed — include price and key details naturally. 3-4 sentences + 5 relevant hashtags.",
   underContract: "Under Contract — celebratory, thank the community for support. 2-3 sentences + 3 hashtags.",
-  priceReduced:  "Price Reduced — urgent but not desperate, highlight the new opportunity. 2-3 sentences + 3 hashtags.",
+  priceRefresh:  "Price Refresh — fresh excitement about a new price, not desperate. New opportunity for buyers. 2-3 sentences + 3 hashtags.",
   sold:          "Sold — celebratory, thank buyers/sellers, reflect on the journey. 3-4 sentences + 4 hashtags.",
 };
 

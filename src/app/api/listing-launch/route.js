@@ -41,22 +41,24 @@ Generate ALL of the following and return ONLY valid JSON (no markdown, no explan
     "callToAction": "A short, punchy CTA phrase (5-8 words) to schedule a showing"
   },
   "captions": {
+    "forSale": "Instagram/Facebook caption for a For Sale post. Inviting, paint the lifestyle. Match ${agent.style} style. 3-4 sentences + 5 relevant hashtags. Include price and key details. End with: '${agent.name} | ${agent.brokerage} | License #${agent.license} | ${agent.mobilePhone}'",
     "justListed": "Instagram/Facebook caption for a Just Listed post. Match the agent's ${agent.style} style. 3-4 sentences + 5 relevant hashtags. Include price and key details naturally. End with a disclosure line: '${agent.name} | ${agent.brokerage} | License #${agent.license} | ${agent.mobilePhone}'",
     "underContract": "Instagram/Facebook caption for an Under Contract post. Celebratory, thank the community. Match ${agent.style} style. 2-3 sentences + 3 hashtags. End with: '${agent.name} | ${agent.brokerage} | License #${agent.license}'",
-    "priceReduced": "Instagram/Facebook caption for a Price Reduced post. Urgent but not desperate. Highlight the new opportunity. Match ${agent.style} style. 2-3 sentences + 3 hashtags. End with: '${agent.name} | ${agent.brokerage} | License #${agent.license} | ${agent.mobilePhone}'",
+    "priceRefresh": "Instagram/Facebook caption for a Price Refresh post. Fresh excitement, new opportunity — not desperate. Match ${agent.style} style. 2-3 sentences + 3 hashtags. End with: '${agent.name} | ${agent.brokerage} | License #${agent.license} | ${agent.mobilePhone}'",
     "sold": "Instagram/Facebook caption for a Sold post. Celebratory, thank the buyers/sellers, reflect on the journey. Match ${agent.style} style. 3-4 sentences + 4 hashtags. End with: '${agent.name} | ${agent.brokerage} | License #${agent.license}'"
   },
   "graphicText": {
-    "justListed": { "headline": "JUST LISTED", "price": "$${listing.price}", "tagline": "5-6 word punchy tagline for the graphic" },
+    "forSale": { "headline": "FOR SALE", "price": "$${listing.price}", "tagline": "5-6 word lifestyle tagline" },
+    "justListed": { "headline": "JUST LISTED", "price": "$${listing.price}", "tagline": "5-6 word punchy tagline" },
     "underContract": { "headline": "UNDER CONTRACT", "tagline": "4-5 word celebratory tagline" },
-    "priceReduced": { "headline": "PRICE REDUCED", "price": "$${listing.price}", "tagline": "5-6 word urgency tagline" },
+    "priceRefresh": { "headline": "PRICE REFRESH", "price": "$${listing.price}", "tagline": "5-6 word fresh opportunity tagline" },
     "sold": { "headline": "SOLD", "tagline": "4-5 word celebration tagline" }
   }
 }`;
 
     const message = await client.messages.create({
       model: "claude-opus-4-5",
-      max_tokens: 2000,
+      max_tokens: 2500,
       messages: [{ role: "user", content: prompt }],
     });
 

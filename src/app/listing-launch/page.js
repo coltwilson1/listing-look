@@ -114,8 +114,8 @@ function ProgressBar({ step }) {
 // ── Social graphic card preview ───────────────────────────────────────────────
 
 function GraphicCard({ type, graphicText, listing, agent, color }) {
-  const labels = { justListed: "Just Listed", underContract: "Under Contract", priceReduced: "Price Reduced", sold: "Sold" };
-  const colors = { justListed: "#E8825A", underContract: "#3b82f6", priceReduced: "#f59e0b", sold: "#10b981" };
+  const labels = { forSale: "For Sale", justListed: "Just Listed", underContract: "Under Contract", priceRefresh: "Price Refresh", sold: "Sold" };
+  const colors = { forSale: "#22c55e", justListed: "#E8825A", underContract: "#3b82f6", priceRefresh: "#f59e0b", sold: "#10b981" };
   const bg = colors[type] || color;
 
   return (
@@ -493,8 +493,8 @@ export default function ListingLaunchPage() {
       const photos = data.photos || [];
       if (photos.length > 0) {
         setPickerPhotos(photos);
-        setPickerSelected(new Set(photos.map((_, i) => i))); // pre-select all
-        setImportMsg({ type: "ok", text: `Found ${photos.length} photo${photos.length !== 1 ? "s" : ""} — select the ones you want below.` });
+        setPickerSelected(new Set()); // default unchecked — user selects up to 10
+        setImportMsg({ type: "ok", text: `Found ${photos.length} photo${photos.length !== 1 ? "s" : ""} — select up to 10 below.` });
       } else {
         setImportMsg({ type: "ok", text: "Details filled in. No photos found on this page — upload them below." });
       }
@@ -508,7 +508,11 @@ export default function ListingLaunchPage() {
   function togglePicker(i) {
     setPickerSelected(prev => {
       const next = new Set(prev);
-      if (next.has(i)) next.delete(i); else next.add(i);
+      if (next.has(i)) {
+        next.delete(i);
+      } else if (next.size < 10) {
+        next.add(i);
+      }
       return next;
     });
   }
@@ -574,9 +578,9 @@ export default function ListingLaunchPage() {
     img.onload = () => {
       const canvas = document.createElement("canvas");
       canvas.width = 1080;
-      canvas.height = 1080;
+      canvas.height = 1350;
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, 1080, 1080);
+      ctx.drawImage(img, 0, 0, 1080, 1350);
       canvas.toBlob((pngBlob) => {
         const pngUrl = URL.createObjectURL(pngBlob);
         const a = document.createElement("a");
@@ -594,10 +598,11 @@ export default function ListingLaunchPage() {
   if (step === 4 && result) {
     const { generated, listing: l, agent: a } = result;
     const GRAPHIC_TYPES = [
-      { key: "justListed", label: "Just Listed", color: "#E8825A" },
+      { key: "forSale",       label: "For Sale",       color: "#22c55e" },
+      { key: "justListed",    label: "Just Listed",    color: "#E8825A" },
       { key: "underContract", label: "Under Contract", color: "#3b82f6" },
-      { key: "priceReduced", label: "Price Reduced", color: "#f59e0b" },
-      { key: "sold", label: "Sold", color: "#10b981" },
+      { key: "priceRefresh",  label: "Price Refresh",  color: "#f59e0b" },
+      { key: "sold",          label: "Sold",           color: "#10b981" },
     ];
 
     return (
@@ -762,7 +767,7 @@ export default function ListingLaunchPage() {
                       <div>
                         <div className="inline-block w-2.5 h-2.5 rounded-full mr-2" style={{ background: color }} />
                         <span className="font-sans text-[0.95rem] font-semibold text-deep">{label} Graphic</span>
-                        <p className="font-sans text-[0.8rem] text-slate mt-0.5">AI-powered custom graphic — 1080×1080, ready to post.</p>
+                        <p className="font-sans text-[0.8rem] text-slate mt-0.5">AI-powered custom graphic — 1080×1350 (4:5), ready to post.</p>
                       </div>
                       {!svg && (
                         <button
@@ -1117,10 +1122,11 @@ export default function ListingLaunchPage() {
                   <div className="p-4 border-t border-border">
                     <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                       <p className="font-sans text-[0.82rem] font-semibold text-deep">
-                        Select photos <span className="font-normal text-slate/60">— first selected becomes primary</span>
+                        Select up to 10 photos <span className="font-normal text-slate/60">— first selected becomes primary</span>
                       </p>
-                      <div className="flex gap-2">
-                        <button onClick={() => setPickerSelected(new Set(pickerPhotos.map((_, i) => i)))} className="font-sans text-[0.75rem] text-coral border-none bg-transparent cursor-pointer hover:underline">All</button>
+                      <div className="flex items-center gap-3">
+                        <span className="font-sans text-[0.75rem] text-slate">{pickerSelected.size}/10</span>
+                        <button onClick={() => setPickerSelected(new Set(pickerPhotos.slice(0, 10).map((_, i) => i)))} className="font-sans text-[0.75rem] text-coral border-none bg-transparent cursor-pointer hover:underline">First 10</button>
                         <button onClick={() => setPickerSelected(new Set())} className="font-sans text-[0.75rem] text-slate border-none bg-transparent cursor-pointer hover:underline">None</button>
                       </div>
                     </div>
@@ -1282,8 +1288,8 @@ export default function ListingLaunchPage() {
               <div className="space-y-3">
                 {[
                   { icon: "🏠", label: "Landing page", desc: "Property description, highlights, neighborhood, schools & market context" },
-                  { icon: "📱", label: "4 social graphics", desc: "Just Listed, Under Contract, Price Reduced, and Sold" },
-                  { icon: "✍️", label: "4 ready-to-post captions", desc: `Written in your ${agent.style} style for every stage` },
+                  { icon: "📱", label: "5 social graphics", desc: "For Sale, Just Listed, Under Contract, Price Refresh, and Sold" },
+                  { icon: "✍️", label: "5 ready-to-post captions", desc: `Written in your ${agent.style} style for every stage` },
                 ].map(({ icon, label, desc }) => (
                   <div key={label} className="flex items-start gap-4 bg-light-gray rounded-2xl p-4">
                     <span className="text-xl">{icon}</span>

@@ -221,6 +221,30 @@ function parseGeneric(html) {
   return { photos: allPhotos, listing: ldListing };
 }
 
+// ── URL deduplication — strips resize params to collapse same-image variants ──
+function deduplicatePhotos(urls) {
+  const seen = new Map(); // normalizedKey -> bestUrl
+  const RESIZE_PARAMS = new Set(["w", "h", "width", "height", "size", "q", "quality", "fit", "format", "auto", "crop", "resize", "scale", "dpr"]);
+  for (const url of urls) {
+    try {
+      const u = new URL(url);
+      RESIZE_PARAMS.forEach(p => u.searchParams.delete(p));
+      const key = u.origin + u.pathname;
+      if (!seen.has(key)) {
+        seen.set(key, url);
+      } else {
+        // Prefer the URL with no query string (cleanest), else keep longest
+        const existing = seen.get(key);
+        const noQ = !url.includes("?");
+        if (noQ || url.length > existing.length) seen.set(key, url);
+      }
+    } catch {
+      if (!seen.has(url)) seen.set(url, url);
+    }
+  }
+  return [...seen.values()];
+}
+
 // ── Route ─────────────────────────────────────────────────────────────────────
 export async function POST(req) {
   try {
@@ -264,7 +288,8 @@ export async function POST(req) {
       ({ photos, listing } = parseGeneric(html));
     }
 
-    return Response.json({ ok: true, photos, listing });
+    const dedupedPhotos = deduplicatePhotos(photos);
+    return Response.json({ ok: true, photos: dedupedPhotos, listing });
   } catch (err) {
     console.error("import-listing error:", err);
     return Response.json({ ok: false, error: err.message }, { status: 500 });
