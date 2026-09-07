@@ -353,12 +353,13 @@ function LandingPreview({ lp, listing, agent, primaryPhoto, additionalPhotos, te
           )}
           <p className="font-sans text-[0.88rem] mb-1" style={{ color: agent.footerTextColor || "#ffffff", opacity: 0.75 }}>{agent.officePhone} &nbsp;·&nbsp; Office</p>
           <p className="font-sans text-[0.88rem] mb-5" style={{ color: agent.footerTextColor || "#ffffff", opacity: 0.75 }}>{agent.mobilePhone} &nbsp;·&nbsp; Mobile</p>
-          <div
-            className="inline-block font-sans font-semibold text-[0.88rem] px-6 py-2.5 rounded-full mb-6"
+          <a
+            href={`tel:${agent.mobilePhone.replace(/\D/g, "")}`}
+            className="inline-block font-sans font-semibold text-[0.88rem] px-6 py-2.5 rounded-full mb-6 no-underline"
             style={{ background: accent, color: contrastText(accent) }}
           >
             {lp.callToAction}
-          </div>
+          </a>
           <p className="font-sans text-[0.72rem]" style={{ color: agent.footerTextColor || "#ffffff", opacity: 0.45 }}>Each office is independently owned and operated.</p>
         </div>
       </div>
@@ -549,7 +550,7 @@ export default function ListingLaunchPage() {
       const res = await fetch("/api/listing-launch/graphic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agent: a, listing: l, stage, primaryPhoto: primaryPhoto?.base64 || null, secondaryPhotos: additionalPhotos.slice(0, 2).map(p => p.base64), team }),
+        body: JSON.stringify({ agent: a, listing: l, stage, primaryPhoto: primaryPhoto?.base64 || null, secondaryPhotos: [...additionalPhotos].sort(() => Math.random() - 0.5).slice(0, 2).map(p => p.base64), team }),
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Graphic generation failed");
