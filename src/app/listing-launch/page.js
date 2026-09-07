@@ -153,7 +153,7 @@ function contrastText(hex) {
   return (r * 299 + g * 587 + b * 114) / 1000 >= 128 ? "#000000" : "#ffffff";
 }
 
-function LandingPreview({ lp, listing, agent, photos }) {
+function LandingPreview({ lp, listing, agent, photos, team }) {
   const [lightbox, setLightbox] = useState(null);
   const mainPhoto = photos?.[0]?.base64;
   const allPhotos = photos || [];
@@ -257,13 +257,27 @@ function LandingPreview({ lp, listing, agent, photos }) {
 
         {/* Agent CTA / Footer */}
         <div className="rounded-2xl p-8 text-center" style={{ background: primary }}>
-          <img
-            src="/logos/KW%20Logos/RGB/KellerWilliams_Realty_GreaterChattanooga_Logo_RGB-rev.png"
-            alt="Keller Williams Realty Greater Chattanooga"
-            className="mx-auto mb-5 w-auto"
-            style={{ height: 72 }}
-          />
-          <p className="font-serif text-[1.3rem] mb-1" style={{ color: agent.footerTextColor || "#ffffff" }}>{agent.name}</p>
+          {/* Logo row — KW + team logo side by side */}
+          <div className="flex items-center justify-center gap-6 mb-5 flex-wrap">
+            <img
+              src="/logos/KW%20Logos/RGB/KellerWilliams_Realty_GreaterChattanooga_Logo_RGB-rev.png"
+              alt="Keller Williams Realty Greater Chattanooga"
+              className="w-auto object-contain"
+              style={{ height: 64 }}
+            />
+            {team?.logo && (
+              <img
+                src={team.logo}
+                alt={team.name || "Team logo"}
+                className="w-auto object-contain"
+                style={{ height: 64 }}
+              />
+            )}
+          </div>
+          <p className="font-serif text-[1.3rem] mb-0.5" style={{ color: agent.footerTextColor || "#ffffff" }}>{agent.name}</p>
+          {team?.name && (
+            <p className="font-sans text-[0.82rem] font-semibold mb-1" style={{ color: agent.footerTextColor || "#ffffff", opacity: 0.85 }}>{team.name}</p>
+          )}
           <p className="font-sans text-[0.88rem] mb-1" style={{ color: agent.footerTextColor || "#ffffff", opacity: 0.75 }}>{agent.officePhone} &nbsp;·&nbsp; Office</p>
           <p className="font-sans text-[0.88rem] mb-5" style={{ color: agent.footerTextColor || "#ffffff", opacity: 0.75 }}>{agent.mobilePhone} &nbsp;·&nbsp; Mobile</p>
           <div
@@ -298,6 +312,9 @@ export default function ListingLaunchPage() {
   const [listing, setListing] = useState({ address: "", city: "", state: "", zip: "", price: "", beds: "", baths: "", sqft: "", yearBuilt: "", features: "", notes: "" });
   const [photos, setPhotos] = useState([]); // array of { name, base64 }
   const photoInputRef = useRef(null);
+  const teamLogoRef = useRef(null);
+  const [team, setTeam] = useState({ name: "", logo: null }); // logo = full data URI
+  const [showTeam, setShowTeam] = useState(false);
 
   const addressRef = useRef(null);
   const acRef = useRef(null);
@@ -365,7 +382,7 @@ export default function ListingLaunchPage() {
       const res = await fetch("/api/listing-launch/graphic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agent: a, listing: l, stage, primaryPhoto: photos[0]?.base64 || null }),
+        body: JSON.stringify({ agent: a, listing: l, stage, primaryPhoto: photos[0]?.base64 || null, team }),
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Graphic generation failed");
@@ -521,7 +538,7 @@ export default function ListingLaunchPage() {
                 </div>
               )}
 
-              <LandingPreview lp={generated.landingPage} listing={l} agent={agent} photos={photos} />
+              <LandingPreview lp={generated.landingPage} listing={l} agent={agent} photos={photos} team={team} />
             </div>
           )}
 
@@ -748,6 +765,65 @@ export default function ListingLaunchPage() {
                   </div>
                 </div>
               </div>
+              {/* Team section */}
+              <div className="border border-border rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => setShowTeam(v => !v)}
+                  className="w-full flex items-center justify-between px-4 py-3 bg-transparent border-none cursor-pointer hover:bg-light-gray transition-colors"
+                >
+                  <span className="font-sans text-[0.88rem] font-semibold text-deep">Are you part of a team? <span className="font-normal text-slate">(optional)</span></span>
+                  <span className="font-sans text-[0.8rem] text-slate">{showTeam ? "▲" : "▼"}</span>
+                </button>
+                {showTeam && (
+                  <div className="px-4 pb-4 space-y-4 border-t border-border pt-4">
+                    <div>
+                      <label className={lCls}>Team Name</label>
+                      <input
+                        className={iCls}
+                        placeholder="The Smith Group"
+                        value={team.name}
+                        onChange={e => setTeam(t => ({ ...t, name: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <label className={lCls}>Team Logo <span className="font-normal text-slate/60">(optional)</span></label>
+                      <input
+                        ref={teamLogoRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async e => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = ev => setTeam(t => ({ ...t, logo: ev.target.result }));
+                          reader.readAsDataURL(file);
+                          e.target.value = "";
+                        }}
+                      />
+                      {team.logo ? (
+                        <div className="flex items-center gap-3 mt-1">
+                          <img src={team.logo} alt="Team logo" className="h-12 w-auto object-contain rounded-lg border border-border p-1 bg-white" />
+                          <button
+                            onClick={() => setTeam(t => ({ ...t, logo: null }))}
+                            className="font-sans text-[0.78rem] text-slate hover:text-coral transition-colors border-none bg-transparent cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => teamLogoRef.current?.click()}
+                          className="mt-1 w-full border-2 border-dashed border-border rounded-xl py-3 font-sans text-[0.85rem] text-slate hover:border-coral hover:text-coral transition-colors bg-transparent cursor-pointer"
+                        >
+                          + Upload Team Logo
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {kwError && (
                 <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
                   <p className="font-sans text-[0.85rem] text-red-600">{kwError}</p>

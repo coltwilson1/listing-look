@@ -24,7 +24,7 @@ function getLogoBase64(style) {
   } catch { return null; }
 }
 
-function injectAssets(svg, logoBase64, photoBase64) {
+function injectAssets(svg, logoBase64, photoBase64, teamLogoDataUri) {
   let injected = svg;
 
   // Inject photo as very first element (background layer)
@@ -33,10 +33,16 @@ function injectAssets(svg, logoBase64, photoBase64) {
     injected = injected.replace(/(<svg[^>]*>)/, `$1\n${photoEl}`);
   }
 
-  // Inject KW logo top-left at very end (top layer) — larger for legibility
+  // Inject KW logo top-left
   if (logoBase64) {
     const logoEl = `<image href="data:image/png;base64,${logoBase64}" x="30" y="24" width="540" height="142" preserveAspectRatio="xMinYMin meet"/>`;
     injected = injected.replace("</svg>", `${logoEl}\n</svg>`);
+  }
+
+  // Inject team logo top-right (if provided)
+  if (teamLogoDataUri) {
+    const teamEl = `<image href="${teamLogoDataUri}" x="810" y="30" width="240" height="130" preserveAspectRatio="xMaxYMin meet"/>`;
+    injected = injected.replace("</svg>", `${teamEl}\n</svg>`);
   }
 
   return injected;
@@ -44,7 +50,7 @@ function injectAssets(svg, logoBase64, photoBase64) {
 
 export async function POST(req) {
   try {
-    const { agent, listing, stage = "justListed", primaryPhoto } = await req.json();
+    const { agent, listing, stage = "justListed", primaryPhoto, team } = await req.json();
     const config = STAGE_CONFIG[stage] || STAGE_CONFIG.justListed;
     const primary = agent.primaryColor || "#C8102E";
     const accent  = agent.accentColor  || "#ffffff";
@@ -82,7 +88,7 @@ ${hasPhoto
 - Add subtle geometric shapes or depth elements for visual interest using a slightly lighter/darker shade of ${primary}`}
 
 LAYOUT (inspired by premium Canva real estate templates):
-1. TOP AREA (y: 0–140) — Leave clear for KW logo (injected separately)
+1. TOP AREA (y: 0–140) — Leave clear for logos (injected separately): KW logo top-left, ${team?.name ? `team logo top-right` : "no team logo"}
 2. MAIN HEADLINE (y: ~180–380) — Large elegant headline: "${config.headline}" — Georgia/serif font, ~110–130px, white, centered
 3. SPEC BAR (y: ~410) — Semi-transparent dark rounded pill: "${listing.beds} bed  |  ${listing.baths} bath  |  ${parseInt(listing.sqft || 0).toLocaleString()} sqft" — white text ~26px
 4. BOTTOM STRIP (y: ~760–980):
@@ -118,7 +124,7 @@ Return ONLY complete SVG starting with <svg and ending with </svg>. No markdown,
       else throw new Error("No valid SVG in response");
     }
 
-    svg = injectAssets(svg, logoBase64, primaryPhoto || null);
+    svg = injectAssets(svg, logoBase64, primaryPhoto || null, team?.logo || null);
 
     return Response.json({ ok: true, svg });
   } catch (err) {
