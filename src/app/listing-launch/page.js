@@ -137,10 +137,30 @@ function CaptionCard({ label, caption, color }) {
 
 // ── Landing page preview ──────────────────────────────────────────────────────
 
+function hexToRgba(hex, alpha) {
+  const c = (hex || "#1C1C2E").replace("#", "");
+  const r = parseInt(c.slice(0, 2), 16);
+  const g = parseInt(c.slice(2, 4), 16);
+  const b = parseInt(c.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function contrastText(hex) {
+  const c = (hex || "#ffffff").replace("#", "");
+  const r = parseInt(c.slice(0, 2), 16);
+  const g = parseInt(c.slice(2, 4), 16);
+  const b = parseInt(c.slice(4, 6), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 >= 128 ? "#000000" : "#ffffff";
+}
+
 function LandingPreview({ lp, listing, agent, photos }) {
   const [lightbox, setLightbox] = useState(null);
   const mainPhoto = photos?.[0]?.base64;
   const allPhotos = photos || [];
+  const primary = agent.primaryColor || "#C8102E";
+  const accent  = agent.accentColor  || "#ffffff";
+
+  const sectionLabel = "font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] mb-2";
 
   return (
     <div className="bg-white rounded-3xl border border-border overflow-hidden shadow-lg">
@@ -149,12 +169,14 @@ function LandingPreview({ lp, listing, agent, photos }) {
         className="relative px-8 py-14 text-center"
         style={mainPhoto
           ? { backgroundImage: `url(data:image/jpeg;base64,${mainPhoto})`, backgroundSize: "cover", backgroundPosition: "center" }
-          : { background: "#1C1C2E" }
+          : { background: primary }
         }
       >
-        {mainPhoto && <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(28,28,46,0.35), rgba(28,28,46,0.72))" }} />}
+        {mainPhoto && (
+          <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, ${hexToRgba(primary, 0.35)}, ${hexToRgba(primary, 0.72)})` }} />
+        )}
         <div className="relative z-10">
-          <div className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.18em] text-coral mb-3">Now Available</div>
+          <div className={`${sectionLabel} mb-3`} style={{ color: accent }}>Now Available</div>
           <h1 className="font-serif text-[clamp(1.5rem,3vw,2.4rem)] text-white leading-tight mb-3">{lp.headline}</h1>
           <p className="font-sans text-[0.95rem] text-white/75 mb-5">{lp.subheadline}</p>
           <div className="inline-flex gap-5 flex-wrap justify-center font-sans text-[0.85rem] text-white/85 bg-black/20 px-5 py-2.5 rounded-full backdrop-blur-sm">
@@ -177,14 +199,14 @@ function LandingPreview({ lp, listing, agent, photos }) {
       <div className="px-8 py-8 space-y-7">
         {/* Description */}
         <div>
-          <h3 className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] text-coral mb-2">About This Home</h3>
+          <h3 className={sectionLabel} style={{ color: primary }}>About This Home</h3>
           <p className="font-sans text-[0.9rem] text-slate leading-[1.75]">{lp.description}</p>
         </div>
 
         {/* Photo gallery — below description, scrollable row */}
         {allPhotos.length > 0 && (
           <div>
-            <h3 className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] text-coral mb-3">Photos</h3>
+            <h3 className={sectionLabel} style={{ color: primary }}>Photos</h3>
             <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: "thin" }}>
               {allPhotos.map((p, i) => (
                 <img
@@ -203,11 +225,11 @@ function LandingPreview({ lp, listing, agent, photos }) {
 
         {/* Highlights */}
         <div>
-          <h3 className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] text-coral mb-3">Property Highlights</h3>
+          <h3 className={`${sectionLabel} mb-3`} style={{ color: primary }}>Property Highlights</h3>
           <div className="grid grid-cols-2 gap-2">
             {(lp.highlights || []).map((h, i) => (
               <div key={i} className="flex items-start gap-2 font-sans text-[0.85rem] text-slate">
-                <span className="text-coral font-bold mt-0.5">✓</span> {h}
+                <span className="font-bold mt-0.5" style={{ color: primary }}>✓</span> {h}
               </div>
             ))}
           </div>
@@ -215,24 +237,24 @@ function LandingPreview({ lp, listing, agent, photos }) {
 
         {/* Neighborhood */}
         <div>
-          <h3 className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] text-coral mb-2">The Neighborhood</h3>
+          <h3 className={sectionLabel} style={{ color: primary }}>The Neighborhood</h3>
           <p className="font-sans text-[0.9rem] text-slate leading-[1.75]">{lp.neighborhood}</p>
         </div>
 
         {/* Schools */}
         <div>
-          <h3 className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] text-coral mb-2">Schools</h3>
+          <h3 className={sectionLabel} style={{ color: primary }}>Schools</h3>
           <p className="font-sans text-[0.9rem] text-slate leading-[1.75]">{lp.schools}</p>
         </div>
 
         {/* Market */}
         <div>
-          <h3 className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] text-coral mb-2">Local Market</h3>
+          <h3 className={sectionLabel} style={{ color: primary }}>Local Market</h3>
           <p className="font-sans text-[0.9rem] text-slate leading-[1.75]">{lp.marketContext}</p>
         </div>
 
         {/* Agent CTA / Footer */}
-        <div className="bg-deep rounded-2xl p-8 text-center">
+        <div className="rounded-2xl p-8 text-center" style={{ background: primary }}>
           <img
             src="/logos/KW%20Logos/RGB/KellerWilliams_Realty_GreaterChattanooga_Logo_RGB-rev.png"
             alt="Keller Williams Realty Greater Chattanooga"
@@ -242,7 +264,10 @@ function LandingPreview({ lp, listing, agent, photos }) {
           <p className="font-serif text-[1.3rem] text-white mb-1">{agent.name}</p>
           <p className="font-sans text-[0.88rem] text-white/70 mb-1">{agent.officePhone} &nbsp;·&nbsp; Office</p>
           <p className="font-sans text-[0.88rem] text-white/70 mb-5">{agent.mobilePhone} &nbsp;·&nbsp; Mobile</p>
-          <div className="inline-block bg-coral text-white font-sans font-semibold text-[0.88rem] px-6 py-2.5 rounded-full mb-6">
+          <div
+            className="inline-block font-sans font-semibold text-[0.88rem] px-6 py-2.5 rounded-full mb-6"
+            style={{ background: accent, color: contrastText(accent) }}
+          >
             {lp.callToAction}
           </div>
           <p className="font-sans text-[0.72rem] text-white/40">Each office is independently owned and operated.</p>
