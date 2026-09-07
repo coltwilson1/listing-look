@@ -157,41 +157,8 @@ const DEFAULTS = {
   },
 };
 
-function mergeContent(data) {
-  if (!data) return DEFAULTS;
-  return {
-    hero: { ...DEFAULTS.hero, ...data.hero },
-    stats: data.stats?.length ? data.stats : DEFAULTS.stats,
-    howItWorks: {
-      ...DEFAULTS.howItWorks,
-      ...data.howItWorks,
-      steps: data.howItWorks?.steps?.length ? data.howItWorks.steps : DEFAULTS.howItWorks.steps,
-    },
-    services: {
-      ...DEFAULTS.services,
-      tag: data.services?.tag || DEFAULTS.services.tag,
-      title: data.services?.title || DEFAULTS.services.title,
-      subtitle: data.services?.subtitle || DEFAULTS.services.subtitle,
-      items: DEFAULTS.services.items,
-    },
-    customOrder: {
-      ...DEFAULTS.customOrder,
-      ...data.customOrder,
-      steps: data.customOrder?.steps?.length ? data.customOrder.steps : DEFAULTS.customOrder.steps,
-    },
-    account: {
-      ...DEFAULTS.account,
-      ...data.account,
-      cards: data.account?.cards?.length ? data.account.cards : DEFAULTS.account.cards,
-    },
-    payment: { ...DEFAULTS.payment, ...data.payment },
-    footer: {
-      ...DEFAULTS.footer,
-      ...data.footer,
-      servicesLinks: data.footer?.servicesLinks?.length ? data.footer.servicesLinks : DEFAULTS.footer.servicesLinks,
-      accountLinks: data.footer?.accountLinks?.length ? data.footer.accountLinks : DEFAULTS.footer.accountLinks,
-    },
-  };
+function mergeContent(_data) {
+  return DEFAULTS;
 }
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
