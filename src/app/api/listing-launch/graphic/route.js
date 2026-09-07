@@ -60,7 +60,13 @@ PROPERTY:
 ${config.showPrice ? `- Price: ${priceText}` : ""}
 - ${listing.beds} bed · ${listing.baths} bath · ${parseInt(listing.sqft || 0).toLocaleString()} sqft
 
-AGENT: ${agent.name} | ${agent.officePhone}
+AGENT: ${agent.name}
+Office: ${agent.officePhone}
+Mobile: ${agent.mobilePhone}
+
+COLORS (use these exactly — do not substitute):
+- Primary / background: ${primary}
+- Accent / highlight: ${accent}
 
 DESIGN SPEC — SVG viewBox "0 0 1080 1080", square Instagram format:
 
@@ -70,30 +76,30 @@ ${hasPhoto
 - DO include a full-size gradient overlay rect immediately after the opening <svg> tag:
   <defs><linearGradient id="ov" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${primary}" stop-opacity="0.05"/><stop offset="40%" stop-color="${primary}" stop-opacity="0.20"/><stop offset="100%" stop-color="${primary}" stop-opacity="0.68"/></linearGradient></defs><rect width="1080" height="1080" fill="url(#ov)"/>
 - The photo must remain clearly visible — the overlay is subtle, not heavy
-- All text must be white or light — it sits over the lightly darkened photo`
+- All text must be white or very light — it sits over the darkened photo`
   : `SOLID BACKGROUND MODE:
-- Full background rect: fill="${primary}"
-- Add subtle geometric shapes and depth elements for visual interest`}
+- Full background rect fill="${primary}" — use this exact hex color, no substitutions
+- Add subtle geometric shapes or depth elements for visual interest using a slightly lighter/darker shade of ${primary}`}
 
 LAYOUT (inspired by premium Canva real estate templates):
 1. TOP AREA (y: 0–140) — Leave clear for KW logo (injected separately)
 2. MAIN HEADLINE (y: ~180–380) — Large elegant headline: "${config.headline}" — Georgia/serif font, ~110–130px, white, centered
 3. SPEC BAR (y: ~410) — Semi-transparent dark rounded pill: "${listing.beds} bed  |  ${listing.baths} bath  |  ${parseInt(listing.sqft || 0).toLocaleString()} sqft" — white text ~26px
-4. BOTTOM STRIP (y: ~780–980):
-   - Location pin (▼ or ● symbol) + address text, left-aligned, white ~28px
-   ${config.showPrice ? `- Price "${priceText}" right-aligned, ${accent} color, bold ~52px` : ""}
-   - Thin horizontal rule line above the bottom strip
+4. BOTTOM STRIP (y: ~760–980):
+   - Location pin (● symbol) + address text, left-aligned, white ~26px
+   ${config.showPrice ? `- Price "${priceText}" right-aligned, color="${accent}", bold ~52px` : ""}
+   - Thin horizontal rule line
    - Agent name: bold, white, 34px — must be clearly legible
-   - Office phone: white 85% opacity, 28px — displayed directly below agent name
-5. COMPLIANCE FOOTER (y: ~1025–1060) — white 60% opacity, 20px:
-   "${agent.name} | ${agent.officePhone}"
-   "Each office is independently owned and operated." on the line below at 18px
+   - "O: ${agent.officePhone}  M: ${agent.mobilePhone}" — white 85% opacity, 26px — on one line directly below agent name
+5. COMPLIANCE FOOTER (y: ~1030–1065) — white 55% opacity, 18px:
+   "${agent.name} | ${agent.officePhone} | ${agent.mobilePhone}"
+   "Each office is independently owned and operated." on the line below at 16px
 
 STYLE NOTES:
-- Accent color: ${accent}
-- Elegant, high-end real estate aesthetic — NOT generic
+- Use accent color ${accent} for price text and any decorative lines/elements
+- Elegant, high-end real estate aesthetic — NOT generic or template-looking
 - System fonts only: Georgia, Arial, sans-serif — NO external references, NO xlink, NO <image> tags
-- Agent name and phone MUST be large enough to read on a phone screen — do not make them small
+- Agent name and both phone numbers MUST be large enough to read on a phone screen
 
 Return ONLY complete SVG starting with <svg and ending with </svg>. No markdown, no explanation.`;
 
