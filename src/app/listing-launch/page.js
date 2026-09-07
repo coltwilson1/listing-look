@@ -248,13 +248,21 @@ function LandingPreview({ lp, listing, agent, photos }) {
           <p className="font-sans text-[0.9rem] text-slate leading-[1.75]">{lp.marketContext}</p>
         </div>
 
-        {/* Agent CTA */}
-        <div className="bg-light-gray rounded-2xl p-6 text-center">
-          <p className="font-serif text-[1.1rem] text-deep mb-1">{agent.name}</p>
-          <p className="font-sans text-[0.82rem] text-slate mb-4">{agent.brokerage}</p>
-          <div className="inline-block bg-coral text-white font-sans font-semibold text-[0.88rem] px-6 py-2.5 rounded-full">
+        {/* Agent CTA / Footer */}
+        <div className="bg-deep rounded-2xl p-8 text-center">
+          <img
+            src="/logos/KW%20Logos/RGB/KellerWilliams_Realty_GreaterChattanooga_Logo_RGB-rev.png"
+            alt="Keller Williams Realty Greater Chattanooga"
+            className="mx-auto mb-5 w-auto"
+            style={{ height: 72 }}
+          />
+          <p className="font-serif text-[1.3rem] text-white mb-1">{agent.name}</p>
+          <p className="font-sans text-[0.88rem] text-white/70 mb-1">{agent.officePhone} &nbsp;·&nbsp; Office</p>
+          <p className="font-sans text-[0.88rem] text-white/70 mb-5">{agent.mobilePhone} &nbsp;·&nbsp; Mobile</p>
+          <div className="inline-block bg-coral text-white font-sans font-semibold text-[0.88rem] px-6 py-2.5 rounded-full mb-6">
             {lp.callToAction}
           </div>
+          <p className="font-sans text-[0.72rem] text-white/40">Each office is independently owned and operated.</p>
         </div>
       </div>
     </div>
