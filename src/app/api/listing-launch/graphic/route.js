@@ -13,30 +13,66 @@ const STAGE_CONFIG = {
 };
 
 
-function getLogoBase64(style) {
+function bgIsRedLike(hex) {
+  const c = (hex || "").replace("#", "").padEnd(6, "0");
+  const r = parseInt(c.slice(0, 2), 16);
+  const g = parseInt(c.slice(2, 4), 16);
+  const b = parseInt(c.slice(4, 6), 16);
+  return r > 140 && r > g * 2.5 && r > b * 2;
+}
+
+function getLogoBase64(style, bgColor) {
+  // If background clashes with KW red → always use pure white logo
+  const useWhite = bgIsRedLike(bgColor);
+  const r = Math.random();
+
+  let folder, file;
+  if (useWhite) {
+    folder = "Black_White";
+    file = "KellerWilliams_Realty_GreaterChattanooga_Logo_rev-W.png";
+  } else if (style === "energetic") {
+    // 50% colored, 30% grey-reversed, 20% pure white
+    if (r < 0.50) { folder = "RGB";         file = "KellerWilliams_Realty_GreaterChattanooga_Logo_RGB-rev.png"; }
+    else if (r < 0.80) { folder = "Black_White"; file = "KellerWilliams_Realty_GreaterChattanooga_Logo_GRY-rev.png"; }
+    else           { folder = "Black_White"; file = "KellerWilliams_Realty_GreaterChattanooga_Logo_rev-W.png"; }
+  } else {
+    // 30% colored, 45% grey-reversed, 25% pure white
+    if (r < 0.30) { folder = "RGB";         file = "KellerWilliams_Realty_GreaterChattanooga_Logo_RGB-rev.png"; }
+    else if (r < 0.75) { folder = "Black_White"; file = "KellerWilliams_Realty_GreaterChattanooga_Logo_GRY-rev.png"; }
+    else           { folder = "Black_White"; file = "KellerWilliams_Realty_GreaterChattanooga_Logo_rev-W.png"; }
+  }
+
   try {
-    const isEnergetic = style === "energetic";
-    const folder = isEnergetic ? "RGB" : "Black_White";
-    const file = isEnergetic
-      ? "KellerWilliams_Realty_GreaterChattanooga_Logo_RGB-rev.png"
-      : "KellerWilliams_Realty_GreaterChattanooga_Logo_GRY-rev.png";
     const logoPath = path.join(process.cwd(), "public", "logos", "KW Logos", folder, file);
     return fs.readFileSync(logoPath).toString("base64");
   } catch { return null; }
 }
 
-function pickLayout(hasPhoto, secondaryCount) {
+// Each stage has a preferred layout so all 5 graphics look visually distinct.
+// Math.random() still applies so Regenerate will produce variety.
+const STAGE_PREFERRED_LAYOUT = {
+  forSale:       "fullBleed",
+  justListed:    "topHero",
+  underContract: "collageSplit",
+  priceRefresh:  "topHero",
+  sold:          "fullBleed",
+};
+
+function pickLayout(hasPhoto, secondaryCount, stage) {
   if (!hasPhoto) return "noPhoto";
-  if (secondaryCount >= 2) {
-    const opts = ["fullBleed", "topHero", "collageSplit"];
-    return opts[Math.floor(Math.random() * opts.length)];
+  const withCollage = ["fullBleed", "topHero", "collageSplit"];
+  const simple      = ["fullBleed", "topHero"];
+  const layouts = secondaryCount >= 1 ? withCollage : simple;
+
+  const preferred = STAGE_PREFERRED_LAYOUT[stage];
+  // 65% use the stage-preferred layout; 35% pick a random alternative for variety
+  if (preferred && layouts.includes(preferred) && Math.random() < 0.65) {
+    return preferred;
   }
-  if (secondaryCount === 1) {
-    const opts = ["fullBleed", "topHero", "collageSplit"];
-    return opts[Math.floor(Math.random() * opts.length)];
-  }
-  const opts = ["fullBleed", "topHero"];
-  return opts[Math.floor(Math.random() * opts.length)];
+  // Pick any layout, weighted away from preferred to maximise variety
+  const others = layouts.filter(l => l !== preferred);
+  const pool = others.length > 0 ? others : layouts;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function injectAssets(svg, logoBase64, primaryPhoto, teamLogoDataUri, layout, secondaryPhotos, primaryColor) {
@@ -114,9 +150,9 @@ export async function POST(req) {
     const config   = STAGE_CONFIG[stage] || STAGE_CONFIG.justListed;
     const primary  = agent.primaryColor || "#C8102E";
     const accent   = agent.accentColor  || "#ffffff";
-    const logoBase64 = getLogoBase64(agent.style);
+    const logoBase64 = getLogoBase64(agent.style, primary);
     const hasPhoto = !!primaryPhoto;
-    const layout   = pickLayout(hasPhoto, secondaryPhotos.length);
+    const layout   = pickLayout(hasPhoto, secondaryPhotos.length, stage);
 
     const priceText = `$${parseInt(listing.price).toLocaleString()}`;
 

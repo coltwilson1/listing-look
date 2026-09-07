@@ -333,7 +333,7 @@ function LandingPreview({ lp, listing, agent, primaryPhoto, additionalPhotos, te
           {/* Logo row — KW + team logo side by side */}
           <div className="flex items-center justify-center gap-6 mb-5 flex-wrap">
             <img
-              src="/logos/KW%20Logos/RGB/KellerWilliams_Realty_GreaterChattanooga_Logo_RGB-rev.png"
+              src="/logos/KW%20Logos/Black_White/KellerWilliams_Realty_GreaterChattanooga_Logo_rev-W.png"
               alt="Keller Williams Realty Greater Chattanooga"
               className="w-auto object-contain"
               style={{ height: 64 }}
