@@ -97,12 +97,14 @@ export default function ServicesWithModals({ content: c }) {
               <p className="font-sans text-[0.95rem] text-white/65 leading-[1.75] mb-8 max-w-[400px]">
                 A complete marketing package for a single listing — landing page, social graphics for every stage, and ready-to-use captions. No subscription needed.
               </p>
-              <button
-                onClick={scrollToStart}
-                className="font-sans bg-coral text-white font-semibold px-8 py-3.5 rounded-full text-[0.9rem] border-none cursor-pointer hover:bg-coral-dark hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(232,130,90,0.4)] transition-all duration-200"
+              <a
+                href="/listing-launch"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block font-sans bg-coral text-white font-semibold px-8 py-3.5 rounded-full text-[0.9rem] no-underline hover:bg-coral-dark hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(232,130,90,0.4)] transition-all duration-200"
               >
-                Order a Listing Launch
-              </button>
+                Launch Your Listing ✨
+              </a>
             </div>
 
             {/* Right: features */}
