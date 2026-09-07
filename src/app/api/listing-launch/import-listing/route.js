@@ -87,12 +87,109 @@ function parseRealtor(html) {
   return { photos: photos.slice(0, 15), listing };
 }
 
-// ── og:image fallback ─────────────────────────────────────────────────────────
-function extractOgImages(html) {
+// ── JSON-LD parser (schema.org — works for KW and many IDX sites) ─────────────
+function parseJsonLD(html) {
+  const photos = [];
+  const listing = {};
+
+  const blocks = [...html.matchAll(/<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)];
+  for (const [, raw] of blocks) {
+    let data;
+    try { data = JSON.parse(raw.trim()); } catch { continue; }
+
+    // Walk arrays (some sites emit @graph)
+    const items = Array.isArray(data) ? data : data["@graph"] ? data["@graph"] : [data];
+    for (const item of items) {
+      const type = (item["@type"] || "").toLowerCase();
+      if (!/(residence|house|home|property|realestate|singlefamily|apartment|condo)/i.test(type)) continue;
+
+      // Address
+      const addr = item.address || {};
+      if (addr.streetAddress) listing.address = addr.streetAddress;
+      if (addr.addressLocality) listing.city = addr.addressLocality;
+      if (addr.addressRegion)   listing.state = addr.addressRegion;
+      if (addr.postalCode)      listing.zip   = addr.postalCode;
+
+      // Details
+      if (item.numberOfBedrooms)     listing.beds  = String(item.numberOfBedrooms);
+      if (item.numberOfBathroomsTotal) listing.baths = String(item.numberOfBathroomsTotal);
+      if (item.floorSize?.value)     listing.sqft  = String(Math.round(item.floorSize.value));
+      if (item.yearBuilt)            listing.yearBuilt = String(item.yearBuilt);
+      if (item.description)          listing.features  = item.description.slice(0, 300);
+
+      // Price
+      const price = item.offers?.price || item.price;
+      if (price) listing.price = String(price).replace(/\D/g, "");
+
+      // Photos
+      const imgs = Array.isArray(item.image) ? item.image : item.image ? [item.image] : [];
+      for (const img of imgs) {
+        const src = typeof img === "string" ? img : img.url || img.contentUrl || "";
+        if (src.startsWith("http")) photos.push(src);
+      }
+    }
+  }
+  return { photos: photos.slice(0, 15), listing };
+}
+
+// ── KW.com parser ─────────────────────────────────────────────────────────────
+function parseKW(html) {
+  // Try JSON-LD first (KW platform uses schema.org)
+  const { photos: ldPhotos, listing: ldListing } = parseJsonLD(html);
+
+  // Also scrape KW CDN photo URLs directly from the page source
+  const norm = html.replace(/\\u002F/g, "/");
+  const cdnPhotos = [];
+  const cdnRe = /https?:\/\/[a-zA-Z0-9\-]+\.kwcdn\.com\/[^\s"'<>]+\.(?:jpg|jpeg|png|webp)/gi;
+  const seen = new Set();
+  for (const [url] of norm.matchAll(cdnRe)) {
+    if (url.includes("thumb") || url.includes("_t.") || url.includes("icon")) continue;
+    if (!seen.has(url)) { seen.add(url); cdnPhotos.push(url); }
+  }
+
+  // Also try __NEXT_DATA__ (KW sites are often Next.js)
+  const ndMatch = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+  const ndPhotos = [];
+  if (ndMatch) {
+    const nd = ndMatch[1].replace(/\\u002F/g, "/");
+    const ndRe = /https?:\/\/[^\s"'\\]+\.(?:jpg|jpeg|png|webp)/gi;
+    const ndSeen = new Set();
+    for (const [url] of nd.matchAll(ndRe)) {
+      if (url.includes("thumb") || url.includes("logo") || url.includes("icon")) continue;
+      if (!ndSeen.has(url)) { ndSeen.add(url); ndPhotos.push(url); }
+    }
+
+    // Listing data from __NEXT_DATA__ if JSON-LD didn't get it
+    if (!ldListing.address) {
+      const g = (re) => { const m = nd.match(re); return m ? m[1] : ""; };
+      if (!ldListing.address)   ldListing.address   = g(/"streetAddress"\s*:\s*"([^"]+)"/);
+      if (!ldListing.city)      ldListing.city       = g(/"city"\s*:\s*"([^"]+)"/);
+      if (!ldListing.state)     ldListing.state      = g(/"state(?:Code)?"\s*:\s*"([A-Z]{2})"/);
+      if (!ldListing.zip)       ldListing.zip        = g(/"zip(?:code|Code)?"\s*:\s*"([^"]+)"/);
+      if (!ldListing.price)     ldListing.price      = g(/"(?:listPrice|list_price|price)"\s*:\s*(\d+)/);
+      if (!ldListing.beds)      ldListing.beds       = g(/"(?:beds|bedrooms)"\s*:\s*(\d+)/);
+      if (!ldListing.baths)     ldListing.baths      = g(/"(?:baths|bathrooms)"\s*:\s*([\d.]+)/);
+      if (!ldListing.sqft)      ldListing.sqft       = g(/"(?:sqft|squareFeet|livingArea)"\s*:\s*(\d+)/);
+      if (!ldListing.yearBuilt) ldListing.yearBuilt  = g(/"yearBuilt"\s*:\s*(\d{4})/);
+    }
+  }
+
+  // Merge photos: CDN-specific > JSON-LD > __NEXT_DATA__ catches
+  const allPhotos = [...new Set([...cdnPhotos, ...ldPhotos, ...ndPhotos])].slice(0, 15);
+  return { photos: allPhotos, listing: ldListing };
+}
+
+// ── og:image + JSON-LD generic fallback ───────────────────────────────────────
+function parseGeneric(html) {
+  // Try JSON-LD structured data first
+  const { photos: ldPhotos, listing: ldListing } = parseJsonLD(html);
+  if (ldPhotos.length > 0 || ldListing.address) return { photos: ldPhotos, listing: ldListing };
+
+  // og:image as last resort
   const photos = [];
   const re = /<meta[^>]+property="og:image"[^>]+content="([^"]+)"/gi;
   for (const [, url] of html.matchAll(re)) if (url.startsWith("http")) photos.push(url);
-  return photos.slice(0, 1);
+  return { photos: photos.slice(0, 1), listing: ldListing };
 }
 
 // ── Route ─────────────────────────────────────────────────────────────────────
@@ -117,8 +214,10 @@ export async function POST(req) {
       ({ photos, listing } = parseZillow(html));
     } else if (url.includes("realtor.com")) {
       ({ photos, listing } = parseRealtor(html));
+    } else if (url.includes("kw.com")) {
+      ({ photos, listing } = parseKW(html));
     } else {
-      photos = extractOgImages(html);
+      ({ photos, listing } = parseGeneric(html));
     }
 
     return Response.json({ ok: true, photos, listing });

@@ -832,7 +832,7 @@ export default function ListingLaunchPage() {
           <div className="flex gap-2">
             <input
               className="flex-1 bg-light-gray border border-border rounded-xl px-3 py-2 text-deep text-[0.85rem] placeholder:text-slate/40 focus:outline-none focus:border-coral transition-colors font-sans"
-              placeholder="Paste your listing URL to auto-fill everything…"
+              placeholder="Paste your Zillow, KW, or Realtor.com listing URL…"
               value={importUrl}
               onChange={e => setImportUrl(e.target.value)}
               onKeyDown={e => e.key === "Enter" && handleImport()}

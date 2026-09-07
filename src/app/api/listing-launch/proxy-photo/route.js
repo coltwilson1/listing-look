@@ -1,10 +1,28 @@
-const ALLOWED_DOMAINS = [
+// Trusted real-estate photo CDN domain fragments
+const ALLOWED_FRAGMENTS = [
   "photos.zillowstatic.com",
   "ap.rdcpix.com",
   "rdcpix.com",
   "media.realtor.com",
   "photos.mlslistings.com",
+  "kwcdn.com",          // Keller Williams CDN
+  "kw.com",            // KW agent sites
+  "kwrealty.com",
+  "mlsimages.net",
+  "mlsphoto.com",
 ];
+
+// Also allow any URL that clearly looks like a listing photo (image extension + photo/listing CDN pattern)
+function isPhotoUrlAllowed(url) {
+  if (ALLOWED_FRAGMENTS.some((f) => url.includes(f))) return true;
+  // Allow image URLs from domains that contain real-estate-adjacent keywords
+  try {
+    const hostname = new URL(url).hostname;
+    const isImageExt = /\.(jpg|jpeg|png|webp)(\?|$)/i.test(url);
+    const looksLikeCdn = /\b(cdn|photo|image|media|listing|property|static|assets)\b/i.test(hostname);
+    return isImageExt && looksLikeCdn;
+  } catch { return false; }
+}
 
 export async function GET(req) {
   try {
@@ -12,8 +30,7 @@ export async function GET(req) {
     const photoUrl = searchParams.get("url");
     if (!photoUrl) return new Response("Missing url", { status: 400 });
 
-    const isAllowed = ALLOWED_DOMAINS.some((d) => photoUrl.includes(d));
-    if (!isAllowed) return new Response("Domain not allowed", { status: 403 });
+    if (!isPhotoUrlAllowed(photoUrl)) return new Response("Domain not allowed", { status: 403 });
 
     const res = await fetch(photoUrl, {
       headers: {
