@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Large logo files — only PNGs are committed
+*.eps
+public/logos/**/*.jpg
+public/logos/**/*.JPG
