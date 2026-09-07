@@ -263,16 +263,16 @@ function LandingPreview({ lp, listing, agent, photos }) {
             className="mx-auto mb-5 w-auto"
             style={{ height: 72 }}
           />
-          <p className="font-serif text-[1.3rem] text-white mb-1">{agent.name}</p>
-          <p className="font-sans text-[0.88rem] text-white/70 mb-1">{agent.officePhone} &nbsp;·&nbsp; Office</p>
-          <p className="font-sans text-[0.88rem] text-white/70 mb-5">{agent.mobilePhone} &nbsp;·&nbsp; Mobile</p>
+          <p className="font-serif text-[1.3rem] mb-1" style={{ color: agent.footerTextColor || "#ffffff" }}>{agent.name}</p>
+          <p className="font-sans text-[0.88rem] mb-1" style={{ color: agent.footerTextColor || "#ffffff", opacity: 0.75 }}>{agent.officePhone} &nbsp;·&nbsp; Office</p>
+          <p className="font-sans text-[0.88rem] mb-5" style={{ color: agent.footerTextColor || "#ffffff", opacity: 0.75 }}>{agent.mobilePhone} &nbsp;·&nbsp; Mobile</p>
           <div
             className="inline-block font-sans font-semibold text-[0.88rem] px-6 py-2.5 rounded-full mb-6"
             style={{ background: accent, color: contrastText(accent) }}
           >
             {lp.callToAction}
           </div>
-          <p className="font-sans text-[0.72rem] text-white/40">Each office is independently owned and operated.</p>
+          <p className="font-sans text-[0.72rem]" style={{ color: agent.footerTextColor || "#ffffff", opacity: 0.45 }}>Each office is independently owned and operated.</p>
         </div>
       </div>
     </div>
@@ -293,7 +293,7 @@ export default function ListingLaunchPage() {
 
   const [kwError, setKwError] = useState("");
   const [phoneErrors, setPhoneErrors] = useState({ officePhone: false, mobilePhone: false });
-  const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional", primaryColor: "#C8102E", accentColor: "#ffffff", labelColor: "", bodyColor: "#475569" });
+  const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional", primaryColor: "#C8102E", accentColor: "#ffffff", labelColor: "", bodyColor: "#475569", footerTextColor: "#ffffff" });
   const [themeOpen, setThemeOpen] = useState(false);
   const [listing, setListing] = useState({ address: "", city: "", state: "", zip: "", price: "", beds: "", baths: "", sqft: "", yearBuilt: "", features: "", notes: "" });
   const [photos, setPhotos] = useState([]); // array of { name, base64 }
@@ -470,13 +470,13 @@ export default function ListingLaunchPage() {
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-sans text-[0.95rem] font-semibold text-deep">Customize Theme</h3>
                     <button
-                      onClick={() => setAgent(a => ({ ...a, primaryColor: "#C8102E", accentColor: "#ffffff", labelColor: "", bodyColor: "#475569" }))}
+                      onClick={() => setAgent(a => ({ ...a, primaryColor: "#C8102E", accentColor: "#ffffff", labelColor: "", bodyColor: "#475569", footerTextColor: "#ffffff" }))}
                       className="font-sans text-[0.78rem] text-slate hover:text-coral transition-colors cursor-pointer border-none bg-transparent"
                     >
                       Reset to defaults
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 mb-5">
                     {[
                       { label: "Background / Brand", key: "primaryColor", hint: "Hero, footer, section labels" },
                       { label: "Accent / Button",    key: "accentColor",  hint: "CTA button, badge" },
@@ -497,6 +497,26 @@ export default function ListingLaunchPage() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                  <div className="border-t border-border pt-4">
+                    <p className="font-sans text-[0.75rem] font-semibold text-deep mb-0.5">Footer Text</p>
+                    <p className="font-sans text-[0.7rem] text-slate/60 mb-2 leading-snug">Name &amp; phone text on the colored footer</p>
+                    <div className="flex gap-2">
+                      {[{ label: "White", value: "#ffffff" }, { label: "Black", value: "#000000" }].map(({ label, value }) => (
+                        <button
+                          key={value}
+                          onClick={() => setAgent(a => ({ ...a, footerTextColor: value }))}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-sans text-[0.8rem] font-semibold cursor-pointer transition-all ${
+                            (agent.footerTextColor || "#ffffff") === value
+                              ? "border-coral text-coral bg-coral/5"
+                              : "border-border text-slate bg-white hover:border-slate/40"
+                          }`}
+                        >
+                          <span className="w-4 h-4 rounded-full border border-black/20 flex-shrink-0" style={{ background: value }} />
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
