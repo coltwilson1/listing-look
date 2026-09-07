@@ -34,6 +34,7 @@ const STYLES = [
 ];
 
 const COLOR_SCHEMES = [
+  { id: "kwred",     label: "KW Red",    swatch: ["#C8102E", "#ffffff"] },
   { id: "forest",    label: "Forest",    swatch: ["#1a3d35", "#c9a84c"] },
   { id: "navy",      label: "Navy",      swatch: ["#1C1C2E", "#E8825A"] },
   { id: "midnight",  label: "Midnight",  swatch: ["#0f0f0f", "#e2e8f0"] },
@@ -47,8 +48,7 @@ const COLOR_SCHEMES = [
   { id: "rose",      label: "Rose",      swatch: ["#2d1a1f", "#f9a8c9"] },
   { id: "emerald",   label: "Emerald",   swatch: ["#0f2d1f", "#34d399"] },
   { id: "desert",    label: "Desert",    swatch: ["#3d2a1a", "#e8c06a"] },
-  { id: "kwred",     label: "KW Red",    swatch: ["#1a0305", "#C8102E"] },
-  { id: "crimson",   label: "Crimson",   swatch: ["#2a0000", "#ffffff"] },
+  { id: "crimson",   label: "Crimson",   swatch: ["#7f0000", "#ffffff"] },
 ];
 
 async function compressPhoto(file) {
@@ -552,17 +552,13 @@ export default function ListingLaunchPage() {
                     <button
                       key={cs.id}
                       onClick={() => setAgent(a => ({ ...a, colorScheme: cs.id }))}
-                      className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 transition-all cursor-pointer ${agent.colorScheme === cs.id ? "border-coral" : "border-border hover:border-slate/30"}`}
-                      style={{ background: cs.swatch[0] }}
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all cursor-pointer bg-white ${agent.colorScheme === cs.id ? "border-coral" : "border-border hover:border-slate/30"}`}
                     >
-                      <span
-                        className="w-5 h-5 rounded-full flex-shrink-0 ring-2 ring-white/30"
-                        style={{ background: cs.swatch[1] }}
-                      />
-                      <span className="font-sans text-[0.8rem] font-semibold text-white drop-shadow-sm truncate">{cs.label}</span>
-                      {agent.colorScheme === cs.id && (
-                        <span className="ml-auto text-white text-[0.7rem] font-bold flex-shrink-0">✓</span>
-                      )}
+                      <span className="flex gap-1 flex-shrink-0">
+                        <span className="w-4 h-4 rounded-full border border-black/10" style={{ background: cs.swatch[0] }} />
+                        <span className="w-4 h-4 rounded-full border border-black/10" style={{ background: cs.swatch[1] }} />
+                      </span>
+                      <span className={`font-sans text-[0.78rem] font-semibold truncate ${agent.colorScheme === cs.id ? "text-coral" : "text-deep"}`}>{cs.label}</span>
                     </button>
                   ))}
                 </div>
