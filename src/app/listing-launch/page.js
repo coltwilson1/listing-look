@@ -157,8 +157,10 @@ function LandingPreview({ lp, listing, agent, photos }) {
   const [lightbox, setLightbox] = useState(null);
   const mainPhoto = photos?.[0]?.base64;
   const allPhotos = photos || [];
-  const primary = agent.primaryColor || "#C8102E";
-  const accent  = agent.accentColor  || "#ffffff";
+  const primary   = agent.primaryColor || "#C8102E";
+  const accent    = agent.accentColor  || "#ffffff";
+  const labelClr  = agent.labelColor   || primary;
+  const bodyClr   = agent.bodyColor    || "#475569";
 
   const sectionLabel = "font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] mb-2";
 
@@ -199,14 +201,14 @@ function LandingPreview({ lp, listing, agent, photos }) {
       <div className="px-8 py-8 space-y-7">
         {/* Description */}
         <div>
-          <h3 className={sectionLabel} style={{ color: primary }}>About This Home</h3>
-          <p className="font-sans text-[0.9rem] text-slate leading-[1.75]">{lp.description}</p>
+          <h3 className={sectionLabel} style={{ color: labelClr }}>About This Home</h3>
+          <p className="font-sans text-[0.9rem] leading-[1.75]" style={{ color: bodyClr }}>{lp.description}</p>
         </div>
 
         {/* Photo gallery — below description, scrollable row */}
         {allPhotos.length > 0 && (
           <div>
-            <h3 className={sectionLabel} style={{ color: primary }}>Photos</h3>
+            <h3 className={sectionLabel} style={{ color: labelClr }}>Photos</h3>
             <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: "thin" }}>
               {allPhotos.map((p, i) => (
                 <img
@@ -225,11 +227,11 @@ function LandingPreview({ lp, listing, agent, photos }) {
 
         {/* Highlights */}
         <div>
-          <h3 className={`${sectionLabel} mb-3`} style={{ color: primary }}>Property Highlights</h3>
+          <h3 className={`${sectionLabel} mb-3`} style={{ color: labelClr }}>Property Highlights</h3>
           <div className="grid grid-cols-2 gap-2">
             {(lp.highlights || []).map((h, i) => (
-              <div key={i} className="flex items-start gap-2 font-sans text-[0.85rem] text-slate">
-                <span className="font-bold mt-0.5" style={{ color: primary }}>✓</span> {h}
+              <div key={i} className="flex items-start gap-2 font-sans text-[0.85rem]" style={{ color: bodyClr }}>
+                <span className="font-bold mt-0.5" style={{ color: labelClr }}>✓</span> {h}
               </div>
             ))}
           </div>
@@ -237,20 +239,20 @@ function LandingPreview({ lp, listing, agent, photos }) {
 
         {/* Neighborhood */}
         <div>
-          <h3 className={sectionLabel} style={{ color: primary }}>The Neighborhood</h3>
-          <p className="font-sans text-[0.9rem] text-slate leading-[1.75]">{lp.neighborhood}</p>
+          <h3 className={sectionLabel} style={{ color: labelClr }}>The Neighborhood</h3>
+          <p className="font-sans text-[0.9rem] leading-[1.75]" style={{ color: bodyClr }}>{lp.neighborhood}</p>
         </div>
 
         {/* Schools */}
         <div>
-          <h3 className={sectionLabel} style={{ color: primary }}>Schools</h3>
-          <p className="font-sans text-[0.9rem] text-slate leading-[1.75]">{lp.schools}</p>
+          <h3 className={sectionLabel} style={{ color: labelClr }}>Schools</h3>
+          <p className="font-sans text-[0.9rem] leading-[1.75]" style={{ color: bodyClr }}>{lp.schools}</p>
         </div>
 
         {/* Market */}
         <div>
-          <h3 className={sectionLabel} style={{ color: primary }}>Local Market</h3>
-          <p className="font-sans text-[0.9rem] text-slate leading-[1.75]">{lp.marketContext}</p>
+          <h3 className={sectionLabel} style={{ color: labelClr }}>Local Market</h3>
+          <p className="font-sans text-[0.9rem] leading-[1.75]" style={{ color: bodyClr }}>{lp.marketContext}</p>
         </div>
 
         {/* Agent CTA / Footer */}
@@ -291,7 +293,8 @@ export default function ListingLaunchPage() {
 
   const [kwError, setKwError] = useState("");
   const [phoneErrors, setPhoneErrors] = useState({ officePhone: false, mobilePhone: false });
-  const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional", primaryColor: "#C8102E", accentColor: "#ffffff" });
+  const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional", primaryColor: "#C8102E", accentColor: "#ffffff", labelColor: "", bodyColor: "#475569" });
+  const [themeOpen, setThemeOpen] = useState(false);
   const [listing, setListing] = useState({ address: "", city: "", state: "", zip: "", price: "", beds: "", baths: "", sqft: "", yearBuilt: "", features: "", notes: "" });
   const [photos, setPhotos] = useState([]); // array of { name, base64 }
   const photoInputRef = useRef(null);
@@ -452,14 +455,102 @@ export default function ListingLaunchPage() {
 
           {activeTab === "landing" && (
             <div>
-              <p className="font-sans text-[0.85rem] text-slate mb-5">AI-powered landing page for <strong>{l.address}</strong>. This is a preview — send this to The Listing Look team to publish it as a live shareable link.</p>
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+                <p className="font-sans text-[0.85rem] text-slate">AI-powered landing page for <strong>{l.address}</strong>. Send to The Listing Look team to publish as a live shareable link.</p>
+                <button
+                  onClick={() => setThemeOpen(o => !o)}
+                  className="flex items-center gap-2 font-sans text-[0.85rem] font-semibold px-4 py-2 rounded-full border border-border bg-white hover:border-coral hover:text-coral transition-colors cursor-pointer text-slate"
+                >
+                  🎨 {themeOpen ? "Close Theme" : "Edit Theme"}
+                </button>
+              </div>
+
+              {themeOpen && (
+                <div className="bg-white border border-border rounded-2xl p-5 mb-5 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-sans text-[0.95rem] font-semibold text-deep">Customize Theme</h3>
+                    <button
+                      onClick={() => setAgent(a => ({ ...a, primaryColor: "#C8102E", accentColor: "#ffffff", labelColor: "", bodyColor: "#475569" }))}
+                      className="font-sans text-[0.78rem] text-slate hover:text-coral transition-colors cursor-pointer border-none bg-transparent"
+                    >
+                      Reset to defaults
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
+                    {[
+                      { label: "Background / Brand", key: "primaryColor", hint: "Hero, footer, section labels" },
+                      { label: "Accent / Button",    key: "accentColor",  hint: "CTA button, badge" },
+                      { label: "Section Headings",   key: "labelColor",   hint: "Small uppercase labels", fallback: agent.primaryColor },
+                      { label: "Body Text",          key: "bodyColor",    hint: "Paragraph text" },
+                    ].map(({ label, key, hint, fallback }) => (
+                      <div key={key}>
+                        <p className="font-sans text-[0.75rem] font-semibold text-deep mb-0.5">{label}</p>
+                        <p className="font-sans text-[0.7rem] text-slate/60 mb-2 leading-snug">{hint}</p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={agent[key] || fallback || "#475569"}
+                            onChange={e => setAgent(a => ({ ...a, [key]: e.target.value }))}
+                            className="w-12 h-10 rounded-xl border border-border cursor-pointer p-0.5 bg-white"
+                          />
+                          <span className="font-sans text-[0.75rem] text-slate uppercase tracking-wide">{agent[key] || fallback || "#475569"}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <LandingPreview lp={generated.landingPage} listing={l} agent={agent} photos={photos} />
             </div>
           )}
 
           {activeTab === "graphics" && (
             <div className="space-y-6">
-              <p className="font-sans text-[0.85rem] text-slate">Generate a custom 1080×1080 graphic for each stage — download as PNG or SVG and post directly.</p>
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <p className="font-sans text-[0.85rem] text-slate">Generate a custom 1080×1080 graphic for each stage — download as PNG or SVG and post directly.</p>
+                <button
+                  onClick={() => setThemeOpen(o => !o)}
+                  className="flex items-center gap-2 font-sans text-[0.85rem] font-semibold px-4 py-2 rounded-full border border-border bg-white hover:border-coral hover:text-coral transition-colors cursor-pointer text-slate"
+                >
+                  🎨 {themeOpen ? "Close Theme" : "Edit Theme"}
+                </button>
+              </div>
+
+              {themeOpen && (
+                <div className="bg-white border border-border rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-sans text-[0.95rem] font-semibold text-deep">Customize Theme</h3>
+                    <button
+                      onClick={() => setAgent(a => ({ ...a, primaryColor: "#C8102E", accentColor: "#ffffff" }))}
+                      className="font-sans text-[0.78rem] text-slate hover:text-coral transition-colors cursor-pointer border-none bg-transparent"
+                    >
+                      Reset to defaults
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-5">
+                    {[
+                      { label: "Background / Brand", key: "primaryColor", hint: "Main color behind the graphic" },
+                      { label: "Accent / Highlight",  key: "accentColor",  hint: "Price text, accent lines" },
+                    ].map(({ label, key, hint }) => (
+                      <div key={key}>
+                        <p className="font-sans text-[0.75rem] font-semibold text-deep mb-0.5">{label}</p>
+                        <p className="font-sans text-[0.7rem] text-slate/60 mb-2 leading-snug">{hint}</p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={agent[key] || "#C8102E"}
+                            onChange={e => setAgent(a => ({ ...a, [key]: e.target.value }))}
+                            className="w-12 h-10 rounded-xl border border-border cursor-pointer p-0.5 bg-white"
+                          />
+                          <span className="font-sans text-[0.75rem] text-slate uppercase tracking-wide">{agent[key] || "#C8102E"}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="font-sans text-[0.75rem] text-slate/50 mt-4">Color changes apply the next time you hit Design or Regenerate.</p>
+                </div>
+              )}
               {GRAPHIC_TYPES.map(({ key, label, color }) => {
                 const svg = svgGraphics[key];
                 const loading = graphicLoadings[key];
@@ -475,7 +566,7 @@ export default function ListingLaunchPage() {
                       </div>
                       {!svg && (
                         <button
-                          onClick={() => generateGraphic(l, a, key)}
+                          onClick={() => generateGraphic(l, agent, key)}
                           disabled={loading}
                           className="flex-shrink-0 flex items-center gap-2 bg-deep text-white font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full border-none cursor-pointer hover:bg-coral transition-colors disabled:opacity-60"
                         >
@@ -500,7 +591,7 @@ export default function ListingLaunchPage() {
                         <div className="flex gap-3 flex-wrap">
                           <button onClick={() => downloadPNG(svg, `${slug}.png`)} className="flex items-center gap-2 bg-coral text-white font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors">⬇ Download PNG</button>
                           <button onClick={() => downloadSVG(svg, `${slug}.svg`)} className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors">⬇ Download SVG</button>
-                          <button onClick={() => { setSvgGraphics(p => ({ ...p, [key]: null })); generateGraphic(l, a, key); }} className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors">↻ Regenerate</button>
+                          <button onClick={() => { setSvgGraphics(p => ({ ...p, [key]: null })); generateGraphic(l, agent, key); }} className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors">↻ Regenerate</button>
                         </div>
                       </div>
                     )}
