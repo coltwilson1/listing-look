@@ -149,8 +149,9 @@ function CaptionCard({ label, caption, color }) {
 // ── Landing page preview ──────────────────────────────────────────────────────
 
 function LandingPreview({ lp, listing, agent, photos }) {
+  const [lightbox, setLightbox] = useState(null);
   const mainPhoto = photos?.[0]?.base64;
-  const extraPhotos = photos?.slice(1) || [];
+  const allPhotos = photos || [];
 
   return (
     <div className="bg-white rounded-3xl border border-border overflow-hidden shadow-lg">
@@ -176,12 +177,11 @@ function LandingPreview({ lp, listing, agent, photos }) {
         </div>
       </div>
 
-      {/* Photo gallery */}
-      {extraPhotos.length > 0 && (
-        <div className={`grid gap-1 ${extraPhotos.length === 1 ? "grid-cols-1" : extraPhotos.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
-          {extraPhotos.map((p, i) => (
-            <img key={i} src={`data:image/jpeg;base64,${p.base64}`} alt="" className="w-full object-cover" style={{ height: 180 }} />
-          ))}
+      {/* Lightbox */}
+      {lightbox !== null && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
+          <img src={`data:image/jpeg;base64,${allPhotos[lightbox]?.base64}`} alt="" className="max-w-full max-h-full rounded-xl object-contain" onClick={e => e.stopPropagation()} />
+          <button onClick={() => setLightbox(null)} className="absolute top-4 right-4 text-white text-[1.5rem] bg-black/40 w-10 h-10 rounded-full border-none cursor-pointer flex items-center justify-center">×</button>
         </div>
       )}
 
@@ -191,6 +191,26 @@ function LandingPreview({ lp, listing, agent, photos }) {
           <h3 className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] text-coral mb-2">About This Home</h3>
           <p className="font-sans text-[0.9rem] text-slate leading-[1.75]">{lp.description}</p>
         </div>
+
+        {/* Photo gallery — below description, scrollable row */}
+        {allPhotos.length > 0 && (
+          <div>
+            <h3 className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] text-coral mb-3">Photos</h3>
+            <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: "thin" }}>
+              {allPhotos.map((p, i) => (
+                <img
+                  key={i}
+                  src={`data:image/jpeg;base64,${p.base64}`}
+                  alt=""
+                  onClick={() => setLightbox(i)}
+                  className="flex-shrink-0 rounded-xl object-cover cursor-pointer hover:opacity-90 transition-opacity border border-border"
+                  style={{ width: 220, height: 160 }}
+                />
+              ))}
+            </div>
+            <p className="font-sans text-[0.72rem] text-slate/50 mt-2">Tap any photo to enlarge</p>
+          </div>
+        )}
 
         {/* Highlights */}
         <div>
@@ -442,7 +462,7 @@ export default function ListingLaunchPage() {
                       )}
                     </div>
                     {err && <p className="font-sans text-[0.82rem] text-coral mb-3">{err}</p>}
-                    {loading && (
+                    {loading && !svg && (
                       <div className="bg-white rounded-2xl border border-border flex items-center justify-center" style={{ aspectRatio: "1/1", maxWidth: 380 }}>
                         <div className="text-center">
                           <div className="w-10 h-10 rounded-full border-2 border-coral border-t-transparent animate-spin mx-auto mb-3" />
