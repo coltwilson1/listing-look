@@ -169,8 +169,10 @@ function mergeContent(data) {
     },
     services: {
       ...DEFAULTS.services,
-      ...data.services,
-      items: data.services?.items?.length ? data.services.items : DEFAULTS.services.items,
+      tag: data.services?.tag || DEFAULTS.services.tag,
+      title: data.services?.title || DEFAULTS.services.title,
+      subtitle: data.services?.subtitle || DEFAULTS.services.subtitle,
+      items: DEFAULTS.services.items,
     },
     customOrder: {
       ...DEFAULTS.customOrder,
