@@ -878,7 +878,7 @@ export default function ListingLaunchPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={lCls}>TN License # <span className="text-coral">*</span></label>
+                  <label className={lCls}>TN License # <span className="font-normal text-slate/50 normal-case tracking-normal">(optional)</span></label>
                   <input className={iCls} placeholder="e.g. 123456" maxLength={7} value={agent.license} onChange={e => setAgent(a => ({ ...a, license: e.target.value }))} />
                 </div>
                 <div>
@@ -1026,7 +1026,7 @@ export default function ListingLaunchPage() {
               )}
               <button
                 onClick={() => { setKwError(""); setStep(1); }}
-                disabled={!agent.name || !agent.license || !phoneComplete(agent.officePhone) || !phoneComplete(agent.mobilePhone)}
+                disabled={!agent.name || !phoneComplete(agent.officePhone) || !phoneComplete(agent.mobilePhone)}
                 className="w-full bg-coral text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
               >
                 Continue →
