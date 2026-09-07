@@ -453,7 +453,7 @@ export default function ListingLaunchPage() {
           {activeTab === "landing" && (
             <div>
               <p className="font-sans text-[0.85rem] text-slate mb-5">AI-powered landing page for <strong>{l.address}</strong>. This is a preview — send this to The Listing Look team to publish it as a live shareable link.</p>
-              <LandingPreview lp={generated.landingPage} listing={l} agent={a} photos={photos} />
+              <LandingPreview lp={generated.landingPage} listing={l} agent={agent} photos={photos} />
             </div>
           )}
 
