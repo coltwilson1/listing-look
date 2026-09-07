@@ -50,9 +50,9 @@ function injectAssets(svg, logoBase64, photoBase64) {
     injected = injected.replace(/(<svg[^>]*>)/, `$1\n${photoEl}`);
   }
 
-  // Inject KW logo top-left at very end (top layer)
+  // Inject KW logo top-left at very end (top layer) — larger for legibility
   if (logoBase64) {
-    const logoEl = `<image href="data:image/png;base64,${logoBase64}" x="36" y="30" width="300" height="80" preserveAspectRatio="xMinYMin meet"/>`;
+    const logoEl = `<image href="data:image/png;base64,${logoBase64}" x="36" y="28" width="400" height="105" preserveAspectRatio="xMinYMin meet"/>`;
     injected = injected.replace("</svg>", `${logoEl}\n</svg>`);
   }
 
@@ -76,7 +76,7 @@ PROPERTY:
 ${config.showPrice ? `- Price: ${priceText}` : ""}
 - ${listing.beds} bed · ${listing.baths} bath · ${parseInt(listing.sqft || 0).toLocaleString()} sqft
 
-AGENT: ${agent.name} | License #${agent.license} | ${agent.mobilePhone}
+AGENT: ${agent.name} | ${agent.officePhone}
 
 DESIGN SPEC — SVG viewBox "0 0 1080 1080", square Instagram format:
 
@@ -96,19 +96,21 @@ LAYOUT (inspired by premium Canva real estate templates):
 2. BADGE (y: ~160) — Small pill badge centered: "${config.badge}" — rounded rect with ${scheme.accent} stroke, white text, ~22px font
 3. MAIN HEADLINE (y: ~230–400) — Large elegant headline: "${config.headline}" — Georgia/serif font, ~110–130px, white, centered
 4. SPEC BAR (y: ~430) — Semi-transparent dark rounded pill: "${listing.beds} bed  |  ${listing.baths} bath  |  ${parseInt(listing.sqft || 0).toLocaleString()} sqft" — white text ~26px
-5. BOTTOM STRIP (y: ~820–1000):
+5. BOTTOM STRIP (y: ~780–980):
    - Location pin (▼ or ● symbol) + address text, left-aligned, white ~28px
    ${config.showPrice ? `- Price "${priceText}" right-aligned, ${scheme.accent} color, bold ~52px` : ""}
    - Thin horizontal rule line above the bottom strip
-6. COMPLIANCE FOOTER (y: ~1030–1055) — white 55% opacity ~16px:
-   "${agent.name} | License #${agent.license} | ${agent.mobilePhone}"
-   "Each office is independently owned and operated." on the line below at ~14px
+   - Agent name: bold, white, 34px — must be clearly legible
+   - Office phone: white 85% opacity, 28px — displayed directly below agent name
+6. COMPLIANCE FOOTER (y: ~1025–1060) — white 60% opacity, 20px:
+   "${agent.name} | ${agent.officePhone}"
+   "Each office is independently owned and operated." on the line below at 18px
 
 STYLE NOTES:
 - Accent color: ${scheme.accent}
 - Elegant, high-end real estate aesthetic — NOT generic
 - System fonts only: Georgia, Arial, sans-serif — NO external references, NO xlink, NO <image> tags
-- Agent name near bottom must NOT exceed 24px
+- Agent name and phone MUST be large enough to read on a phone screen — do not make them small
 
 Return ONLY complete SVG starting with <svg and ending with </svg>. No markdown, no explanation.`;
 
