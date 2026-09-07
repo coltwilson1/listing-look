@@ -17,29 +17,29 @@ const DEFAULTS = {
   },
   stats: [
     { num: "3–5×", label: "Posts per week, every week" },
-    { num: "100%", label: "Custom to your brand & market" },
-    { num: "0", label: "Long-term contracts" },
+    { num: "1", label: "Discovery call before your first post" },
+    { num: "0", label: "Long-term contracts required" },
   ],
   howItWorks: {
     tag: "How It Works",
     title: "Up and running in days, not weeks.",
     subtitle:
-      "No complicated setup. Just pick a plan, share your brand details, and watch your feed stay active.",
+      "No guesswork, no back-and-forth. We start with a real conversation about your brand so every post feels like you.",
     steps: [
       {
         title: "Choose Your Plan",
         description:
-          "Pick Essential, Growth, or Signature based on how much content you want each week. Month-to-month, cancel anytime.",
+          "Pick Essential, Growth, or Signature based on how many posts you want each week. Month-to-month — no contracts, cancel anytime.",
       },
       {
-        title: "Quick Onboarding",
+        title: "Discovery Consultation",
         description:
-          "Share your logo, headshot, brand colors, and brokerage info. We build your brand kit and content calendar in days.",
+          "We hop on a one-time call to learn your style, branding, target audience, and goals — so the content is truly yours from day one.",
       },
       {
-        title: "Content Flows Every Week",
+        title: "We Post Every Week",
         description:
-          "Custom-branded posts go live on your Facebook & Instagram on a consistent schedule — listings, tips, market updates, and more.",
+          "We design and publish your posts directly to Facebook & Instagram on your behalf — using KW Command or your Facebook login.",
       },
     ],
   },
@@ -117,9 +117,9 @@ const DEFAULTS = {
       "Fill out the short form and we'll reach out within 24 hours to answer questions and get your account set up.",
     steps: [
       { icon: "📋", title: "Fill Out the Form", description: "Tell us which plan interests you and a bit about your goals." },
-      { icon: "💬", title: "We'll Reach Out", description: "Expect a reply within 24 hours to answer any questions." },
-      { icon: "🎨", title: "Quick Onboarding", description: "Share your branding and we'll build your content calendar." },
-      { icon: "📱", title: "Your Feed Goes Live", description: "Consistent, custom posts start flowing on schedule." },
+      { icon: "💬", title: "We'll Reach Out", description: "Expect a reply within 24 hours to confirm your plan and schedule your discovery call." },
+      { icon: "🤝", title: "Discovery Consultation", description: "A one-time call to learn your brand, style, target audience, and posting preferences — so everything feels like you." },
+      { icon: "📱", title: "We Post Every Week", description: "Custom-branded content goes live on your Facebook & Instagram — designed and posted entirely by us." },
     ],
   },
   account: {
@@ -338,7 +338,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "What do I need to provide to get started?",
-    a: "Just your logo, a headshot, your brand colors, and your brokerage name. For listing posts, we'll need property details when you have a new listing. We walk you through everything during a quick onboarding after you sign up.",
+    a: "Just your logo, a headshot, your brand colors, and your brokerage name. After you sign up, we schedule a one-time discovery consultation call to understand your style, audience, and posting preferences — then we take it from there.",
   },
   {
     q: "Can I buy Listing Launch without a monthly plan?",
