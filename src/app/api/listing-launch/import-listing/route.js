@@ -209,13 +209,20 @@ export async function POST(req) {
       return Response.json({ ok: false, error: "Invalid URL" }, { status: 400 });
     }
 
-    const res = await fetch(url, { headers: FETCH_HEADERS, redirect: "follow" });
+    const scraperKey = process.env.SCRAPER_API_KEY;
+    const fetchUrl = scraperKey
+      ? `http://api.scraperapi.com?api_key=${scraperKey}&url=${encodeURIComponent(url)}&render=false`
+      : url;
+    const fetchOpts = scraperKey
+      ? {}
+      : { headers: FETCH_HEADERS, redirect: "follow" };
+
+    const res = await fetch(fetchUrl, fetchOpts);
     if (!res.ok) {
       if (res.status === 429 || res.status === 403) {
-        const site = url.includes("zillow.com") ? "Zillow" : url.includes("realtor.com") ? "Realtor.com" : "This site";
         return Response.json({
           ok: false,
-          error: `${site} is blocking automated access right now. Try pasting your KW listing link instead, or upload photos manually below.`,
+          error: "This listing site is blocking access. Try a different link, or upload your photos manually below.",
         }, { status: 400 });
       }
       return Response.json({ ok: false, error: `Listing page returned ${res.status}` }, { status: 400 });
