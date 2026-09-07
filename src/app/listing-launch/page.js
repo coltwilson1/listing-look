@@ -283,7 +283,7 @@ export default function ListingLaunchPage() {
 
           {activeTab === "landing" && (
             <div>
-              <p className="font-sans text-[0.85rem] text-slate mb-5">AI-generated landing page for <strong>{l.address}</strong>. This is a preview — send this to The Listing Look team to publish it as a live shareable link.</p>
+              <p className="font-sans text-[0.85rem] text-slate mb-5">Landing page for <strong>{l.address}</strong>. This is a preview — send this to The Listing Look team to publish it as a live shareable link.</p>
               <LandingPreview lp={generated.landingPage} listing={l} agent={a} />
             </div>
           )}
@@ -294,8 +294,8 @@ export default function ListingLaunchPage() {
               <div className="bg-light-gray rounded-2xl p-6 mb-6">
                 <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
                   <div>
-                    <h3 className="font-sans text-[0.95rem] font-semibold text-deep mb-1">AI-Designed Just Listed Graphic</h3>
-                    <p className="font-sans text-[0.82rem] text-slate">Claude designs a unique 1080×1080 graphic for your listing — download as PNG or SVG and post directly.</p>
+                    <h3 className="font-sans text-[0.95rem] font-semibold text-deep mb-1">Just Listed Graphic</h3>
+                    <p className="font-sans text-[0.82rem] text-slate">A custom 1080×1080 graphic for your listing — download as PNG or SVG and post directly.</p>
                   </div>
                   {!svgGraphic && (
                     <button
@@ -390,7 +390,7 @@ export default function ListingLaunchPage() {
         <div className="text-center mb-8">
           <a href="/" className="font-serif text-[1.2rem] text-deep no-underline">The Listing <span className="text-coral">Look</span></a>
           <h1 className="font-serif text-[2rem] text-deep mt-4 mb-1">Listing Launch</h1>
-          <p className="font-sans text-[0.9rem] text-slate">Get a landing page, social graphics, and captions — AI-generated in seconds.</p>
+          <p className="font-sans text-[0.9rem] text-slate">Get a landing page, social graphics, and ready-to-post captions — built in seconds.</p>
         </div>
 
         <div className="bg-white rounded-3xl border border-border p-8 shadow-sm">
@@ -518,7 +518,7 @@ export default function ListingLaunchPage() {
             <div className="space-y-5">
               <div>
                 <h2 className="font-serif text-[1.5rem] text-deep mb-1">Property details</h2>
-                <p className="font-sans text-[0.87rem] text-slate mb-6">The more you share, the better the AI-generated content will be.</p>
+                <p className="font-sans text-[0.87rem] text-slate mb-6">The more detail you share, the better your content will be.</p>
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
