@@ -1,11 +1,20 @@
 const FETCH_HEADERS = {
   "User-Agent":
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
   Accept:
-    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-  "Accept-Language": "en-US,en;q=0.5",
+    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Accept-Encoding": "gzip, deflate, br",
+  "Cache-Control": "max-age=0",
   Connection: "keep-alive",
   "Upgrade-Insecure-Requests": "1",
+  "Sec-Ch-Ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+  "Sec-Ch-Ua-Mobile": "?0",
+  "Sec-Ch-Ua-Platform": '"macOS"',
+  "Sec-Fetch-Dest": "document",
+  "Sec-Fetch-Mode": "navigate",
+  "Sec-Fetch-Site": "none",
+  "Sec-Fetch-User": "?1",
 };
 
 // ── Zillow parser ─────────────────────────────────────────────────────────────
@@ -202,6 +211,13 @@ export async function POST(req) {
 
     const res = await fetch(url, { headers: FETCH_HEADERS, redirect: "follow" });
     if (!res.ok) {
+      if (res.status === 429 || res.status === 403) {
+        const site = url.includes("zillow.com") ? "Zillow" : url.includes("realtor.com") ? "Realtor.com" : "This site";
+        return Response.json({
+          ok: false,
+          error: `${site} is blocking automated access right now. Try pasting your KW listing link instead, or upload photos manually below.`,
+        }, { status: 400 });
+      }
       return Response.json({ ok: false, error: `Listing page returned ${res.status}` }, { status: 400 });
     }
 
