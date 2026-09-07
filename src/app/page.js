@@ -219,22 +219,22 @@ function Hero({ content: c }) {
 
 function HowItWorks({ content: c }) {
   return (
-    <section id="how-it-works" className="py-24 px-8">
+    <section id="how-it-works" className="py-24 px-8 bg-deep">
       <div className="max-w-[1100px] mx-auto">
-        <div className="text-[0.75rem] font-bold uppercase tracking-[0.15em] text-coral mb-3">{c.tag}</div>
-        <h2 className="font-serif text-[clamp(2rem,4vw,3rem)] text-deep mb-4">{c.title}</h2>
-        <p className="font-sans text-[1.05rem] text-slate leading-[1.7] max-w-[520px] mb-14">{c.subtitle}</p>
+        <div className="text-[0.75rem] font-bold uppercase tracking-[0.15em] text-blush mb-3">{c.tag}</div>
+        <h2 className="font-serif text-[clamp(2rem,4vw,3rem)] text-white mb-4">{c.title}</h2>
+        <p className="font-sans text-[1.05rem] text-white/60 leading-[1.7] max-w-[520px] mb-14">{c.subtitle}</p>
 
         <div className="relative">
-          <div className="hidden md:block absolute top-7 left-[10%] right-[10%] h-px bg-border z-0" />
+          <div className="hidden md:block absolute top-7 left-[10%] right-[10%] h-px bg-white/10 z-0" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {c.steps.map(({ title, description }, i) => (
               <div key={i} className="group text-center relative z-10">
-                <div className="w-14 h-14 rounded-full bg-white border-2 border-border flex items-center justify-center font-serif text-xl font-bold text-coral mx-auto mb-4 shadow-sm transition-all duration-200 group-hover:bg-coral group-hover:text-white group-hover:border-coral group-hover:scale-110">
+                <div className="w-14 h-14 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center font-serif text-xl font-bold text-blush mx-auto mb-4 shadow-sm transition-all duration-200 group-hover:bg-coral group-hover:text-white group-hover:border-coral group-hover:scale-110">
                   {i + 1}
                 </div>
-                <h3 className="font-sans text-[1rem] font-semibold text-deep mb-2">{title}</h3>
-                <p className="font-sans text-[0.87rem] text-slate leading-[1.65]">{description}</p>
+                <h3 className="font-sans text-[1rem] font-semibold text-white mb-2">{title}</h3>
+                <p className="font-sans text-[0.87rem] text-white/55 leading-[1.65]">{description}</p>
               </div>
             ))}
           </div>
