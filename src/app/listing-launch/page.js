@@ -153,10 +153,10 @@ function contrastText(hex) {
   return (r * 299 + g * 587 + b * 114) / 1000 >= 128 ? "#000000" : "#ffffff";
 }
 
-function LandingPreview({ lp, listing, agent, photos, team }) {
+function LandingPreview({ lp, listing, agent, primaryPhoto, additionalPhotos, team }) {
   const [lightbox, setLightbox] = useState(null);
-  const mainPhoto = photos?.[0]?.base64;
-  const allPhotos = photos || [];
+  const mainPhoto = primaryPhoto?.base64;
+  const allPhotos = [primaryPhoto, ...additionalPhotos].filter(Boolean);
   const primary   = agent.primaryColor || "#C8102E";
   const accent    = agent.accentColor  || "#ffffff";
   const labelClr  = agent.labelColor   || primary;
@@ -310,8 +310,10 @@ export default function ListingLaunchPage() {
   const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional", primaryColor: "#C8102E", accentColor: "#ffffff", labelColor: "", bodyColor: "#475569", footerTextColor: "#ffffff" });
   const [themeOpen, setThemeOpen] = useState(false);
   const [listing, setListing] = useState({ address: "", city: "", state: "", zip: "", price: "", beds: "", baths: "", sqft: "", yearBuilt: "", features: "", notes: "" });
-  const [photos, setPhotos] = useState([]); // array of { name, base64 }
-  const photoInputRef = useRef(null);
+  const [primaryPhoto, setPrimaryPhoto] = useState(null);     // { name, base64 } — graphic background
+  const [additionalPhotos, setAdditionalPhotos] = useState([]); // [{ name, base64 }] up to 10 — website gallery
+  const primaryPhotoRef = useRef(null);
+  const additionalPhotosRef = useRef(null);
   const teamLogoRef = useRef(null);
   const [team, setTeam] = useState({ name: "", logo: null }); // logo = full data URI
   const [showTeam, setShowTeam] = useState(false);
@@ -382,7 +384,7 @@ export default function ListingLaunchPage() {
       const res = await fetch("/api/listing-launch/graphic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agent: a, listing: l, stage, primaryPhoto: photos[0]?.base64 || null, team }),
+        body: JSON.stringify({ agent: a, listing: l, stage, primaryPhoto: primaryPhoto?.base64 || null, secondaryPhotos: additionalPhotos.slice(0, 2).map(p => p.base64), team }),
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Graphic generation failed");
@@ -538,7 +540,7 @@ export default function ListingLaunchPage() {
                 </div>
               )}
 
-              <LandingPreview lp={generated.landingPage} listing={l} agent={agent} photos={photos} team={team} />
+              <LandingPreview lp={generated.landingPage} listing={l} agent={agent} primaryPhoto={primaryPhoto} additionalPhotos={additionalPhotos} team={team} />
             </div>
           )}
 
@@ -929,46 +931,62 @@ export default function ListingLaunchPage() {
                   onChange={e => setListing(l => ({ ...l, notes: e.target.value }))}
                 />
               </div>
+              {/* Primary photo */}
               <div>
-                <label className={lCls}>Listing Photos <span className="text-coral normal-case font-normal tracking-normal">— used as graphic backgrounds</span></label>
-                <input
-                  ref={photoInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  hidden
-                  onChange={async (e) => {
-                    const files = Array.from(e.target.files).slice(0, 5);
-                    const compressed = await Promise.all(files.map(async f => ({ name: f.name, base64: await compressPhoto(f) })));
-                    setPhotos(prev => [...prev, ...compressed].slice(0, 5));
-                    e.target.value = "";
-                  }}
-                />
-                {photos.length === 0 ? (
-                  <button
-                    type="button"
-                    onClick={() => photoInputRef.current?.click()}
-                    className="w-full border-2 border-dashed border-border rounded-xl py-6 text-center cursor-pointer hover:border-coral transition-colors bg-transparent mt-1"
-                  >
-                    <div className="font-sans text-[0.88rem] text-slate">Click to upload photos</div>
-                    <div className="font-sans text-[0.75rem] text-slate/50 mt-1">JPG, PNG — up to 5 photos. First photo used as graphic background.</div>
+                <label className={lCls}>Primary Photo <span className="text-coral normal-case font-normal tracking-normal">— used in social media graphics</span></label>
+                <input ref={primaryPhotoRef} type="file" accept="image/*" hidden onChange={async e => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const base64 = await compressPhoto(file);
+                  setPrimaryPhoto({ name: file.name, base64 });
+                  e.target.value = "";
+                }} />
+                {primaryPhoto ? (
+                  <div className="flex items-center gap-4 mt-2">
+                    <div className="relative flex-shrink-0">
+                      <img src={`data:image/jpeg;base64,${primaryPhoto.base64}`} alt={primaryPhoto.name} className="w-28 h-28 object-cover rounded-xl border border-border" />
+                      <button onClick={() => setPrimaryPhoto(null)} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-deep text-white rounded-full text-[0.65rem] font-bold border-none cursor-pointer flex items-center justify-center">×</button>
+                    </div>
+                    <button type="button" onClick={() => primaryPhotoRef.current?.click()} className="font-sans text-[0.82rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-4 py-2 bg-transparent cursor-pointer">Replace photo</button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => primaryPhotoRef.current?.click()} className="w-full border-2 border-dashed border-border rounded-xl py-6 text-center cursor-pointer hover:border-coral transition-colors bg-transparent mt-1">
+                    <div className="font-sans text-[0.88rem] text-slate">Click to upload primary photo</div>
+                    <div className="font-sans text-[0.75rem] text-slate/50 mt-1">1 photo — becomes the graphic background</div>
+                  </button>
+                )}
+              </div>
+
+              {/* Additional photos for website gallery */}
+              <div>
+                <label className={lCls}>Additional Photos <span className="normal-case font-normal text-slate/60 tracking-normal">— website gallery, up to 10</span></label>
+                <input ref={additionalPhotosRef} type="file" accept="image/*" multiple hidden onChange={async e => {
+                  const files = Array.from(e.target.files);
+                  const compressed = await Promise.all(files.map(async f => ({ name: f.name, base64: await compressPhoto(f) })));
+                  setAdditionalPhotos(prev => [...prev, ...compressed].slice(0, 10));
+                  e.target.value = "";
+                }} />
+                {additionalPhotos.length === 0 ? (
+                  <button type="button" onClick={() => additionalPhotosRef.current?.click()} className="w-full border-2 border-dashed border-border rounded-xl py-4 text-center cursor-pointer hover:border-coral transition-colors bg-transparent mt-1">
+                    <div className="font-sans text-[0.85rem] text-slate">+ Add photos for the website gallery</div>
+                    <div className="font-sans text-[0.72rem] text-slate/50 mt-0.5">JPG, PNG — up to 10 photos</div>
                   </button>
                 ) : (
-                  <div className="mt-1">
+                  <div className="mt-2">
                     <div className="flex gap-2 flex-wrap">
-                      {photos.map((p, i) => (
+                      {additionalPhotos.map((p, i) => (
                         <div key={i} className="relative">
                           <img src={`data:image/jpeg;base64,${p.base64}`} alt={p.name} className="w-20 h-20 object-cover rounded-xl border border-border" />
-                          {i === 0 && <span className="absolute top-1 left-1 bg-coral text-white font-sans text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full">Main</span>}
-                          <button onClick={() => setPhotos(prev => prev.filter((_, j) => j !== i))} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-deep text-white rounded-full text-[0.65rem] font-bold border-none cursor-pointer flex items-center justify-center">×</button>
+                          <button onClick={() => setAdditionalPhotos(prev => prev.filter((_, j) => j !== i))} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-deep text-white rounded-full text-[0.65rem] font-bold border-none cursor-pointer flex items-center justify-center">×</button>
                         </div>
                       ))}
-                      {photos.length < 5 && (
-                        <button type="button" onClick={() => photoInputRef.current?.click()} className="w-20 h-20 border-2 border-dashed border-border rounded-xl flex items-center justify-center cursor-pointer hover:border-coral transition-colors bg-transparent">
+                      {additionalPhotos.length < 10 && (
+                        <button type="button" onClick={() => additionalPhotosRef.current?.click()} className="w-20 h-20 border-2 border-dashed border-border rounded-xl flex items-center justify-center cursor-pointer hover:border-coral transition-colors bg-transparent">
                           <span className="text-slate text-[1.5rem]">+</span>
                         </button>
                       )}
                     </div>
+                    <p className="font-sans text-[0.72rem] text-slate/50 mt-2">{additionalPhotos.length}/10 photos added</p>
                   </div>
                 )}
               </div>
