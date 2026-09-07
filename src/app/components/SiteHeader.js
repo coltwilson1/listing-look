@@ -115,12 +115,12 @@ export default function SiteHeader() {
           </li>
           <li>
             <a href="#services" className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors">
-              Services
+              Pricing
             </a>
           </li>
           <li>
-            <a href="#custom" className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors">
-              Custom Order
+            <a href="#faq" className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors">
+              FAQ
             </a>
           </li>
           {!currentUser && (

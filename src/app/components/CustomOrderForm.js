@@ -6,11 +6,9 @@ export default function CustomOrderForm() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "",
-    category: "",
-    listing: "",
-    style: "",
-    deadline: "",
+    brokerage: "",
+    plan: "",
+    notes: "",
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,13 +32,10 @@ export default function CustomOrderForm() {
   if (submitted) {
     return (
       <div className="text-center py-10">
-        <div className="text-5xl mb-4">🚀</div>
-        <h3 className="font-serif text-2xl text-white mb-2">
-          Request Submitted!
-        </h3>
-        <p className="font-sans text-white/60 text-sm leading-relaxed">
-          We&apos;ll get back to you within 24 hours with a quote and next
-          steps.
+        <div className="text-5xl mb-4">🎉</div>
+        <h3 className="font-serif text-2xl text-white mb-2">We'll be in touch soon!</h3>
+        <p className="font-sans text-white/60 text-[0.9rem] leading-relaxed">
+          Thanks for reaching out. Expect a response within 24 hours to answer your questions and get you set up.
         </p>
       </div>
     );
@@ -61,92 +56,59 @@ export default function CustomOrderForm() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className={labelClass}>Email Address</label>
-          <input
-            type="email"
-            name="email"
-            required
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="jane@realty.com"
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className={labelClass}>Phone (optional)</label>
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="(555) 000-0000"
-            className={inputClass}
-          />
-        </div>
+      <div>
+        <label className={labelClass}>Email Address</label>
+        <input
+          type="email"
+          name="email"
+          required
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="jane@realty.com"
+          className={inputClass}
+        />
       </div>
 
       <div>
-        <label className={labelClass}>What do you need?</label>
-        <select
-          name="category"
+        <label className={labelClass}>Brokerage</label>
+        <input
+          type="text"
+          name="brokerage"
           required
-          value={formData.category}
+          value={formData.brokerage}
+          onChange={handleChange}
+          placeholder="Your brokerage name"
+          className={inputClass}
+        />
+      </div>
+
+      <div>
+        <label className={labelClass}>Plan Interest</label>
+        <select
+          name="plan"
+          required
+          value={formData.plan}
           onChange={handleChange}
           className={inputClass + " appearance-none cursor-pointer"}
         >
-          <option value="" style={{ background: "#1C1C2E" }}>
-            Select a category...
-          </option>
-          <option style={{ background: "#1C1C2E" }}>
-            Social Media Graphics — Open House
-          </option>
-          <option style={{ background: "#1C1C2E" }}>
-            Social Media Graphics — New Listing
-          </option>
-          <option style={{ background: "#1C1C2E" }}>
-            Social Media Graphics — Just Sold
-          </option>
-          <option style={{ background: "#1C1C2E" }}>
-            Postcards &amp; Print Materials
-          </option>
-          <option style={{ background: "#1C1C2E" }}>Custom / Other</option>
+          <option value="" style={{ background: "#1C1C2E" }}>Select a plan...</option>
+          <option style={{ background: "#1C1C2E" }}>Essential — $450/month</option>
+          <option style={{ background: "#1C1C2E" }}>Growth — $600/month</option>
+          <option style={{ background: "#1C1C2E" }}>Signature — $750/month</option>
+          <option style={{ background: "#1C1C2E" }}>Listing Launch — $150 one-time</option>
+          <option style={{ background: "#1C1C2E" }}>Not sure yet — just exploring</option>
         </select>
       </div>
 
       <div>
-        <label className={labelClass}>Property / Listing Details</label>
+        <label className={labelClass}>Notes or Questions (optional)</label>
         <textarea
-          name="listing"
-          value={formData.listing}
+          name="notes"
+          value={formData.notes}
           onChange={handleChange}
-          placeholder="Address, price, bedrooms, baths, any key features..."
+          placeholder="Tell us about your goals, current posting habits, or any questions you have..."
           rows={3}
           className={inputClass + " resize-none"}
-        />
-      </div>
-
-      <div>
-        <label className={labelClass}>Style Notes or Special Requests</label>
-        <textarea
-          name="style"
-          value={formData.style}
-          onChange={handleChange}
-          placeholder="Colors, fonts, brand guidelines, vibe you're going for..."
-          rows={2}
-          className={inputClass + " resize-none"}
-        />
-      </div>
-
-      <div>
-        <label className={labelClass}>Deadline</label>
-        <input
-          type="date"
-          name="deadline"
-          value={formData.deadline}
-          onChange={handleChange}
-          className={inputClass}
         />
       </div>
 
@@ -155,7 +117,7 @@ export default function CustomOrderForm() {
         disabled={loading}
         className="w-full bg-coral text-white font-semibold text-[1rem] py-4 rounded-full border-none cursor-pointer hover:bg-coral-dark hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(232,130,90,0.4)] transition-all duration-200 disabled:opacity-60 font-sans"
       >
-        {loading ? "Submitting..." : "🚀 Submit My Request"}
+        {loading ? "Sending..." : "Send My Inquiry →"}
       </button>
     </form>
   );
