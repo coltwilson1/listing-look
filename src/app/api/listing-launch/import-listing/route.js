@@ -221,8 +221,9 @@ export async function POST(req) {
     }
 
     const scraperKey = process.env.SCRAPER_API_KEY;
+    // render=true uses headless Chrome so JS-rendered photos (KW, etc.) are included
     const fetchUrl = scraperKey
-      ? `http://api.scraperapi.com?api_key=${scraperKey}&url=${encodeURIComponent(url)}&render=false`
+      ? `http://api.scraperapi.com?api_key=${scraperKey}&url=${encodeURIComponent(url)}&render=true&wait=3000`
       : url;
     const fetchOpts = scraperKey
       ? {}
