@@ -159,7 +159,7 @@ export default function ListingLaunchPage() {
   const [graphicError, setGraphicError] = useState("");
 
   const [kwError, setKwError] = useState("");
-  const [agent, setAgent] = useState({ name: "", brokerage: "", license: "", phone: "", brokerName: "", style: "professional" });
+  const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional" });
   const [listing, setListing] = useState({ address: "", city: "", state: "", zip: "", price: "", beds: "", baths: "", sqft: "", yearBuilt: "", features: "", notes: "" });
 
   const iCls = "w-full bg-white border border-border rounded-xl px-4 py-3 text-deep text-[0.9rem] placeholder:text-slate/40 focus:outline-none focus:border-coral transition-colors font-sans";
@@ -412,27 +412,24 @@ export default function ListingLaunchPage() {
                 <input className={iCls} placeholder="Jane Smith" value={agent.name} onChange={e => setAgent(a => ({ ...a, name: e.target.value }))} />
               </div>
               <div>
-                <label className={lCls}>Brokerage <span className="text-coral normal-case font-normal tracking-normal">— must be a KW office</span></label>
-                <input className={iCls} placeholder="Keller Williams Realty, Nashville, TN" value={agent.brokerage} onChange={e => { setAgent(a => ({ ...a, brokerage: e.target.value })); setKwError(""); }} />
+                <label className={lCls}>Brokerage</label>
+                <select className={iCls} value={agent.brokerage} onChange={e => setAgent(a => ({ ...a, brokerage: e.target.value }))}>
+                  <option value="Keller Williams Realty - Greater Chattanooga">Keller Williams Realty - Greater Chattanooga</option>
+                </select>
+              </div>
+              <div>
+                <label className={lCls}>TN License # <span className="text-coral">*</span></label>
+                <input className={iCls} placeholder="e.g. 123456" value={agent.license} onChange={e => setAgent(a => ({ ...a, license: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={lCls}>TN License # <span className="text-coral">*</span></label>
-                  <input className={iCls} placeholder="e.g. 123456" value={agent.license} onChange={e => setAgent(a => ({ ...a, license: e.target.value }))} />
+                  <label className={lCls}>Office Phone <span className="text-coral">*</span></label>
+                  <input className={iCls} placeholder="(423) 000-0000" value={agent.officePhone} onChange={e => setAgent(a => ({ ...a, officePhone: e.target.value }))} />
                 </div>
                 <div>
-                  <label className={lCls}>Phone / Website <span className="text-coral">*</span></label>
-                  <input className={iCls} placeholder="(615) 000-0000" value={agent.phone} onChange={e => setAgent(a => ({ ...a, phone: e.target.value }))} />
+                  <label className={lCls}>Mobile Phone <span className="text-coral">*</span></label>
+                  <input className={iCls} placeholder="(423) 000-0000" value={agent.mobilePhone} onChange={e => setAgent(a => ({ ...a, mobilePhone: e.target.value }))} />
                 </div>
-              </div>
-              <div>
-                <label className={lCls}>Responsible Broker Name <span className="text-coral">*</span></label>
-                <input className={iCls} placeholder="Your KW team leader or designated broker" value={agent.brokerName} onChange={e => setAgent(a => ({ ...a, brokerName: e.target.value }))} />
-              </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-                <p className="font-sans text-[0.78rem] text-amber-700 leading-relaxed">
-                  <strong>TREC compliance:</strong> Your license number, brokerage, broker name, and contact info will be embedded on every graphic per TREC Rule 1260-02.
-                </p>
               </div>
               <div>
                 <label className={lCls}>Posting Style</label>
@@ -455,13 +452,8 @@ export default function ListingLaunchPage() {
                 </div>
               )}
               <button
-                onClick={() => {
-                  const isKW = agent.brokerage.toLowerCase().includes("keller williams") || agent.brokerage.toLowerCase().includes("kw ");
-                  if (!isKW) { setKwError("Listing Launch is currently available for Keller Williams agents only. If you believe this is an error, contact The Listing Look."); return; }
-                  setKwError("");
-                  setStep(1);
-                }}
-                disabled={!agent.name || !agent.brokerage || !agent.license || !agent.phone || !agent.brokerName}
+                onClick={() => { setKwError(""); setStep(1); }}
+                disabled={!agent.name || !agent.license || !agent.officePhone || !agent.mobilePhone}
                 className="w-full bg-coral text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
               >
                 Continue →

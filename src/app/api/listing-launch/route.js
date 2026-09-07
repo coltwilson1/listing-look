@@ -8,12 +8,12 @@ export async function POST(req) {
 
     const prompt = `You are a real estate marketing expert. Generate complete listing launch content for an agent.
 
-AGENT INFO (TREC Rule 1260-02 — all 4 must appear in every caption):
+AGENT INFO:
 - Name: ${agent.name}
 - Brokerage: ${agent.brokerage}
 - TN License #: ${agent.license}
-- Contact: ${agent.phone}
-- Responsible Broker: ${agent.brokerName}
+- Office Phone: ${agent.officePhone}
+- Mobile Phone: ${agent.mobilePhone}
 - Posting style: ${agent.style} (professional = polished & elegant, conversational = warm & personable, energetic = bold & exciting)
 
 LISTING INFO:
@@ -41,10 +41,10 @@ Generate ALL of the following and return ONLY valid JSON (no markdown, no explan
     "callToAction": "A short, punchy CTA phrase (5-8 words) to schedule a showing"
   },
   "captions": {
-    "justListed": "Instagram/Facebook caption for a Just Listed post. Match the agent's ${agent.style} style. 3-4 sentences + 5 relevant hashtags. Include price and key details naturally. End with a TREC-compliant disclosure line: '${agent.name} | ${agent.brokerage} | License #${agent.license} | Broker: ${agent.brokerName} | ${agent.phone}'",
-    "underContract": "Instagram/Facebook caption for an Under Contract post. Celebratory, thank the community. Match ${agent.style} style. 2-3 sentences + 3 hashtags. End with: '${agent.name} | ${agent.brokerage} | License #${agent.license} | Broker: ${agent.brokerName}'",
-    "priceReduced": "Instagram/Facebook caption for a Price Reduced post. Urgent but not desperate. Highlight the new opportunity. Match ${agent.style} style. 2-3 sentences + 3 hashtags. End with: '${agent.name} | ${agent.brokerage} | License #${agent.license} | Broker: ${agent.brokerName} | ${agent.phone}'",
-    "sold": "Instagram/Facebook caption for a Sold post. Celebratory, thank the buyers/sellers, reflect on the journey. Match ${agent.style} style. 3-4 sentences + 4 hashtags. End with: '${agent.name} | ${agent.brokerage} | License #${agent.license} | Broker: ${agent.brokerName}'"
+    "justListed": "Instagram/Facebook caption for a Just Listed post. Match the agent's ${agent.style} style. 3-4 sentences + 5 relevant hashtags. Include price and key details naturally. End with a disclosure line: '${agent.name} | ${agent.brokerage} | License #${agent.license} | ${agent.mobilePhone}'",
+    "underContract": "Instagram/Facebook caption for an Under Contract post. Celebratory, thank the community. Match ${agent.style} style. 2-3 sentences + 3 hashtags. End with: '${agent.name} | ${agent.brokerage} | License #${agent.license}'",
+    "priceReduced": "Instagram/Facebook caption for a Price Reduced post. Urgent but not desperate. Highlight the new opportunity. Match ${agent.style} style. 2-3 sentences + 3 hashtags. End with: '${agent.name} | ${agent.brokerage} | License #${agent.license} | ${agent.mobilePhone}'",
+    "sold": "Instagram/Facebook caption for a Sold post. Celebratory, thank the buyers/sellers, reflect on the journey. Match ${agent.style} style. 3-4 sentences + 4 hashtags. End with: '${agent.name} | ${agent.brokerage} | License #${agent.license}'"
   },
   "graphicText": {
     "justListed": { "headline": "JUST LISTED", "price": "$${listing.price}", "tagline": "5-6 word punchy tagline for the graphic" },
