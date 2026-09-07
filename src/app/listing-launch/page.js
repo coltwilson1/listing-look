@@ -489,6 +489,7 @@ export default function ListingLaunchPage() {
         sqft:      d.sqft      || l.sqft,
         yearBuilt: d.yearBuilt || l.yearBuilt,
         features:  d.features  || l.features,
+        notes:     d.notes     || l.notes,
       }));
 
       const photos = data.photos || [];

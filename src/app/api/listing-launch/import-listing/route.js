@@ -17,6 +17,53 @@ const FETCH_HEADERS = {
   "Sec-Fetch-User": "?1",
 };
 
+// ── Meta / plain-text fallback extractor — works on any page ─────────────────
+function extractMetaAndText(html) {
+  const out = {};
+
+  // Meta description or OG description
+  const metaRe = /<meta\b[^>]+(?:name=["']description["']|property=["']og:description["'])[^>]+content=["']([^"']{20,}?)["']/i;
+  const metaRe2 = /<meta\b[^>]+content=["']([^"']{20,}?)["'][^>]+(?:name=["']description["']|property=["']og:description["'])/i;
+  const metaMatch = html.match(metaRe) || html.match(metaRe2);
+  if (metaMatch) out.notes = metaMatch[1].trim().slice(0, 1500);
+
+  // Strip HTML tags for plain-text pattern matching
+  const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+
+  // Price — e.g. "$450,000" or "450000"
+  if (!out.price) {
+    const m = text.match(/\$\s*([\d,]{4,})/);
+    if (m) out.price = m[1].replace(/,/g, "");
+  }
+  // Beds
+  if (!out.beds) {
+    const m = text.match(/\b(\d+)\s*(?:Bed(?:room)?s?|BR)\b/i);
+    if (m) out.beds = m[1];
+  }
+  // Baths
+  if (!out.baths) {
+    const m = text.match(/\b(\d+(?:\.\d)?)\s*(?:(?:Full\s+)?Bath(?:room)?s?|BA)\b/i);
+    if (m) out.baths = m[1];
+  }
+  // Sqft
+  if (!out.sqft) {
+    const m = text.match(/([\d,]+)\s*(?:sq\.?\s*ft\.?|sqft|square\s*feet)/i);
+    if (m) out.sqft = m[1].replace(/,/g, "");
+  }
+  // Year built
+  if (!out.yearBuilt) {
+    const m = text.match(/(?:built|year\s+built)\D{0,15}((?:19|20)\d{2})\b/i);
+    if (m) out.yearBuilt = m[1];
+  }
+
+  return out;
+}
+
+// Decode a JSON-encoded string value (handles \n, \", etc.)
+function decodeJsonStr(s) {
+  return s.replace(/\\n/g, " ").replace(/\\t/g, " ").replace(/\\"/g, '"').replace(/\\'/g, "'").replace(/\s+/g, " ").trim();
+}
+
 // ── Zillow parser ─────────────────────────────────────────────────────────────
 function parseZillow(html) {
   const photos = [];
@@ -26,16 +73,13 @@ function parseZillow(html) {
   if (!ndMatch) return { photos, listing };
 
   const raw = ndMatch[1];
-  // Normalize unicode escapes so regexes work uniformly
   const norm = raw.replace(/\\u002F/g, "/").replace(/\\u0026/g, "&");
 
   // ── Photos ──
-  // Match zillowstatic.com/fp/ URLs and keep the highest-quality version of each
   const baseToUrl = new Map();
   const photoRe = /https?:\/\/photos\.zillowstatic\.com\/fp\/([a-zA-Z0-9_\-]+)(\.[a-z]{3,4})?/g;
   for (const [fullUrl, hash] of norm.matchAll(photoRe)) {
     if (fullUrl.includes("_cc_ft") || fullUrl.includes("-t.")) continue;
-    // Prefer .jpg over .webp for Canvas compatibility; prefer uncropped/large variants
     const existing = baseToUrl.get(hash);
     const isJpg = fullUrl.endsWith(".jpg");
     const isLarge = fullUrl.includes("uncropped") || fullUrl.includes("_p_f") || fullUrl.includes("_p_g");
@@ -48,18 +92,28 @@ function parseZillow(html) {
     if (!key.endsWith("_best")) photos.push(url);
   }
 
-  // ── Listing data — regex on the JSON string ──
+  // ── Listing data ──
   const g = (re) => { const m = norm.match(re); return m ? m[1] : ""; };
-  listing.address  = g(/"streetAddress"\s*:\s*"([^"]+)"/);
-  listing.city     = g(/"city"\s*:\s*"([^"]+)"/);
-  listing.state    = g(/"state"\s*:\s*"([A-Z]{2})"/);
-  listing.zip      = g(/"zipcode"\s*:\s*"([^"]+)"/);
-  listing.price    = g(/"price"\s*:\s*(\d+)/);
-  listing.beds     = g(/"bedrooms"\s*:\s*(\d+)/);
-  listing.baths    = g(/"bathrooms"\s*:\s*([\d.]+)/);
-  listing.sqft     = g(/"livingArea"\s*:\s*(\d+)/);
+  listing.address   = g(/"streetAddress"\s*:\s*"([^"]+)"/);
+  listing.city      = g(/"city"\s*:\s*"([^"]+)"/);
+  listing.state     = g(/"state"\s*:\s*"([A-Z]{2})"/);
+  listing.zip       = g(/"zipcode"\s*:\s*"([^"]+)"/);
+  listing.price     = g(/"price"\s*:\s*(\d+)/);
+  listing.beds      = g(/"bedrooms"\s*:\s*(\d+)/);
+  listing.baths     = g(/"bathrooms"\s*:\s*([\d.]+)/);
+  listing.sqft      = g(/"livingArea"\s*:\s*(\d+)/);
   listing.yearBuilt = g(/"yearBuilt"\s*:\s*(\d{4})/);
-  listing.features = g(/"description"\s*:\s*"([^"]{20,300})"/);
+
+  // Description → notes (full), features (short excerpt)
+  const descM = norm.match(/"description"\s*:\s*"((?:[^"\\]|\\[\s\S]){20,2000})"/);
+  if (descM) {
+    listing.notes    = decodeJsonStr(descM[1]).slice(0, 1500);
+    listing.features = listing.notes.slice(0, 250);
+  }
+
+  // Fallback: fill any blanks from meta/text
+  const meta = extractMetaAndText(html);
+  Object.entries(meta).forEach(([k, v]) => { if (v && !listing[k]) listing[k] = v; });
 
   return { photos, listing };
 }
@@ -70,11 +124,14 @@ function parseRealtor(html) {
   const listing = {};
 
   const ndMatch = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
-  if (!ndMatch) return { photos, listing };
+  if (!ndMatch) {
+    const meta = extractMetaAndText(html);
+    return { photos, listing: meta };
+  }
 
   const norm = ndMatch[1].replace(/\\u002F/g, "/");
 
-  // ap.rdcpix.com photo URLs
+  // Photos
   const seen = new Set();
   const photoRe = /https?:\/\/ap\.rdcpix\.com\/[a-zA-Z0-9\/\-_]+\.jpg/g;
   for (const [url] of norm.matchAll(photoRe)) {
@@ -83,15 +140,27 @@ function parseRealtor(html) {
   }
 
   const g = (re) => { const m = norm.match(re); return m ? m[1] : ""; };
-  listing.address  = g(/"line"\s*:\s*"([^"]+)"/);
-  listing.city     = g(/"city"\s*:\s*"([^"]+)"/);
-  listing.state    = g(/"state_code"\s*:\s*"([A-Z]{2})"/);
-  listing.zip      = g(/"postal_code"\s*:\s*"([^"]+)"/);
-  listing.price    = g(/"list_price"\s*:\s*(\d+)/);
-  listing.beds     = g(/"beds"\s*:\s*(\d+)/);
-  listing.baths    = g(/"baths_consolidated"\s*:\s*"([\d.]+)"/);
-  listing.sqft     = g(/"sqft"\s*:\s*(\d+)/);
+  listing.address   = g(/"line"\s*:\s*"([^"]+)"/);
+  listing.city      = g(/"city"\s*:\s*"([^"]+)"/);
+  listing.state     = g(/"state_code"\s*:\s*"([A-Z]{2})"/);
+  listing.zip       = g(/"postal_code"\s*:\s*"([^"]+)"/);
+  listing.price     = g(/"list_price"\s*:\s*(\d+)/);
+  listing.beds      = g(/"beds"\s*:\s*(\d+)/);
+  listing.baths     = g(/"baths_consolidated"\s*:\s*"([\d.]+)"/);
+  listing.sqft      = g(/"sqft"\s*:\s*(\d+)/);
   listing.yearBuilt = g(/"year_built"\s*:\s*(\d{4})/);
+
+  // Description — try multiple keys Realtor.com uses
+  const descM = norm.match(/"(?:text|description|prop_description)"\s*:\s*"((?:[^"\\]|\\[\s\S]){20,2000})"/)
+    || norm.match(/"remarks"\s*:\s*"((?:[^"\\]|\\[\s\S]){20,2000})"/);
+  if (descM) {
+    listing.notes    = decodeJsonStr(descM[1]).slice(0, 1500);
+    listing.features = listing.notes.slice(0, 250);
+  }
+
+  // Fallback for any blanks
+  const meta = extractMetaAndText(html);
+  Object.entries(meta).forEach(([k, v]) => { if (v && !listing[k]) listing[k] = v; });
 
   return { photos, listing };
 }
@@ -106,31 +175,30 @@ function parseJsonLD(html) {
     let data;
     try { data = JSON.parse(raw.trim()); } catch { continue; }
 
-    // Walk arrays (some sites emit @graph)
     const items = Array.isArray(data) ? data : data["@graph"] ? data["@graph"] : [data];
     for (const item of items) {
       const type = (item["@type"] || "").toLowerCase();
       if (!/(residence|house|home|property|realestate|singlefamily|apartment|condo)/i.test(type)) continue;
 
-      // Address
       const addr = item.address || {};
-      if (addr.streetAddress) listing.address = addr.streetAddress;
-      if (addr.addressLocality) listing.city = addr.addressLocality;
-      if (addr.addressRegion)   listing.state = addr.addressRegion;
-      if (addr.postalCode)      listing.zip   = addr.postalCode;
+      if (addr.streetAddress)      listing.address   = addr.streetAddress;
+      if (addr.addressLocality)    listing.city      = addr.addressLocality;
+      if (addr.addressRegion)      listing.state     = addr.addressRegion;
+      if (addr.postalCode)         listing.zip       = addr.postalCode;
 
-      // Details
-      if (item.numberOfBedrooms)     listing.beds  = String(item.numberOfBedrooms);
-      if (item.numberOfBathroomsTotal) listing.baths = String(item.numberOfBathroomsTotal);
-      if (item.floorSize?.value)     listing.sqft  = String(Math.round(item.floorSize.value));
-      if (item.yearBuilt)            listing.yearBuilt = String(item.yearBuilt);
-      if (item.description)          listing.features  = item.description.slice(0, 300);
+      if (item.numberOfBedrooms)        listing.beds      = String(item.numberOfBedrooms);
+      if (item.numberOfBathroomsTotal)  listing.baths     = String(item.numberOfBathroomsTotal);
+      if (item.floorSize?.value)        listing.sqft      = String(Math.round(item.floorSize.value));
+      if (item.yearBuilt)               listing.yearBuilt = String(item.yearBuilt);
 
-      // Price
+      if (item.description) {
+        listing.notes    = item.description.slice(0, 1500);
+        listing.features = item.description.slice(0, 250);
+      }
+
       const price = item.offers?.price || item.price;
       if (price) listing.price = String(price).replace(/\D/g, "");
 
-      // Photos
       const imgs = Array.isArray(item.image) ? item.image : item.image ? [item.image] : [];
       for (const img of imgs) {
         const src = typeof img === "string" ? img : img.url || img.contentUrl || "";
@@ -187,12 +255,10 @@ function extractAllImageUrls(html) {
 
 // ── KW.com parser ─────────────────────────────────────────────────────────────
 function parseKW(html) {
-  // Try JSON-LD first (KW platform uses schema.org)
   const { photos: ldPhotos, listing: ldListing } = parseJsonLD(html);
 
-  // Also try __NEXT_DATA__ for listing fields
   const ndMatch = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
-  if (ndMatch && !ldListing.address) {
+  if (ndMatch) {
     const nd = ndMatch[1].replace(/\\u002F/g, "/");
     const g = (re) => { const m = nd.match(re); return m ? m[1] : ""; };
     ldListing.address   = ldListing.address   || g(/"streetAddress"\s*:\s*"([^"]+)"/);
@@ -204,20 +270,36 @@ function parseKW(html) {
     ldListing.baths     = ldListing.baths      || g(/"(?:baths|bathrooms)"\s*:\s*([\d.]+)/);
     ldListing.sqft      = ldListing.sqft       || g(/"(?:sqft|squareFeet|livingArea)"\s*:\s*(\d+)/);
     ldListing.yearBuilt = ldListing.yearBuilt  || g(/"yearBuilt"\s*:\s*(\d{4})/);
+
+    if (!ldListing.notes) {
+      const descM = nd.match(/"(?:description|publicRemarks|remarks|propertyDescription)"\s*:\s*"((?:[^"\\]|\\[\s\S]){20,2000})"/);
+      if (descM) {
+        ldListing.notes    = decodeJsonStr(descM[1]).slice(0, 1500);
+        ldListing.features = ldListing.features || ldListing.notes.slice(0, 250);
+      }
+    }
   }
 
-  // Use broad extractor for photos — KW CDN domain varies by agent/market
   const broadPhotos = extractAllImageUrls(html);
-
   const allPhotos = [...new Set([...ldPhotos, ...broadPhotos])];
+
+  // Meta/text fills any remaining blanks
+  const meta = extractMetaAndText(html);
+  Object.entries(meta).forEach(([k, v]) => { if (v && !ldListing[k]) ldListing[k] = v; });
+
   return { photos: allPhotos, listing: ldListing };
 }
 
-// ── og:image + JSON-LD generic fallback ───────────────────────────────────────
+// ── Generic fallback (FlexMLS, IDX, any other site) ──────────────────────────
 function parseGeneric(html) {
   const { photos: ldPhotos, listing: ldListing } = parseJsonLD(html);
   const broadPhotos = extractAllImageUrls(html);
   const allPhotos = [...new Set([...ldPhotos, ...broadPhotos])];
+
+  // Meta tags + text patterns fill everything the JSON-LD missed
+  const meta = extractMetaAndText(html);
+  Object.entries(meta).forEach(([k, v]) => { if (v && !ldListing[k]) ldListing[k] = v; });
+
   return { photos: allPhotos, listing: ldListing };
 }
 
