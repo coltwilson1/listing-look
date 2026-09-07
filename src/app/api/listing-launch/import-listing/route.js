@@ -61,7 +61,7 @@ function parseZillow(html) {
   listing.yearBuilt = g(/"yearBuilt"\s*:\s*(\d{4})/);
   listing.features = g(/"description"\s*:\s*"([^"]{20,300})"/);
 
-  return { photos: photos.slice(0, 15), listing };
+  return { photos, listing };
 }
 
 // ── Realtor.com parser ────────────────────────────────────────────────────────
@@ -93,7 +93,7 @@ function parseRealtor(html) {
   listing.sqft     = g(/"sqft"\s*:\s*(\d+)/);
   listing.yearBuilt = g(/"year_built"\s*:\s*(\d{4})/);
 
-  return { photos: photos.slice(0, 15), listing };
+  return { photos, listing };
 }
 
 // ── JSON-LD parser (schema.org — works for KW and many IDX sites) ─────────────
@@ -138,7 +138,7 @@ function parseJsonLD(html) {
       }
     }
   }
-  return { photos: photos.slice(0, 15), listing };
+  return { photos, listing };
 }
 
 // ── Broad image URL extractor — works on any page ────────────────────────────
@@ -146,33 +146,43 @@ function extractAllImageUrls(html) {
   const norm = html
     .replace(/\\u002F/g, "/")
     .replace(/\\u0022/g, '"')
+    .replace(/\\n/g, " ")
     .replace(/\\"/g, '"');
 
   const seen = new Set();
-  const photos = [];
+  const add = (url) => { if (url && !seen.has(url)) { seen.add(url); } };
 
-  // 1. <img src="..."> tags
-  const imgRe = /<img[^>]+src=["'](https?:\/\/[^"'>\s]+\.(?:jpe?g|png|webp))["']/gi;
-  for (const [, url] of norm.matchAll(imgRe)) {
-    if (!seen.has(url)) { seen.add(url); photos.push(url); }
+  // 1. <img> — src, data-src, data-lazy-src, data-original, data-srcset (first URL)
+  const imgTagRe = /<img\b([^>]{0,2000})>/gi;
+  for (const [, attrs] of norm.matchAll(imgTagRe)) {
+    for (const attr of ["src", "data-src", "data-lazy-src", "data-original", "data-srcset", "data-lazy"]) {
+      const m = attrs.match(new RegExp(`${attr}=["']([^"']+)`, "i"));
+      if (m) {
+        // data-srcset may have multiple URLs — take the last (largest)
+        const urls = m[1].split(/\s*,\s*/).map(s => s.trim().split(/\s+/)[0]);
+        urls.forEach(u => u.startsWith("http") && add(u));
+      }
+    }
   }
 
-  // 2. Any quoted https URL ending in an image extension
-  const urlRe = /["'`](https?:\/\/[^"'`\s<>\\]{10,}\.(?:jpe?g|png|webp))["'`]/gi;
-  for (const [, url] of norm.matchAll(urlRe)) {
-    if (!seen.has(url)) { seen.add(url); photos.push(url); }
+  // 2. CSS background-image in style attributes
+  const bgRe = /background(?:-image)?\s*:\s*url\(['"]?(https?:\/\/[^'")>\s]+)['"]?\)/gi;
+  for (const [, url] of norm.matchAll(bgRe)) add(url);
+
+  // 3. Any quoted https URL ending in image extension (catches JSON / JS data)
+  const extRe = /["'`](https?:\/\/[^"'`\s<>\\]{15,}\.(?:jpe?g|png|webp)(?:\?[^"'`\s<>]*)?)/gi;
+  for (const [, url] of norm.matchAll(extRe)) add(url);
+
+  // 4. URLs without extension but from known photo CDN patterns
+  const cdnRe = /["'`](https?:\/\/[^"'`\s<>\\]*\/(?:photo|image|media|listing|property|img)s?\/[^"'`\s<>\\]{10,})/gi;
+  for (const [, url] of norm.matchAll(cdnRe)) {
+    if (!url.match(/\.(css|js|html|svg|gif|ico|woff|ttf)(\?|$)/i)) add(url);
   }
 
-  // Filter out obvious non-listing images
-  const skip = /\b(logo|icon|avatar|thumb(?:nail)?|sprite|banner|badge|map|pin|marker|headshot|profile|brand|favicon|placeholder|default|fallback|loader|spinner)\b/i;
-  const filtered = photos.filter(u => {
-    if (skip.test(u)) return false;
-    // Skip very short URLs — likely placeholders
-    if (u.length < 30) return false;
-    return true;
-  });
+  const skip = /\b(logo|icon|avatar|sprite|banner|badge|map(?:box)?|pin|marker|headshot|profile|brand|favicon|placeholder|default|fallback|loader|spinner|bullet|arrow|check|star|dot)\b/i;
+  const photos = [...seen].filter(u => !skip.test(u) && u.length >= 30);
 
-  return [...new Set(filtered)].slice(0, 20);
+  return photos; // no cap — caller slices
 }
 
 // ── KW.com parser ─────────────────────────────────────────────────────────────
@@ -199,8 +209,7 @@ function parseKW(html) {
   // Use broad extractor for photos — KW CDN domain varies by agent/market
   const broadPhotos = extractAllImageUrls(html);
 
-  // Merge: JSON-LD photos first (highest confidence), then broad scan
-  const allPhotos = [...new Set([...ldPhotos, ...broadPhotos])].slice(0, 15);
+  const allPhotos = [...new Set([...ldPhotos, ...broadPhotos])];
   return { photos: allPhotos, listing: ldListing };
 }
 
@@ -208,7 +217,7 @@ function parseKW(html) {
 function parseGeneric(html) {
   const { photos: ldPhotos, listing: ldListing } = parseJsonLD(html);
   const broadPhotos = extractAllImageUrls(html);
-  const allPhotos = [...new Set([...ldPhotos, ...broadPhotos])].slice(0, 15);
+  const allPhotos = [...new Set([...ldPhotos, ...broadPhotos])];
   return { photos: allPhotos, listing: ldListing };
 }
 
@@ -221,9 +230,9 @@ export async function POST(req) {
     }
 
     const scraperKey = process.env.SCRAPER_API_KEY;
-    // render=true uses headless Chrome so JS-rendered photos (KW, etc.) are included
+    // render=true + tall viewport loads lazy images; wait=5000 lets JS finish
     const fetchUrl = scraperKey
-      ? `http://api.scraperapi.com?api_key=${scraperKey}&url=${encodeURIComponent(url)}&render=true&wait=3000`
+      ? `http://api.scraperapi.com?api_key=${scraperKey}&url=${encodeURIComponent(url)}&render=true&wait=5000&window_width=1440&window_height=8000`
       : url;
     const fetchOpts = scraperKey
       ? {}

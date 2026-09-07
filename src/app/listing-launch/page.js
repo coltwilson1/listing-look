@@ -529,7 +529,7 @@ export default function ListingLaunchPage() {
       setImportMsg({ type: "err", text: "Couldn't load those photos — try uploading them manually below." });
     } else {
       setPrimaryPhoto(valid[0]);
-      setAdditionalPhotos(valid.slice(1, 11));
+      setAdditionalPhotos(valid.slice(1));
       setPickerPhotos([]);
       setPickerSelected(new Set());
       setImportMsg({ type: "ok", text: `Imported ${valid.length} photo${valid.length !== 1 ? "s" : ""}` });
