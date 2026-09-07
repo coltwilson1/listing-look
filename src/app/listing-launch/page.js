@@ -547,18 +547,22 @@ export default function ListingLaunchPage() {
               </div>
               <div>
                 <label className={lCls}>Graphic Color Scheme</label>
-                <div className="flex gap-3 mt-1 flex-wrap">
+                <div className="grid grid-cols-3 gap-2 mt-1">
                   {COLOR_SCHEMES.map(cs => (
                     <button
                       key={cs.id}
                       onClick={() => setAgent(a => ({ ...a, colorScheme: cs.id }))}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 transition-all cursor-pointer bg-transparent ${agent.colorScheme === cs.id ? "border-coral" : "border-border hover:border-slate/30"}`}
+                      className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 transition-all cursor-pointer ${agent.colorScheme === cs.id ? "border-coral" : "border-border hover:border-slate/30"}`}
+                      style={{ background: cs.swatch[0] }}
                     >
-                      <span className="flex rounded-full overflow-hidden w-5 h-5 flex-shrink-0">
-                        <span className="flex-1" style={{ background: cs.swatch[0] }} />
-                        <span className="flex-1" style={{ background: cs.swatch[1] }} />
-                      </span>
-                      <span className={`font-sans text-[0.8rem] font-semibold ${agent.colorScheme === cs.id ? "text-coral" : "text-deep"}`}>{cs.label}</span>
+                      <span
+                        className="w-5 h-5 rounded-full flex-shrink-0 ring-2 ring-white/30"
+                        style={{ background: cs.swatch[1] }}
+                      />
+                      <span className="font-sans text-[0.8rem] font-semibold text-white drop-shadow-sm truncate">{cs.label}</span>
+                      {agent.colorScheme === cs.id && (
+                        <span className="ml-auto text-white text-[0.7rem] font-bold flex-shrink-0">✓</span>
+                      )}
                     </button>
                   ))}
                 </div>
