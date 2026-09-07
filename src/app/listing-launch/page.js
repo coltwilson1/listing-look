@@ -154,6 +154,9 @@ export default function ListingLaunchPage() {
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
   const [activeTab, setActiveTab] = useState("landing");
+  const [svgGraphic, setSvgGraphic] = useState(null);
+  const [graphicLoading, setGraphicLoading] = useState(false);
+  const [graphicError, setGraphicError] = useState("");
 
   const [agent, setAgent] = useState({ name: "", brokerage: "", style: "professional" });
   const [listing, setListing] = useState({ address: "", city: "", state: "", zip: "", price: "", beds: "", baths: "", sqft: "", yearBuilt: "", features: "", notes: "" });
@@ -179,6 +182,59 @@ export default function ListingLaunchPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function generateGraphic(l, a) {
+    setGraphicLoading(true);
+    setGraphicError("");
+    setSvgGraphic(null);
+    try {
+      const res = await fetch("/api/listing-launch/graphic", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agent: a, listing: l }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Graphic generation failed");
+      setSvgGraphic(data.svg);
+    } catch (e) {
+      setGraphicError(e.message);
+    } finally {
+      setGraphicLoading(false);
+    }
+  }
+
+  function downloadSVG(svg, filename = "just-listed.svg") {
+    const blob = new Blob([svg], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadPNG(svg, filename = "just-listed.png") {
+    const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1080;
+      canvas.height = 1080;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, 1080, 1080);
+      canvas.toBlob((pngBlob) => {
+        const pngUrl = URL.createObjectURL(pngBlob);
+        const a = document.createElement("a");
+        a.href = pngUrl;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(pngUrl);
+      }, "image/png");
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
   }
 
   // ── Results view ─────────────────────────────────────────────────────────────
@@ -233,7 +289,73 @@ export default function ListingLaunchPage() {
 
           {activeTab === "graphics" && (
             <div>
-              <p className="font-sans text-[0.85rem] text-slate mb-5">Four graphics covering every stage of the sale. Send these to The Listing Look team and they'll produce the final branded versions.</p>
+              {/* AI-designed Just Listed graphic */}
+              <div className="bg-light-gray rounded-2xl p-6 mb-6">
+                <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
+                  <div>
+                    <h3 className="font-sans text-[0.95rem] font-semibold text-deep mb-1">AI-Designed Just Listed Graphic</h3>
+                    <p className="font-sans text-[0.82rem] text-slate">Claude designs a unique 1080×1080 graphic for your listing — download as PNG or SVG and post directly.</p>
+                  </div>
+                  {!svgGraphic && (
+                    <button
+                      onClick={() => generateGraphic(l, a)}
+                      disabled={graphicLoading}
+                      className="flex-shrink-0 flex items-center gap-2 bg-deep text-white font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full border-none cursor-pointer hover:bg-coral transition-colors disabled:opacity-60"
+                    >
+                      {graphicLoading ? (
+                        <>
+                          <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" />
+                          Designing…
+                        </>
+                      ) : "✨ Design My Graphic"}
+                    </button>
+                  )}
+                </div>
+
+                {graphicError && <p className="font-sans text-[0.82rem] text-coral mb-3">{graphicError}</p>}
+
+                {graphicLoading && (
+                  <div className="bg-white rounded-2xl border border-border flex items-center justify-center" style={{ aspectRatio: "1/1", maxWidth: 400 }}>
+                    <div className="text-center">
+                      <div className="w-10 h-10 rounded-full border-2 border-coral border-t-transparent animate-spin mx-auto mb-3" />
+                      <p className="font-sans text-[0.85rem] text-slate">Claude is designing your graphic…</p>
+                    </div>
+                  </div>
+                )}
+
+                {svgGraphic && (
+                  <div>
+                    <div
+                      className="rounded-2xl overflow-hidden border border-border mb-4"
+                      style={{ maxWidth: 420 }}
+                      dangerouslySetInnerHTML={{ __html: svgGraphic.replace('<svg', '<svg width="100%" height="100%"') }}
+                    />
+                    <div className="flex gap-3 flex-wrap">
+                      <button
+                        onClick={() => downloadPNG(svgGraphic, `just-listed-${l.address.replace(/\s+/g, "-").toLowerCase()}.png`)}
+                        className="flex items-center gap-2 bg-coral text-white font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors"
+                      >
+                        ⬇ Download PNG
+                      </button>
+                      <button
+                        onClick={() => downloadSVG(svgGraphic, `just-listed-${l.address.replace(/\s+/g, "-").toLowerCase()}.svg`)}
+                        className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors"
+                      >
+                        ⬇ Download SVG
+                      </button>
+                      <button
+                        onClick={() => { setSvgGraphic(null); generateGraphic(l, a); }}
+                        className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors"
+                      >
+                        ↻ Regenerate
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Stage preview cards */}
+              <p className="font-sans text-[0.82rem] text-slate mb-4">Additional graphics for every stage of the sale:</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {GRAPHIC_TYPES.map(({ key, label, color }) => (
                   <div key={key}>
