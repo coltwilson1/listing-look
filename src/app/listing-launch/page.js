@@ -65,6 +65,32 @@ async function compressPhoto(file) {
   });
 }
 
+async function compressPhotoFromUrl(proxyUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const MAX = 1080;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => {
+        if (!blob) { reject(new Error("Canvas export failed")); return; }
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result.split(",")[1]);
+        reader.readAsDataURL(blob);
+      }, "image/jpeg", 0.78);
+    };
+    img.onerror = () => reject(new Error("Image load failed"));
+    img.src = proxyUrl;
+  });
+}
+
 const STEPS = ["You", "Property", "Details", "Generate"];
 
 function ProgressBar({ step }) {
@@ -367,6 +393,10 @@ export default function ListingLaunchPage() {
   const [team, setTeam] = useState({ name: "", logo: null }); // logo = full data URI
   const [showTeam, setShowTeam] = useState(false);
 
+  const [importUrl, setImportUrl] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState({ type: "", text: "" }); // type: "ok" | "err"
+
   const addressRef = useRef(null);
   const acRef = useRef(null);
 
@@ -426,6 +456,66 @@ export default function ListingLaunchPage() {
     }
   }
 
+  async function handleImport() {
+    const url = importUrl.trim();
+    if (!url) return;
+    setImporting(true);
+    setImportMsg({ type: "", text: "" });
+    try {
+      const res = await fetch("/api/listing-launch/import-listing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Import failed");
+
+      // Fill in listing fields with whatever we got
+      const d = data.listing || {};
+      setListing(l => ({
+        ...l,
+        address:   d.address   || l.address,
+        city:      d.city      || l.city,
+        state:     d.state     || l.state,
+        zip:       d.zip       || l.zip,
+        price:     d.price     || l.price,
+        beds:      d.beds      || l.beds,
+        baths:     d.baths     || l.baths,
+        sqft:      d.sqft      || l.sqft,
+        yearBuilt: d.yearBuilt || l.yearBuilt,
+        features:  d.features  || l.features,
+      }));
+
+      // Compress + import photos
+      const photoUrls = data.photos || [];
+      if (photoUrls.length === 0) {
+        setImportMsg({ type: "ok", text: "Listing info imported — no photos found. Upload them below." });
+        return;
+      }
+
+      const encode = (rawUrl) =>
+        compressPhotoFromUrl(`/api/listing-launch/proxy-photo?url=${encodeURIComponent(rawUrl)}`);
+
+      const results = await Promise.allSettled(photoUrls.slice(0, 11).map(encode));
+      const valid = results
+        .map((r, i) => r.status === "fulfilled" ? { name: `photo-${i + 1}.jpg`, base64: r.value } : null)
+        .filter(Boolean);
+
+      let photoCount = 0;
+      if (valid[0]) { setPrimaryPhoto(valid[0]); photoCount++; }
+      if (valid.length > 1) {
+        setAdditionalPhotos(valid.slice(1).slice(0, 10));
+        photoCount += valid.length - 1;
+      }
+
+      setImportMsg({ type: "ok", text: `Imported ${photoCount} photo${photoCount !== 1 ? "s" : ""}${d.address ? ` for ${d.address}` : ""}` });
+    } catch (err) {
+      setImportMsg({ type: "err", text: err.message });
+    } finally {
+      setImporting(false);
+    }
+  }
+
   async function generateGraphic(l, a, stage) {
     setGraphicLoadings(prev => ({ ...prev, [stage]: true }));
     setGraphicErrors(prev => ({ ...prev, [stage]: "" }));
@@ -442,7 +532,7 @@ export default function ListingLaunchPage() {
     } catch (e) {
       setGraphicErrors(prev => ({ ...prev, [stage]: e.message }));
     } finally {
-      setGraphicLoading(false);
+      setGraphicLoadings(prev => ({ ...prev, [stage]: false }));
     }
   }
 
@@ -917,9 +1007,39 @@ export default function ListingLaunchPage() {
             <div className="space-y-5">
               <div>
                 <h2 className="font-serif text-[1.5rem] text-deep mb-1">The property</h2>
-                <p className="font-sans text-[0.87rem] text-slate mb-6">Start typing the address and select it from the suggestions.</p>
+                <p className="font-sans text-[0.87rem] text-slate mb-4">Start typing the address and select it from the suggestions — or paste your Zillow link to auto-fill everything.</p>
               </div>
-              <div>
+
+              {/* Auto-import card */}
+              <div className="bg-gradient-to-br from-coral/5 to-amber-50 border border-coral/25 rounded-2xl p-4">
+                <p className="font-sans text-[0.78rem] font-bold uppercase tracking-[0.09em] text-coral mb-1">Auto-Import from Zillow</p>
+                <p className="font-sans text-[0.82rem] text-slate mb-3">Paste your Zillow (or Realtor.com) listing link to auto-fill all fields and pull listing photos.</p>
+                <div className="flex gap-2">
+                  <input
+                    className={iCls + " flex-1 text-[0.85rem] py-2.5"}
+                    placeholder="https://www.zillow.com/homedetails/..."
+                    value={importUrl}
+                    onChange={e => setImportUrl(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && handleImport()}
+                    disabled={importing}
+                  />
+                  <button
+                    onClick={handleImport}
+                    disabled={importing || !importUrl.trim()}
+                    className="flex-shrink-0 bg-coral text-white font-sans text-[0.83rem] font-semibold px-4 py-2.5 rounded-xl border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5"
+                  >
+                    {importing ? (
+                      <><span className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Importing…</>
+                    ) : "⚡ Import"}
+                  </button>
+                </div>
+                {importMsg.text && (
+                  <p className={`font-sans text-[0.8rem] mt-2 ${importMsg.type === "ok" ? "text-green-700" : "text-coral"}`}>
+                    {importMsg.type === "ok" ? "✓ " : "⚠ "}{importMsg.text}
+                  </p>
+                )}
+              </div>
+              <div className="mt-1">
                 <label className={lCls}>Street Address</label>
                 <input
                   ref={addressRef}
