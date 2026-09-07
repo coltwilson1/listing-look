@@ -826,6 +826,35 @@ export default function ListingLaunchPage() {
           <p className="font-sans text-[0.9rem] text-slate">Get a landing page, social graphics, and ready-to-post captions — powered by AI in seconds.</p>
         </div>
 
+        {/* ── Always-visible import bar ── */}
+        <div className="bg-white border border-coral/20 rounded-2xl px-4 py-3 mb-4 shadow-sm">
+          <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.09em] text-coral mb-1.5">⚡ Auto-Import from Zillow or Realtor.com</p>
+          <div className="flex gap-2">
+            <input
+              className="flex-1 bg-light-gray border border-border rounded-xl px-3 py-2 text-deep text-[0.85rem] placeholder:text-slate/40 focus:outline-none focus:border-coral transition-colors font-sans"
+              placeholder="Paste your listing URL to auto-fill everything…"
+              value={importUrl}
+              onChange={e => setImportUrl(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && handleImport()}
+              disabled={importing}
+            />
+            <button
+              onClick={handleImport}
+              disabled={importing || !importUrl.trim()}
+              className="flex-shrink-0 bg-coral text-white font-sans text-[0.82rem] font-semibold px-4 py-2 rounded-xl border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5"
+            >
+              {importing ? (
+                <><span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Importing…</>
+              ) : "Import"}
+            </button>
+          </div>
+          {importMsg.text && (
+            <p className={`font-sans text-[0.78rem] mt-1.5 ${importMsg.type === "ok" ? "text-green-700" : "text-coral"}`}>
+              {importMsg.type === "ok" ? "✓ " : "⚠ "}{importMsg.text}
+            </p>
+          )}
+        </div>
+
         <div className="bg-white rounded-3xl border border-border p-4 sm:p-8 shadow-sm">
           <ProgressBar step={step} />
 
@@ -1007,39 +1036,9 @@ export default function ListingLaunchPage() {
             <div className="space-y-5">
               <div>
                 <h2 className="font-serif text-[1.5rem] text-deep mb-1">The property</h2>
-                <p className="font-sans text-[0.87rem] text-slate mb-4">Start typing the address and select it from the suggestions — or paste your Zillow link to auto-fill everything.</p>
+                <p className="font-sans text-[0.87rem] text-slate mb-6">Start typing the address or use the import bar above to pull everything automatically.</p>
               </div>
-
-              {/* Auto-import card */}
-              <div className="bg-gradient-to-br from-coral/5 to-amber-50 border border-coral/25 rounded-2xl p-4">
-                <p className="font-sans text-[0.78rem] font-bold uppercase tracking-[0.09em] text-coral mb-1">Auto-Import from Zillow</p>
-                <p className="font-sans text-[0.82rem] text-slate mb-3">Paste your Zillow (or Realtor.com) listing link to auto-fill all fields and pull listing photos.</p>
-                <div className="flex gap-2">
-                  <input
-                    className={iCls + " flex-1 text-[0.85rem] py-2.5"}
-                    placeholder="https://www.zillow.com/homedetails/..."
-                    value={importUrl}
-                    onChange={e => setImportUrl(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && handleImport()}
-                    disabled={importing}
-                  />
-                  <button
-                    onClick={handleImport}
-                    disabled={importing || !importUrl.trim()}
-                    className="flex-shrink-0 bg-coral text-white font-sans text-[0.83rem] font-semibold px-4 py-2.5 rounded-xl border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5"
-                  >
-                    {importing ? (
-                      <><span className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Importing…</>
-                    ) : "⚡ Import"}
-                  </button>
-                </div>
-                {importMsg.text && (
-                  <p className={`font-sans text-[0.8rem] mt-2 ${importMsg.type === "ok" ? "text-green-700" : "text-coral"}`}>
-                    {importMsg.type === "ok" ? "✓ " : "⚠ "}{importMsg.text}
-                  </p>
-                )}
-              </div>
-              <div className="mt-1">
+              <div>
                 <label className={lCls}>Street Address</label>
                 <input
                   ref={addressRef}
