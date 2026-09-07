@@ -1,6 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+
+// ── Google Maps loader (singleton) ────────────────────────────────────────────
+let _mapsReady = false;
+let _mapsCallbacks = [];
+function loadGoogleMaps(cb) {
+  if (_mapsReady) { cb(); return; }
+  _mapsCallbacks.push(cb);
+  if (document.querySelector('script[src*="maps.googleapis.com"]')) return;
+  window.__tllMapsInit = () => { _mapsReady = true; _mapsCallbacks.forEach(fn => fn()); _mapsCallbacks = []; };
+  const s = document.createElement("script");
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&callback=__tllMapsInit`;
+  s.async = true;
+  document.head.appendChild(s);
+}
+
+// ── Phone formatting helpers ──────────────────────────────────────────────────
+function formatPhone(raw) {
+  const digits = raw.replace(/\D/g, "").slice(0, 10);
+  if (digits.length < 4) return digits;
+  if (digits.length < 7) return `(${digits.slice(0,3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`;
+}
+function phoneComplete(val) {
+  return val.replace(/\D/g, "").length === 10;
+}
 
 const STYLES = [
   { id: "professional", label: "Professional", desc: "Polished, elegant, trust-building" },
@@ -159,8 +184,44 @@ export default function ListingLaunchPage() {
   const [graphicError, setGraphicError] = useState("");
 
   const [kwError, setKwError] = useState("");
+  const [phoneErrors, setPhoneErrors] = useState({ officePhone: false, mobilePhone: false });
   const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional" });
   const [listing, setListing] = useState({ address: "", city: "", state: "", zip: "", price: "", beds: "", baths: "", sqft: "", yearBuilt: "", features: "", notes: "" });
+
+  const addressRef = useRef(null);
+  const acRef = useRef(null);
+
+  useEffect(() => {
+    if (step !== 1) return;
+    if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) return;
+    loadGoogleMaps(() => {
+      if (!addressRef.current || acRef.current) return;
+      acRef.current = new window.google.maps.places.Autocomplete(addressRef.current, {
+        types: ["address"],
+        componentRestrictions: { country: "us" },
+        fields: ["address_components", "formatted_address"],
+      });
+      acRef.current.addListener("place_changed", () => {
+        const place = acRef.current.getPlace();
+        if (!place?.address_components) return;
+        const get = (type) => place.address_components.find(c => c.types.includes(type))?.long_name || "";
+        const getShort = (type) => place.address_components.find(c => c.types.includes(type))?.short_name || "";
+        const streetNum = get("street_number");
+        const streetName = get("route");
+        setListing(l => ({
+          ...l,
+          address: `${streetNum} ${streetName}`.trim() || place.formatted_address,
+          city: get("locality") || get("sublocality"),
+          state: getShort("administrative_area_level_1"),
+          zip: get("postal_code"),
+        }));
+      });
+    });
+    return () => {
+      if (acRef.current) window.google?.maps?.event?.clearInstanceListeners(acRef.current);
+      acRef.current = null;
+    };
+  }, [step]);
 
   const iCls = "w-full bg-white border border-border rounded-xl px-4 py-3 text-deep text-[0.9rem] placeholder:text-slate/40 focus:outline-none focus:border-coral transition-colors font-sans";
   const lCls = "block font-sans text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-slate mb-1.5";
@@ -423,12 +484,32 @@ export default function ListingLaunchPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={lCls}>Office Phone <span className="text-coral">*</span></label>
-                  <input className={iCls} placeholder="(423) 000-0000" value={agent.officePhone} onChange={e => setAgent(a => ({ ...a, officePhone: e.target.value }))} />
+                  <label className={lCls}>
+                    Office Phone <span className="text-coral">*</span>
+                    {phoneErrors.officePhone && <span className="text-coral normal-case font-normal tracking-normal ml-1">— incomplete number</span>}
+                  </label>
+                  <input
+                    className={`${iCls} ${phoneErrors.officePhone ? "border-coral ring-2 ring-coral/20" : ""}`}
+                    placeholder="(423) 000-0000"
+                    value={agent.officePhone}
+                    onChange={e => { setAgent(a => ({ ...a, officePhone: formatPhone(e.target.value) })); setPhoneErrors(p => ({ ...p, officePhone: false })); }}
+                    onBlur={() => { if (agent.officePhone && !phoneComplete(agent.officePhone)) setPhoneErrors(p => ({ ...p, officePhone: true })); }}
+                    inputMode="tel"
+                  />
                 </div>
                 <div>
-                  <label className={lCls}>Mobile Phone <span className="text-coral">*</span></label>
-                  <input className={iCls} placeholder="(423) 000-0000" value={agent.mobilePhone} onChange={e => setAgent(a => ({ ...a, mobilePhone: e.target.value }))} />
+                  <label className={lCls}>
+                    Mobile Phone <span className="text-coral">*</span>
+                    {phoneErrors.mobilePhone && <span className="text-coral normal-case font-normal tracking-normal ml-1">— incomplete number</span>}
+                  </label>
+                  <input
+                    className={`${iCls} ${phoneErrors.mobilePhone ? "border-coral ring-2 ring-coral/20" : ""}`}
+                    placeholder="(423) 000-0000"
+                    value={agent.mobilePhone}
+                    onChange={e => { setAgent(a => ({ ...a, mobilePhone: formatPhone(e.target.value) })); setPhoneErrors(p => ({ ...p, mobilePhone: false })); }}
+                    onBlur={() => { if (agent.mobilePhone && !phoneComplete(agent.mobilePhone)) setPhoneErrors(p => ({ ...p, mobilePhone: true })); }}
+                    inputMode="tel"
+                  />
                 </div>
               </div>
               <div>
@@ -453,7 +534,7 @@ export default function ListingLaunchPage() {
               )}
               <button
                 onClick={() => { setKwError(""); setStep(1); }}
-                disabled={!agent.name || !agent.license || !agent.officePhone || !agent.mobilePhone}
+                disabled={!agent.name || !agent.license || !phoneComplete(agent.officePhone) || !phoneComplete(agent.mobilePhone)}
                 className="w-full bg-coral text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
               >
                 Continue →
@@ -466,20 +547,27 @@ export default function ListingLaunchPage() {
             <div className="space-y-5">
               <div>
                 <h2 className="font-serif text-[1.5rem] text-deep mb-1">The property</h2>
-                <p className="font-sans text-[0.87rem] text-slate mb-6">Enter the listing address and price. The MLS must have this as an active listing.</p>
+                <p className="font-sans text-[0.87rem] text-slate mb-6">Start typing the address and select it from the suggestions.</p>
               </div>
               <div>
                 <label className={lCls}>Street Address</label>
-                <input className={iCls} placeholder="123 Maple Street" value={listing.address} onChange={e => setListing(l => ({ ...l, address: e.target.value }))} />
+                <input
+                  ref={addressRef}
+                  className={iCls}
+                  placeholder="123 Maple Street"
+                  value={listing.address}
+                  onChange={e => setListing(l => ({ ...l, address: e.target.value }))}
+                  autoComplete="off"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={lCls}>City</label>
-                  <input className={iCls} placeholder="Austin" value={listing.city} onChange={e => setListing(l => ({ ...l, city: e.target.value }))} />
+                  <input className={iCls} placeholder="Chattanooga" value={listing.city} onChange={e => setListing(l => ({ ...l, city: e.target.value }))} />
                 </div>
                 <div>
                   <label className={lCls}>State</label>
-                  <input className={iCls} placeholder="TX" value={listing.state} onChange={e => setListing(l => ({ ...l, state: e.target.value }))} />
+                  <input className={iCls} placeholder="TN" value={listing.state} onChange={e => setListing(l => ({ ...l, state: e.target.value }))} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
