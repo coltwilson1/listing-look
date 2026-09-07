@@ -395,7 +395,10 @@ export default function ListingLaunchPage() {
 
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
-  const [importMsg, setImportMsg] = useState({ type: "", text: "" }); // type: "ok" | "err"
+  const [importMsg, setImportMsg] = useState({ type: "", text: "" });
+  const [pickerPhotos, setPickerPhotos] = useState([]);       // URLs found from import
+  const [pickerSelected, setPickerSelected] = useState(new Set());
+  const [pickerImporting, setPickerImporting] = useState(false);
 
   const addressRef = useRef(null);
   const acRef = useRef(null);
@@ -461,6 +464,8 @@ export default function ListingLaunchPage() {
     if (!url) return;
     setImporting(true);
     setImportMsg({ type: "", text: "" });
+    setPickerPhotos([]);
+    setPickerSelected(new Set());
     try {
       const res = await fetch("/api/listing-launch/import-listing", {
         method: "POST",
@@ -470,7 +475,6 @@ export default function ListingLaunchPage() {
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Import failed");
 
-      // Fill in listing fields with whatever we got
       const d = data.listing || {};
       setListing(l => ({
         ...l,
@@ -486,34 +490,51 @@ export default function ListingLaunchPage() {
         features:  d.features  || l.features,
       }));
 
-      // Compress + import photos
-      const photoUrls = data.photos || [];
-      if (photoUrls.length === 0) {
-        setImportMsg({ type: "ok", text: "Listing info imported — no photos found. Upload them below." });
-        return;
+      const photos = data.photos || [];
+      if (photos.length > 0) {
+        setPickerPhotos(photos);
+        setPickerSelected(new Set(photos.map((_, i) => i))); // pre-select all
+        setImportMsg({ type: "ok", text: `Found ${photos.length} photo${photos.length !== 1 ? "s" : ""} — select the ones you want below.` });
+      } else {
+        setImportMsg({ type: "ok", text: "Details filled in. No photos found on this page — upload them below." });
       }
-
-      const encode = (rawUrl) =>
-        compressPhotoFromUrl(`/api/listing-launch/proxy-photo?url=${encodeURIComponent(rawUrl)}`);
-
-      const results = await Promise.allSettled(photoUrls.slice(0, 11).map(encode));
-      const valid = results
-        .map((r, i) => r.status === "fulfilled" ? { name: `photo-${i + 1}.jpg`, base64: r.value } : null)
-        .filter(Boolean);
-
-      let photoCount = 0;
-      if (valid[0]) { setPrimaryPhoto(valid[0]); photoCount++; }
-      if (valid.length > 1) {
-        setAdditionalPhotos(valid.slice(1).slice(0, 10));
-        photoCount += valid.length - 1;
-      }
-
-      setImportMsg({ type: "ok", text: `Imported ${photoCount} photo${photoCount !== 1 ? "s" : ""}${d.address ? ` for ${d.address}` : ""}` });
     } catch (err) {
       setImportMsg({ type: "err", text: err.message });
     } finally {
       setImporting(false);
     }
+  }
+
+  function togglePicker(i) {
+    setPickerSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i); else next.add(i);
+      return next;
+    });
+  }
+
+  async function importSelectedPhotos() {
+    if (pickerSelected.size === 0) return;
+    setPickerImporting(true);
+    const selected = pickerPhotos.filter((_, i) => pickerSelected.has(i));
+    const results = await Promise.allSettled(
+      selected.map(url =>
+        compressPhotoFromUrl(`/api/listing-launch/proxy-photo?url=${encodeURIComponent(url)}`)
+      )
+    );
+    const valid = results
+      .map((r, i) => r.status === "fulfilled" ? { name: `photo-${i + 1}.jpg`, base64: r.value } : null)
+      .filter(Boolean);
+    if (valid.length === 0) {
+      setImportMsg({ type: "err", text: "Couldn't load those photos — try uploading them manually below." });
+    } else {
+      setPrimaryPhoto(valid[0]);
+      setAdditionalPhotos(valid.slice(1, 11));
+      setPickerPhotos([]);
+      setPickerSelected(new Set());
+      setImportMsg({ type: "ok", text: `Imported ${valid.length} photo${valid.length !== 1 ? "s" : ""}` });
+    }
+    setPickerImporting(false);
   }
 
   async function generateGraphic(l, a, stage) {
@@ -826,35 +847,6 @@ export default function ListingLaunchPage() {
           <p className="font-sans text-[0.9rem] text-slate">Get a landing page, social graphics, and ready-to-post captions — powered by AI in seconds.</p>
         </div>
 
-        {/* ── Always-visible import bar ── */}
-        <div className="bg-white border border-coral/20 rounded-2xl px-4 py-3 mb-4 shadow-sm">
-          <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.09em] text-coral mb-1.5">⚡ Auto-Import from Zillow or Realtor.com</p>
-          <div className="flex gap-2">
-            <input
-              className="flex-1 bg-light-gray border border-border rounded-xl px-3 py-2 text-deep text-[0.85rem] placeholder:text-slate/40 focus:outline-none focus:border-coral transition-colors font-sans"
-              placeholder="Paste your Zillow, KW, or Realtor.com listing URL…"
-              value={importUrl}
-              onChange={e => setImportUrl(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && handleImport()}
-              disabled={importing}
-            />
-            <button
-              onClick={handleImport}
-              disabled={importing || !importUrl.trim()}
-              className="flex-shrink-0 bg-coral text-white font-sans text-[0.82rem] font-semibold px-4 py-2 rounded-xl border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5"
-            >
-              {importing ? (
-                <><span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Importing…</>
-              ) : "Import"}
-            </button>
-          </div>
-          {importMsg.text && (
-            <p className={`font-sans text-[0.78rem] mt-1.5 ${importMsg.type === "ok" ? "text-green-700" : "text-coral"}`}>
-              {importMsg.type === "ok" ? "✓ " : "⚠ "}{importMsg.text}
-            </p>
-          )}
-        </div>
-
         <div className="bg-white rounded-3xl border border-border p-4 sm:p-8 shadow-sm">
           <ProgressBar step={step} />
 
@@ -1036,7 +1028,7 @@ export default function ListingLaunchPage() {
             <div className="space-y-5">
               <div>
                 <h2 className="font-serif text-[1.5rem] text-deep mb-1">The property</h2>
-                <p className="font-sans text-[0.87rem] text-slate mb-6">Start typing the address or use the import bar above to pull everything automatically.</p>
+                <p className="font-sans text-[0.87rem] text-slate mb-6">Start typing the address and select it from the suggestions.</p>
               </div>
               <div>
                 <label className={lCls}>Street Address</label>
@@ -1087,8 +1079,95 @@ export default function ListingLaunchPage() {
             <div className="space-y-5">
               <div>
                 <h2 className="font-serif text-[1.5rem] text-deep mb-1">Property details</h2>
-                <p className="font-sans text-[0.87rem] text-slate mb-6">The more detail you share, the better your AI-powered content will be.</p>
+                <p className="font-sans text-[0.87rem] text-slate mb-4">Fill in the details below — or paste your KW, Zillow, or Realtor.com listing link to pull details and photos automatically.</p>
               </div>
+
+              {/* ── Import from listing link ── */}
+              <div className="border border-border rounded-2xl overflow-hidden">
+                <div className="p-4 bg-light-gray/40">
+                  <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.08em] text-coral mb-2">Import from Listing Link</p>
+                  <div className="flex gap-2">
+                    <input
+                      className={iCls + " flex-1 text-[0.85rem] py-2.5"}
+                      placeholder="https://coltwilson.kw.com/property/..."
+                      value={importUrl}
+                      onChange={e => setImportUrl(e.target.value)}
+                      onKeyDown={e => e.key === "Enter" && handleImport()}
+                      disabled={importing}
+                    />
+                    <button
+                      onClick={handleImport}
+                      disabled={importing || !importUrl.trim()}
+                      className="flex-shrink-0 bg-coral text-white font-sans text-[0.83rem] font-semibold px-4 py-2.5 rounded-xl border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5"
+                    >
+                      {importing
+                        ? <><span className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Looking up…</>
+                        : "Look Up"}
+                    </button>
+                  </div>
+                  {importMsg.text && (
+                    <p className={`font-sans text-[0.78rem] mt-2 ${importMsg.type === "ok" ? "text-green-700" : "text-coral"}`}>
+                      {importMsg.type === "ok" ? "✓ " : "⚠ "}{importMsg.text}
+                    </p>
+                  )}
+                </div>
+
+                {/* Photo picker */}
+                {pickerPhotos.length > 0 && (
+                  <div className="p-4 border-t border-border">
+                    <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                      <p className="font-sans text-[0.82rem] font-semibold text-deep">
+                        Select photos <span className="font-normal text-slate/60">— first selected becomes primary</span>
+                      </p>
+                      <div className="flex gap-2">
+                        <button onClick={() => setPickerSelected(new Set(pickerPhotos.map((_, i) => i)))} className="font-sans text-[0.75rem] text-coral border-none bg-transparent cursor-pointer hover:underline">All</button>
+                        <button onClick={() => setPickerSelected(new Set())} className="font-sans text-[0.75rem] text-slate border-none bg-transparent cursor-pointer hover:underline">None</button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 mb-4">
+                      {pickerPhotos.map((url, i) => {
+                        const sel = pickerSelected.has(i);
+                        const isFirst = sel && [...pickerSelected][0] === i;
+                        return (
+                          <div
+                            key={i}
+                            onClick={() => togglePicker(i)}
+                            className={`relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all ${sel ? "border-coral" : "border-transparent hover:border-border"}`}
+                            style={{ aspectRatio: "4/3" }}
+                          >
+                            <img
+                              src={url}
+                              alt=""
+                              className="w-full h-full object-cover"
+                              onError={e => { e.target.style.display = "none"; e.target.parentElement.style.background = "#f1f5f9"; }}
+                            />
+                            {sel && (
+                              <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-coral rounded-full flex items-center justify-center">
+                                <span className="text-white text-[0.6rem] font-bold">✓</span>
+                              </div>
+                            )}
+                            {isFirst && (
+                              <div className="absolute bottom-0 left-0 right-0 bg-coral/90 text-white font-sans text-[0.6rem] font-bold text-center py-0.5 uppercase tracking-wide">
+                                Primary
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <button
+                      onClick={importSelectedPhotos}
+                      disabled={pickerSelected.size === 0 || pickerImporting}
+                      className="w-full bg-coral text-white font-sans text-[0.88rem] font-semibold py-3 rounded-xl border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {pickerImporting
+                        ? <><span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Importing…</>
+                        : `Import ${pickerSelected.size} Photo${pickerSelected.size !== 1 ? "s" : ""}`}
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className={lCls}>Beds</label>
