@@ -668,7 +668,7 @@ export default function ListingLaunchPage() {
                 </div>
                 <div>
                   <label className={lCls}>List Price</label>
-                  <input className={iCls} placeholder="$450,000" inputMode="numeric" value={listing.price} onChange={e => setListing(l => ({ ...l, price: formatPrice(e.target.value) }))} />
+                  <input className={iCls} placeholder="$450,000" inputMode="numeric" value={listing.price ? formatPrice(listing.price) : ""} onChange={e => setListing(l => ({ ...l, price: e.target.value.replace(/\D/g, "") }))} />
                 </div>
               </div>
               <div className="flex gap-3">
