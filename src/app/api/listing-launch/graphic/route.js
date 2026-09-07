@@ -84,8 +84,9 @@ ${hasPhoto
   ? `PHOTO BACKGROUND MODE: A listing photo will be injected as the first SVG element (background).
 - Do NOT include any background rect or solid fill
 - DO include a full-size gradient overlay rect immediately after the opening <svg> tag:
-  <defs><linearGradient id="ov" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${scheme.bg}" stop-opacity="0.45"/><stop offset="55%" stop-color="${scheme.bg}" stop-opacity="0.65"/><stop offset="100%" stop-color="${scheme.bg}" stop-opacity="0.92"/></linearGradient></defs><rect width="1080" height="1080" fill="url(#ov)"/>
-- All text must be white or light — it sits over a darkened photo`
+  <defs><linearGradient id="ov" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${scheme.bg}" stop-opacity="0.05"/><stop offset="40%" stop-color="${scheme.bg}" stop-opacity="0.20"/><stop offset="100%" stop-color="${scheme.bg}" stop-opacity="0.68"/></linearGradient></defs><rect width="1080" height="1080" fill="url(#ov)"/>
+- The photo must remain clearly visible — the overlay is subtle, not heavy
+- All text must be white or light — it sits over the lightly darkened photo`
   : `SOLID BACKGROUND MODE:
 - Full background rect: fill="${scheme.bg}"
 - Add subtle geometric shapes and depth elements for visual interest`}

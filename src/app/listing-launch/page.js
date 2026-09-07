@@ -148,21 +148,42 @@ function CaptionCard({ label, caption, color }) {
 
 // ── Landing page preview ──────────────────────────────────────────────────────
 
-function LandingPreview({ lp, listing, agent }) {
+function LandingPreview({ lp, listing, agent, photos }) {
+  const mainPhoto = photos?.[0]?.base64;
+  const extraPhotos = photos?.slice(1) || [];
+
   return (
     <div className="bg-white rounded-3xl border border-border overflow-hidden shadow-lg">
       {/* Hero */}
-      <div className="bg-deep px-8 py-12 text-center">
-        <div className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.18em] text-coral mb-3">Now Available</div>
-        <h1 className="font-serif text-[clamp(1.5rem,3vw,2.4rem)] text-white leading-tight mb-3">{lp.headline}</h1>
-        <p className="font-sans text-[0.95rem] text-white/65 mb-5">{lp.subheadline}</p>
-        <div className="inline-flex gap-5 flex-wrap justify-center font-sans text-[0.85rem] text-white/80">
-          <span>🛏 {listing.beds} Beds</span>
-          <span>🛁 {listing.baths} Baths</span>
-          <span>📐 {parseInt(listing.sqft || 0).toLocaleString()} sqft</span>
-          <span>💰 ${parseInt(listing.price || 0).toLocaleString()}</span>
+      <div
+        className="relative px-8 py-14 text-center"
+        style={mainPhoto
+          ? { backgroundImage: `url(data:image/jpeg;base64,${mainPhoto})`, backgroundSize: "cover", backgroundPosition: "center" }
+          : { background: "#1C1C2E" }
+        }
+      >
+        {mainPhoto && <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(28,28,46,0.35), rgba(28,28,46,0.72))" }} />}
+        <div className="relative z-10">
+          <div className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.18em] text-coral mb-3">Now Available</div>
+          <h1 className="font-serif text-[clamp(1.5rem,3vw,2.4rem)] text-white leading-tight mb-3">{lp.headline}</h1>
+          <p className="font-sans text-[0.95rem] text-white/75 mb-5">{lp.subheadline}</p>
+          <div className="inline-flex gap-5 flex-wrap justify-center font-sans text-[0.85rem] text-white/85 bg-black/20 px-5 py-2.5 rounded-full backdrop-blur-sm">
+            <span>🛏 {listing.beds} Beds</span>
+            <span>🛁 {listing.baths} Baths</span>
+            <span>📐 {parseInt(listing.sqft || 0).toLocaleString()} sqft</span>
+            <span>💰 ${parseInt(listing.price || 0).toLocaleString()}</span>
+          </div>
         </div>
       </div>
+
+      {/* Photo gallery */}
+      {extraPhotos.length > 0 && (
+        <div className={`grid gap-1 ${extraPhotos.length === 1 ? "grid-cols-1" : extraPhotos.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+          {extraPhotos.map((p, i) => (
+            <img key={i} src={`data:image/jpeg;base64,${p.base64}`} alt="" className="w-full object-cover" style={{ height: 180 }} />
+          ))}
+        </div>
+      )}
 
       <div className="px-8 py-8 space-y-7">
         {/* Description */}
@@ -390,7 +411,7 @@ export default function ListingLaunchPage() {
           {activeTab === "landing" && (
             <div>
               <p className="font-sans text-[0.85rem] text-slate mb-5">AI-powered landing page for <strong>{l.address}</strong>. This is a preview — send this to The Listing Look team to publish it as a live shareable link.</p>
-              <LandingPreview lp={generated.landingPage} listing={l} agent={a} />
+              <LandingPreview lp={generated.landingPage} listing={l} agent={a} photos={photos} />
             </div>
           )}
 
