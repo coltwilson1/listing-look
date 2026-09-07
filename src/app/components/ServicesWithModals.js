@@ -9,7 +9,7 @@ export default function ServicesWithModals({ content: c }) {
     { icon: "🏠", title: "Custom Landing Page", desc: "Built from your MLS ID and listing photos — a shareable link for every platform." },
     { icon: "📱", title: "Every Stage Covered", desc: "Just Listed, Under Contract, Price Reduced, and Sold graphics included." },
     { icon: "✍️", title: "Ready-to-Use Captions", desc: "Copy, paste, and post — captions written for every graphic." },
-    { icon: "⚡", title: "No Subscription Needed", desc: "Standalone purchase, $150 per listing. Order anytime." },
+    { icon: "⚡", title: "No Subscription Needed", desc: "Standalone purchase, $99 per listing. Order anytime." },
   ];
 
   return (
@@ -93,7 +93,7 @@ export default function ServicesWithModals({ content: c }) {
               <h3 className="font-serif text-[clamp(1.7rem,3vw,2.3rem)] text-white mb-2">
                 Listing Launch
               </h3>
-              <div className="font-sans text-[1.4rem] font-bold text-coral mb-4">$150 / listing</div>
+              <div className="font-sans text-[1.4rem] font-bold text-coral mb-4">$99 / listing</div>
               <p className="font-sans text-[0.95rem] text-white/65 leading-[1.75] mb-8 max-w-[400px]">
                 A complete marketing package for a single listing — landing page, social graphics for every stage, and ready-to-use captions. No subscription needed.
               </p>

@@ -293,7 +293,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Can I buy Listing Launch without a monthly plan?",
-    a: "Yes — Listing Launch is completely standalone. No subscription required. Just fill out the form, select Listing Launch, and we'll handle the rest. $150 flat per listing.",
+    a: "Yes — Listing Launch is completely standalone. No subscription required. Just fill out the form, select Listing Launch, and we'll handle the rest. $99 flat per listing.",
   },
   {
     q: "Do the graphics include my brokerage name and compliance disclosures?",
