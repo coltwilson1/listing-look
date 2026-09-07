@@ -39,23 +39,6 @@ const STYLES = [
   { id: "energetic", label: "Energetic", desc: "Bold, exciting, high-energy" },
 ];
 
-const COLOR_SCHEMES = [
-  { id: "kwred",     label: "KW Red",    swatch: ["#C8102E", "#ffffff"] },
-  { id: "forest",    label: "Forest",    swatch: ["#1a3d35", "#c9a84c"] },
-  { id: "navy",      label: "Navy",      swatch: ["#1C1C2E", "#E8825A"] },
-  { id: "midnight",  label: "Midnight",  swatch: ["#0f0f0f", "#e2e8f0"] },
-  { id: "warm",      label: "Warm",      swatch: ["#2a1810", "#d4835a"] },
-  { id: "slate",     label: "Slate",     swatch: ["#1a2233", "#60a5fa"] },
-  { id: "burgundy",  label: "Burgundy",  swatch: ["#2d0f14", "#c9a84c"] },
-  { id: "sage",      label: "Sage",      swatch: ["#2a3d2a", "#e8d5b0"] },
-  { id: "ocean",     label: "Ocean",     swatch: ["#0d2233", "#48cae4"] },
-  { id: "plum",      label: "Plum",      swatch: ["#2a1a33", "#c084fc"] },
-  { id: "charcoal",  label: "Charcoal",  swatch: ["#2a2a2a", "#fbbf24"] },
-  { id: "rose",      label: "Rose",      swatch: ["#2d1a1f", "#f9a8c9"] },
-  { id: "emerald",   label: "Emerald",   swatch: ["#0f2d1f", "#34d399"] },
-  { id: "desert",    label: "Desert",    swatch: ["#3d2a1a", "#e8c06a"] },
-  { id: "crimson",   label: "Crimson",   swatch: ["#7f0000", "#ffffff"] },
-];
 
 async function compressPhoto(file) {
   return new Promise((resolve) => {
@@ -283,7 +266,7 @@ export default function ListingLaunchPage() {
 
   const [kwError, setKwError] = useState("");
   const [phoneErrors, setPhoneErrors] = useState({ officePhone: false, mobilePhone: false });
-  const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional", colorScheme: "forest" });
+  const [agent, setAgent] = useState({ name: "", brokerage: "Keller Williams Realty - Greater Chattanooga", license: "", officePhone: "", mobilePhone: "", style: "professional", primaryColor: "#C8102E", accentColor: "#ffffff" });
   const [listing, setListing] = useState({ address: "", city: "", state: "", zip: "", price: "", beds: "", baths: "", sqft: "", yearBuilt: "", features: "", notes: "" });
   const [photos, setPhotos] = useState([]); // array of { name, base64 }
   const photoInputRef = useRef(null);
@@ -527,7 +510,7 @@ export default function ListingLaunchPage() {
           <p className="font-sans text-[0.9rem] text-slate">Get a landing page, social graphics, and ready-to-post captions — powered by AI in seconds.</p>
         </div>
 
-        <div className="bg-white rounded-3xl border border-border p-8 shadow-sm">
+        <div className="bg-white rounded-3xl border border-border p-4 sm:p-8 shadow-sm">
           <ProgressBar step={step} />
 
           {/* Step 0: Agent info */}
@@ -587,7 +570,7 @@ export default function ListingLaunchPage() {
               </div>
               <div>
                 <label className={lCls}>Posting Style</label>
-                <div className="grid grid-cols-3 gap-3 mt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1">
                   {STYLES.map(s => (
                     <button
                       key={s.id}
@@ -601,21 +584,32 @@ export default function ListingLaunchPage() {
                 </div>
               </div>
               <div>
-                <label className={lCls}>Graphic Color Scheme</label>
-                <div className="grid grid-cols-3 gap-2 mt-1">
-                  {COLOR_SCHEMES.map(cs => (
-                    <button
-                      key={cs.id}
-                      onClick={() => setAgent(a => ({ ...a, colorScheme: cs.id }))}
-                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all cursor-pointer bg-white ${agent.colorScheme === cs.id ? "border-coral" : "border-border hover:border-slate/30"}`}
-                    >
-                      <span className="flex gap-1 flex-shrink-0">
-                        <span className="w-4 h-4 rounded-full border border-black/10" style={{ background: cs.swatch[0] }} />
-                        <span className="w-4 h-4 rounded-full border border-black/10" style={{ background: cs.swatch[1] }} />
-                      </span>
-                      <span className={`font-sans text-[0.78rem] font-semibold truncate ${agent.colorScheme === cs.id ? "text-coral" : "text-deep"}`}>{cs.label}</span>
-                    </button>
-                  ))}
+                <label className={lCls}>Graphic Colors</label>
+                <div className="grid grid-cols-2 gap-4 mt-2">
+                  <div>
+                    <p className="font-sans text-[0.75rem] text-slate mb-2">Background / Overlay</p>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="color"
+                        value={agent.primaryColor}
+                        onChange={e => setAgent(a => ({ ...a, primaryColor: e.target.value }))}
+                        className="w-14 h-11 rounded-xl border border-border cursor-pointer p-0.5 bg-white"
+                      />
+                      <span className="font-sans text-[0.8rem] text-slate uppercase tracking-wide">{agent.primaryColor}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-sans text-[0.75rem] text-slate mb-2">Accent / Highlight</p>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="color"
+                        value={agent.accentColor}
+                        onChange={e => setAgent(a => ({ ...a, accentColor: e.target.value }))}
+                        className="w-14 h-11 rounded-xl border border-border cursor-pointer p-0.5 bg-white"
+                      />
+                      <span className="font-sans text-[0.8rem] text-slate uppercase tracking-wide">{agent.accentColor}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               {kwError && (
@@ -691,7 +685,7 @@ export default function ListingLaunchPage() {
                 <h2 className="font-serif text-[1.5rem] text-deep mb-1">Property details</h2>
                 <p className="font-sans text-[0.87rem] text-slate mb-6">The more detail you share, the better your AI-powered content will be.</p>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className={lCls}>Beds</label>
                   <input className={iCls} placeholder="4" type="number" value={listing.beds} onChange={e => setListing(l => ({ ...l, beds: e.target.value }))} />

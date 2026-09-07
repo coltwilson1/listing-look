@@ -5,29 +5,12 @@ import path from "path";
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const STAGE_CONFIG = {
-  justListed:     { headline: "Just Listed",     badge: "NEW PROPERTY",   showPrice: true  },
-  underContract:  { headline: "Under Contract",  badge: "UNDER CONTRACT", showPrice: false },
-  priceReduced:   { headline: "Price Reduced",   badge: "NEW PRICE",      showPrice: true  },
-  sold:           { headline: "Just Sold!",      badge: "SOLD",           showPrice: false },
+  justListed:    { headline: "Just Listed",    showPrice: true  },
+  underContract: { headline: "Under Contract", showPrice: false },
+  priceReduced:  { headline: "Price Reduced",  showPrice: true  },
+  sold:          { headline: "Just Sold!",     showPrice: false },
 };
 
-const SCHEME_MAP = {
-  forest:   { bg: "#1a3d35", accent: "#c9a84c", overlay: "rgba(15,40,32,0.72)"  },
-  navy:     { bg: "#1C1C2E", accent: "#E8825A", overlay: "rgba(15,15,35,0.72)"  },
-  midnight: { bg: "#0f0f0f", accent: "#e2e8f0", overlay: "rgba(0,0,0,0.75)"     },
-  warm:     { bg: "#2a1810", accent: "#d4835a", overlay: "rgba(30,12,5,0.72)"   },
-  slate:    { bg: "#1a2233", accent: "#60a5fa", overlay: "rgba(10,15,30,0.72)"  },
-  burgundy: { bg: "#2d0f14", accent: "#c9a84c", overlay: "rgba(35,5,10,0.75)"  },
-  sage:     { bg: "#2a3d2a", accent: "#e8d5b0", overlay: "rgba(20,38,20,0.72)" },
-  ocean:    { bg: "#0d2233", accent: "#48cae4", overlay: "rgba(5,18,35,0.74)"  },
-  plum:     { bg: "#2a1a33", accent: "#c084fc", overlay: "rgba(25,10,38,0.74)" },
-  charcoal: { bg: "#2a2a2a", accent: "#fbbf24", overlay: "rgba(15,15,15,0.76)" },
-  rose:     { bg: "#2d1a1f", accent: "#f9a8c9", overlay: "rgba(35,10,18,0.74)" },
-  emerald:  { bg: "#0f2d1f", accent: "#34d399", overlay: "rgba(5,28,15,0.74)"  },
-  desert:   { bg: "#3d2a1a", accent: "#e8c06a", overlay: "rgba(40,22,8,0.73)"  },
-  kwred:    { bg: "#C8102E", accent: "#ffffff", overlay: "rgba(140,5,20,0.78)" },
-  crimson:  { bg: "#7f0000", accent: "#ffffff", overlay: "rgba(60,0,0,0.78)"   },
-};
 
 function getLogoBase64(style) {
   try {
@@ -63,7 +46,8 @@ export async function POST(req) {
   try {
     const { agent, listing, stage = "justListed", primaryPhoto } = await req.json();
     const config = STAGE_CONFIG[stage] || STAGE_CONFIG.justListed;
-    const scheme = SCHEME_MAP[agent.colorScheme] || SCHEME_MAP.forest;
+    const primary = agent.primaryColor || "#C8102E";
+    const accent  = agent.accentColor  || "#ffffff";
     const logoBase64 = getLogoBase64(agent.style);
     const hasPhoto = !!primaryPhoto;
 
@@ -84,30 +68,29 @@ ${hasPhoto
   ? `PHOTO BACKGROUND MODE: A listing photo will be injected as the first SVG element (background).
 - Do NOT include any background rect or solid fill
 - DO include a full-size gradient overlay rect immediately after the opening <svg> tag:
-  <defs><linearGradient id="ov" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${scheme.bg}" stop-opacity="0.05"/><stop offset="40%" stop-color="${scheme.bg}" stop-opacity="0.20"/><stop offset="100%" stop-color="${scheme.bg}" stop-opacity="0.68"/></linearGradient></defs><rect width="1080" height="1080" fill="url(#ov)"/>
+  <defs><linearGradient id="ov" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${primary}" stop-opacity="0.05"/><stop offset="40%" stop-color="${primary}" stop-opacity="0.20"/><stop offset="100%" stop-color="${primary}" stop-opacity="0.68"/></linearGradient></defs><rect width="1080" height="1080" fill="url(#ov)"/>
 - The photo must remain clearly visible — the overlay is subtle, not heavy
 - All text must be white or light — it sits over the lightly darkened photo`
   : `SOLID BACKGROUND MODE:
-- Full background rect: fill="${scheme.bg}"
+- Full background rect: fill="${primary}"
 - Add subtle geometric shapes and depth elements for visual interest`}
 
 LAYOUT (inspired by premium Canva real estate templates):
 1. TOP AREA (y: 0–140) — Leave clear for KW logo (injected separately)
-2. BADGE (y: ~160) — Small pill badge centered: "${config.badge}" — rounded rect with ${scheme.accent} stroke, white text, ~22px font
-3. MAIN HEADLINE (y: ~230–400) — Large elegant headline: "${config.headline}" — Georgia/serif font, ~110–130px, white, centered
-4. SPEC BAR (y: ~430) — Semi-transparent dark rounded pill: "${listing.beds} bed  |  ${listing.baths} bath  |  ${parseInt(listing.sqft || 0).toLocaleString()} sqft" — white text ~26px
-5. BOTTOM STRIP (y: ~780–980):
+2. MAIN HEADLINE (y: ~180–380) — Large elegant headline: "${config.headline}" — Georgia/serif font, ~110–130px, white, centered
+3. SPEC BAR (y: ~410) — Semi-transparent dark rounded pill: "${listing.beds} bed  |  ${listing.baths} bath  |  ${parseInt(listing.sqft || 0).toLocaleString()} sqft" — white text ~26px
+4. BOTTOM STRIP (y: ~780–980):
    - Location pin (▼ or ● symbol) + address text, left-aligned, white ~28px
-   ${config.showPrice ? `- Price "${priceText}" right-aligned, ${scheme.accent} color, bold ~52px` : ""}
+   ${config.showPrice ? `- Price "${priceText}" right-aligned, ${accent} color, bold ~52px` : ""}
    - Thin horizontal rule line above the bottom strip
    - Agent name: bold, white, 34px — must be clearly legible
    - Office phone: white 85% opacity, 28px — displayed directly below agent name
-6. COMPLIANCE FOOTER (y: ~1025–1060) — white 60% opacity, 20px:
+5. COMPLIANCE FOOTER (y: ~1025–1060) — white 60% opacity, 20px:
    "${agent.name} | ${agent.officePhone}"
    "Each office is independently owned and operated." on the line below at 18px
 
 STYLE NOTES:
-- Accent color: ${scheme.accent}
+- Accent color: ${accent}
 - Elegant, high-end real estate aesthetic — NOT generic
 - System fonts only: Georgia, Arial, sans-serif — NO external references, NO xlink, NO <image> tags
 - Agent name and phone MUST be large enough to read on a phone screen — do not make them small
