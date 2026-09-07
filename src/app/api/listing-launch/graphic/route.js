@@ -35,7 +35,7 @@ function injectAssets(svg, logoBase64, photoBase64) {
 
   // Inject KW logo top-left at very end (top layer) — larger for legibility
   if (logoBase64) {
-    const logoEl = `<image href="data:image/png;base64,${logoBase64}" x="36" y="28" width="400" height="105" preserveAspectRatio="xMinYMin meet"/>`;
+    const logoEl = `<image href="data:image/png;base64,${logoBase64}" x="30" y="24" width="540" height="142" preserveAspectRatio="xMinYMin meet"/>`;
     injected = injected.replace("</svg>", `${logoEl}\n</svg>`);
   }
 
