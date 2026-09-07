@@ -12,16 +12,11 @@ const ALLOWED_FRAGMENTS = [
   "mlsphoto.com",
 ];
 
-// Also allow any URL that clearly looks like a listing photo (image extension + photo/listing CDN pattern)
 function isPhotoUrlAllowed(url) {
+  if (!url.startsWith("https://")) return false;
   if (ALLOWED_FRAGMENTS.some((f) => url.includes(f))) return true;
-  // Allow image URLs from domains that contain real-estate-adjacent keywords
-  try {
-    const hostname = new URL(url).hostname;
-    const isImageExt = /\.(jpg|jpeg|png|webp)(\?|$)/i.test(url);
-    const looksLikeCdn = /\b(cdn|photo|image|media|listing|property|static|assets)\b/i.test(hostname);
-    return isImageExt && looksLikeCdn;
-  } catch { return false; }
+  // Allow any HTTPS URL that ends with an image extension — KW CDN varies by market
+  return /\.(jpe?g|png|webp)(\?[^"]*)?$/i.test(url);
 }
 
 export async function GET(req) {

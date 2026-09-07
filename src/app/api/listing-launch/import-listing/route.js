@@ -141,64 +141,75 @@ function parseJsonLD(html) {
   return { photos: photos.slice(0, 15), listing };
 }
 
+// ── Broad image URL extractor — works on any page ────────────────────────────
+function extractAllImageUrls(html) {
+  const norm = html
+    .replace(/\\u002F/g, "/")
+    .replace(/\\u0022/g, '"')
+    .replace(/\\"/g, '"');
+
+  const seen = new Set();
+  const photos = [];
+
+  // 1. <img src="..."> tags
+  const imgRe = /<img[^>]+src=["'](https?:\/\/[^"'>\s]+\.(?:jpe?g|png|webp))["']/gi;
+  for (const [, url] of norm.matchAll(imgRe)) {
+    if (!seen.has(url)) { seen.add(url); photos.push(url); }
+  }
+
+  // 2. Any quoted https URL ending in an image extension
+  const urlRe = /["'`](https?:\/\/[^"'`\s<>\\]{10,}\.(?:jpe?g|png|webp))["'`]/gi;
+  for (const [, url] of norm.matchAll(urlRe)) {
+    if (!seen.has(url)) { seen.add(url); photos.push(url); }
+  }
+
+  // Filter out obvious non-listing images
+  const skip = /\b(logo|icon|avatar|thumb(?:nail)?|sprite|banner|badge|map|pin|marker|headshot|profile|brand|favicon|placeholder|default|fallback|loader|spinner)\b/i;
+  const filtered = photos.filter(u => {
+    if (skip.test(u)) return false;
+    // Skip very short URLs — likely placeholders
+    if (u.length < 30) return false;
+    return true;
+  });
+
+  return [...new Set(filtered)].slice(0, 20);
+}
+
 // ── KW.com parser ─────────────────────────────────────────────────────────────
 function parseKW(html) {
   // Try JSON-LD first (KW platform uses schema.org)
   const { photos: ldPhotos, listing: ldListing } = parseJsonLD(html);
 
-  // Also scrape KW CDN photo URLs directly from the page source
-  const norm = html.replace(/\\u002F/g, "/");
-  const cdnPhotos = [];
-  const cdnRe = /https?:\/\/[a-zA-Z0-9\-]+\.kwcdn\.com\/[^\s"'<>]+\.(?:jpg|jpeg|png|webp)/gi;
-  const seen = new Set();
-  for (const [url] of norm.matchAll(cdnRe)) {
-    if (url.includes("thumb") || url.includes("_t.") || url.includes("icon")) continue;
-    if (!seen.has(url)) { seen.add(url); cdnPhotos.push(url); }
-  }
-
-  // Also try __NEXT_DATA__ (KW sites are often Next.js)
+  // Also try __NEXT_DATA__ for listing fields
   const ndMatch = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
-  const ndPhotos = [];
-  if (ndMatch) {
+  if (ndMatch && !ldListing.address) {
     const nd = ndMatch[1].replace(/\\u002F/g, "/");
-    const ndRe = /https?:\/\/[^\s"'\\]+\.(?:jpg|jpeg|png|webp)/gi;
-    const ndSeen = new Set();
-    for (const [url] of nd.matchAll(ndRe)) {
-      if (url.includes("thumb") || url.includes("logo") || url.includes("icon")) continue;
-      if (!ndSeen.has(url)) { ndSeen.add(url); ndPhotos.push(url); }
-    }
-
-    // Listing data from __NEXT_DATA__ if JSON-LD didn't get it
-    if (!ldListing.address) {
-      const g = (re) => { const m = nd.match(re); return m ? m[1] : ""; };
-      if (!ldListing.address)   ldListing.address   = g(/"streetAddress"\s*:\s*"([^"]+)"/);
-      if (!ldListing.city)      ldListing.city       = g(/"city"\s*:\s*"([^"]+)"/);
-      if (!ldListing.state)     ldListing.state      = g(/"state(?:Code)?"\s*:\s*"([A-Z]{2})"/);
-      if (!ldListing.zip)       ldListing.zip        = g(/"zip(?:code|Code)?"\s*:\s*"([^"]+)"/);
-      if (!ldListing.price)     ldListing.price      = g(/"(?:listPrice|list_price|price)"\s*:\s*(\d+)/);
-      if (!ldListing.beds)      ldListing.beds       = g(/"(?:beds|bedrooms)"\s*:\s*(\d+)/);
-      if (!ldListing.baths)     ldListing.baths      = g(/"(?:baths|bathrooms)"\s*:\s*([\d.]+)/);
-      if (!ldListing.sqft)      ldListing.sqft       = g(/"(?:sqft|squareFeet|livingArea)"\s*:\s*(\d+)/);
-      if (!ldListing.yearBuilt) ldListing.yearBuilt  = g(/"yearBuilt"\s*:\s*(\d{4})/);
-    }
+    const g = (re) => { const m = nd.match(re); return m ? m[1] : ""; };
+    ldListing.address   = ldListing.address   || g(/"streetAddress"\s*:\s*"([^"]+)"/);
+    ldListing.city      = ldListing.city       || g(/"city"\s*:\s*"([^"]+)"/);
+    ldListing.state     = ldListing.state      || g(/"state(?:Code)?"\s*:\s*"([A-Z]{2})"/);
+    ldListing.zip       = ldListing.zip        || g(/"zip(?:code|Code)?"\s*:\s*"([^"]+)"/);
+    ldListing.price     = ldListing.price      || g(/"(?:listPrice|list_price|price)"\s*:\s*(\d+)/);
+    ldListing.beds      = ldListing.beds       || g(/"(?:beds|bedrooms)"\s*:\s*(\d+)/);
+    ldListing.baths     = ldListing.baths      || g(/"(?:baths|bathrooms)"\s*:\s*([\d.]+)/);
+    ldListing.sqft      = ldListing.sqft       || g(/"(?:sqft|squareFeet|livingArea)"\s*:\s*(\d+)/);
+    ldListing.yearBuilt = ldListing.yearBuilt  || g(/"yearBuilt"\s*:\s*(\d{4})/);
   }
 
-  // Merge photos: CDN-specific > JSON-LD > __NEXT_DATA__ catches
-  const allPhotos = [...new Set([...cdnPhotos, ...ldPhotos, ...ndPhotos])].slice(0, 15);
+  // Use broad extractor for photos — KW CDN domain varies by agent/market
+  const broadPhotos = extractAllImageUrls(html);
+
+  // Merge: JSON-LD photos first (highest confidence), then broad scan
+  const allPhotos = [...new Set([...ldPhotos, ...broadPhotos])].slice(0, 15);
   return { photos: allPhotos, listing: ldListing };
 }
 
 // ── og:image + JSON-LD generic fallback ───────────────────────────────────────
 function parseGeneric(html) {
-  // Try JSON-LD structured data first
   const { photos: ldPhotos, listing: ldListing } = parseJsonLD(html);
-  if (ldPhotos.length > 0 || ldListing.address) return { photos: ldPhotos, listing: ldListing };
-
-  // og:image as last resort
-  const photos = [];
-  const re = /<meta[^>]+property="og:image"[^>]+content="([^"]+)"/gi;
-  for (const [, url] of html.matchAll(re)) if (url.startsWith("http")) photos.push(url);
-  return { photos: photos.slice(0, 1), listing: ldListing };
+  const broadPhotos = extractAllImageUrls(html);
+  const allPhotos = [...new Set([...ldPhotos, ...broadPhotos])].slice(0, 15);
+  return { photos: allPhotos, listing: ldListing };
 }
 
 // ── Route ─────────────────────────────────────────────────────────────────────
@@ -219,13 +230,13 @@ export async function POST(req) {
 
     const res = await fetch(fetchUrl, fetchOpts);
     if (!res.ok) {
-      if (res.status === 429 || res.status === 403) {
-        return Response.json({
-          ok: false,
-          error: "This listing site is blocking access. Try a different link, or upload your photos manually below.",
-        }, { status: 400 });
-      }
-      return Response.json({ ok: false, error: `Listing page returned ${res.status}` }, { status: 400 });
+      const msg =
+        res.status === 429 || res.status === 403
+          ? "This listing site is blocking automated access. Try your KW listing link, or upload photos manually below."
+          : res.status === 500
+          ? "The listing site returned an error. Try a different listing link, or upload photos manually below."
+          : `Listing page returned ${res.status}`;
+      return Response.json({ ok: false, error: msg }, { status: 400 });
     }
 
     const html = await res.text();
