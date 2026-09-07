@@ -34,11 +34,19 @@ const STYLES = [
 ];
 
 const COLOR_SCHEMES = [
-  { id: "forest",    label: "Forest",    bg: "#1a3d35", accent: "#c9a84c", swatch: ["#1a3d35", "#c9a84c"] },
-  { id: "navy",      label: "Navy",      bg: "#1C1C2E", accent: "#E8825A", swatch: ["#1C1C2E", "#E8825A"] },
-  { id: "midnight",  label: "Midnight",  bg: "#0f0f0f", accent: "#e2e8f0", swatch: ["#0f0f0f", "#e2e8f0"] },
-  { id: "warm",      label: "Warm",      bg: "#2a1810", accent: "#d4835a", swatch: ["#2a1810", "#d4835a"] },
-  { id: "slate",     label: "Slate",     bg: "#1a2233", accent: "#60a5fa", swatch: ["#1a2233", "#60a5fa"] },
+  { id: "forest",    label: "Forest",    swatch: ["#1a3d35", "#c9a84c"] },
+  { id: "navy",      label: "Navy",      swatch: ["#1C1C2E", "#E8825A"] },
+  { id: "midnight",  label: "Midnight",  swatch: ["#0f0f0f", "#e2e8f0"] },
+  { id: "warm",      label: "Warm",      swatch: ["#2a1810", "#d4835a"] },
+  { id: "slate",     label: "Slate",     swatch: ["#1a2233", "#60a5fa"] },
+  { id: "burgundy",  label: "Burgundy",  swatch: ["#2d0f14", "#c9a84c"] },
+  { id: "sage",      label: "Sage",      swatch: ["#2a3d2a", "#e8d5b0"] },
+  { id: "ocean",     label: "Ocean",     swatch: ["#0d2233", "#48cae4"] },
+  { id: "plum",      label: "Plum",      swatch: ["#2a1a33", "#c084fc"] },
+  { id: "charcoal",  label: "Charcoal",  swatch: ["#2a2a2a", "#fbbf24"] },
+  { id: "rose",      label: "Rose",      swatch: ["#2d1a1f", "#f9a8c9"] },
+  { id: "emerald",   label: "Emerald",   swatch: ["#0f2d1f", "#34d399"] },
+  { id: "desert",    label: "Desert",    swatch: ["#3d2a1a", "#e8c06a"] },
 ];
 
 async function compressPhoto(file) {

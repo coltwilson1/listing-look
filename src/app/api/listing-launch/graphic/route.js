@@ -12,11 +12,19 @@ const STAGE_CONFIG = {
 };
 
 const SCHEME_MAP = {
-  forest:   { bg: "#1a3d35", accent: "#c9a84c", overlay: "rgba(15,40,32,0.72)" },
-  navy:     { bg: "#1C1C2E", accent: "#E8825A", overlay: "rgba(15,15,35,0.72)" },
-  midnight: { bg: "#0f0f0f", accent: "#e2e8f0", overlay: "rgba(0,0,0,0.75)"    },
-  warm:     { bg: "#2a1810", accent: "#d4835a", overlay: "rgba(30,12,5,0.72)"  },
-  slate:    { bg: "#1a2233", accent: "#60a5fa", overlay: "rgba(10,15,30,0.72)" },
+  forest:   { bg: "#1a3d35", accent: "#c9a84c", overlay: "rgba(15,40,32,0.72)"  },
+  navy:     { bg: "#1C1C2E", accent: "#E8825A", overlay: "rgba(15,15,35,0.72)"  },
+  midnight: { bg: "#0f0f0f", accent: "#e2e8f0", overlay: "rgba(0,0,0,0.75)"     },
+  warm:     { bg: "#2a1810", accent: "#d4835a", overlay: "rgba(30,12,5,0.72)"   },
+  slate:    { bg: "#1a2233", accent: "#60a5fa", overlay: "rgba(10,15,30,0.72)"  },
+  burgundy: { bg: "#2d0f14", accent: "#c9a84c", overlay: "rgba(35,5,10,0.75)"  },
+  sage:     { bg: "#2a3d2a", accent: "#e8d5b0", overlay: "rgba(20,38,20,0.72)" },
+  ocean:    { bg: "#0d2233", accent: "#48cae4", overlay: "rgba(5,18,35,0.74)"  },
+  plum:     { bg: "#2a1a33", accent: "#c084fc", overlay: "rgba(25,10,38,0.74)" },
+  charcoal: { bg: "#2a2a2a", accent: "#fbbf24", overlay: "rgba(15,15,15,0.76)" },
+  rose:     { bg: "#2d1a1f", accent: "#f9a8c9", overlay: "rgba(35,10,18,0.74)" },
+  emerald:  { bg: "#0f2d1f", accent: "#34d399", overlay: "rgba(5,28,15,0.74)"  },
+  desert:   { bg: "#3d2a1a", accent: "#e8c06a", overlay: "rgba(40,22,8,0.73)"  },
 };
 
 function getLogoBase64(style) {
