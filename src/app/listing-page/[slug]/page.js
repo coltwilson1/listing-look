@@ -21,7 +21,8 @@ export async function generateMetadata({ params }) {
     .select("address, form_data")
     .eq("type", "listing-launch")
     .order("submitted_at", { ascending: false });
-  const row = orders?.find(o => o.form_data?.addressSlug === slug);
+  const row = orders?.find(o => o.form_data?.addressSlug === slug)
+           ?? orders?.find(o => o.id === slug);
   const lp = row?.form_data?.landingPage;
   return {
     title: lp?.headline || row?.address || "Property Listing",
@@ -39,7 +40,9 @@ export default async function ListingPage({ params }) {
     .eq("type", "listing-launch")
     .order("submitted_at", { ascending: false });
 
-  const row = orders?.find(o => o.form_data?.addressSlug === slug);
+  // Match by addressSlug first (new orders), then fall back to order ID (old orders)
+  const row = orders?.find(o => o.form_data?.addressSlug === slug)
+           ?? orders?.find(o => o.id === slug);
   if (!row) notFound();
 
   const fd = row.form_data || {};
