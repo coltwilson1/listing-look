@@ -758,7 +758,7 @@ export default function ListingLaunchPage() {
                     </div>
                     <div>
                       <label className="block font-sans text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-slate mb-1.5">Email Address</label>
-                      <input className={iCls2} type="email" placeholder="jane@kwchattanooga.com" value={purchaseEmail} onChange={e => setPurchaseEmail(e.target.value)} />
+                      <input className={iCls2} type="email" placeholder="your@email.com" value={purchaseEmail} onChange={e => setPurchaseEmail(e.target.value)} />
                     </div>
                     {purchaseError && <p className="font-sans text-[0.82rem] text-coral">{purchaseError}</p>}
                     <button
@@ -1233,8 +1233,96 @@ export default function ListingLaunchPage() {
             <div className="space-y-5">
               <div>
                 <h2 className="font-serif text-[1.5rem] text-deep mb-1">The property</h2>
-                <p className="font-sans text-[0.87rem] text-slate mb-6">Start typing the address and select it from the suggestions.</p>
+                <p className="font-sans text-[0.87rem] text-slate mb-4">Paste your listing link to auto-fill details and photos — or enter the address manually.</p>
               </div>
+
+              {/* ── Import from listing link (step 1) ── */}
+              <div className="border border-border rounded-2xl overflow-hidden">
+                <div className="p-4 bg-light-gray/40">
+                  <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.08em] text-coral mb-2">Import from Listing Link</p>
+                  <div className="flex gap-2">
+                    <input
+                      className={iCls + " flex-1 text-[0.85rem] py-2.5"}
+                      placeholder="Paste Zillow, Realtor.com, or KW listing URL…"
+                      value={importUrl}
+                      onChange={e => setImportUrl(e.target.value)}
+                      onKeyDown={e => e.key === "Enter" && handleImport()}
+                      disabled={importing}
+                    />
+                    <button
+                      onClick={handleImport}
+                      disabled={importing || !importUrl.trim()}
+                      className="flex-shrink-0 bg-coral text-white font-sans text-[0.83rem] font-semibold px-4 py-2.5 rounded-xl border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5"
+                    >
+                      {importing
+                        ? <><span className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Looking up…</>
+                        : "Look Up"}
+                    </button>
+                  </div>
+                  {importMsg.text && (
+                    <p className={`font-sans text-[0.78rem] mt-2 ${importMsg.type === "ok" ? "text-green-700" : "text-coral"}`}>
+                      {importMsg.type === "ok" ? "✓ " : "⚠ "}{importMsg.text}
+                    </p>
+                  )}
+                </div>
+
+                {/* Photo picker */}
+                {pickerPhotos.length > 0 && (
+                  <div className="p-4 border-t border-border">
+                    <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                      <p className="font-sans text-[0.82rem] font-semibold text-deep">
+                        Select up to 10 photos <span className="font-normal text-slate/60">— first selected becomes primary</span>
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <span className="font-sans text-[0.75rem] text-slate">{pickerSelected.size}/10</span>
+                        <button onClick={() => setPickerSelected(new Set(pickerPhotos.slice(0, 10).map((_, i) => i)))} className="font-sans text-[0.75rem] text-coral border-none bg-transparent cursor-pointer hover:underline">First 10</button>
+                        <button onClick={() => setPickerSelected(new Set())} className="font-sans text-[0.75rem] text-slate border-none bg-transparent cursor-pointer hover:underline">None</button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 mb-4">
+                      {pickerPhotos.map((url, i) => {
+                        const sel = pickerSelected.has(i);
+                        const isFirst = sel && [...pickerSelected][0] === i;
+                        return (
+                          <div
+                            key={i}
+                            onClick={() => togglePicker(i)}
+                            className={`relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all ${sel ? "border-coral" : "border-transparent hover:border-border"}`}
+                            style={{ aspectRatio: "4/3" }}
+                          >
+                            <img
+                              src={url}
+                              alt=""
+                              className="w-full h-full object-cover"
+                              onError={e => { e.target.style.display = "none"; e.target.parentElement.style.background = "#f1f5f9"; }}
+                            />
+                            {sel && (
+                              <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-coral rounded-full flex items-center justify-center">
+                                <span className="text-white text-[0.6rem] font-bold">✓</span>
+                              </div>
+                            )}
+                            {isFirst && (
+                              <div className="absolute bottom-0 left-0 right-0 bg-coral/90 text-white font-sans text-[0.6rem] font-bold text-center py-0.5 uppercase tracking-wide">
+                                Primary
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <button
+                      onClick={importSelectedPhotos}
+                      disabled={pickerSelected.size === 0 || pickerImporting}
+                      className="w-full bg-coral text-white font-sans text-[0.88rem] font-semibold py-3 rounded-xl border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {pickerImporting
+                        ? <><span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Importing…</>
+                        : `Import ${pickerSelected.size} Photo${pickerSelected.size !== 1 ? "s" : ""}`}
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <div>
                 <label className={lCls}>Street Address</label>
                 <input
@@ -1294,7 +1382,7 @@ export default function ListingLaunchPage() {
                   <div className="flex gap-2">
                     <input
                       className={iCls + " flex-1 text-[0.85rem] py-2.5"}
-                      placeholder="https://coltwilson.kw.com/property/..."
+                      placeholder="Paste Zillow, Realtor.com, or KW listing URL…"
                       value={importUrl}
                       onChange={e => setImportUrl(e.target.value)}
                       onKeyDown={e => e.key === "Enter" && handleImport()}
