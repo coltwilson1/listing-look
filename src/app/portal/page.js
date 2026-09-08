@@ -667,6 +667,11 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
         </div>
       </div>
 
+      {/* Listing Launch deliverables — auto-generated, no admin needed */}
+      {order.type === "listing-launch" && (
+        <ListingLaunchDeliverables order={order} />
+      )}
+
       {/* Delivered files (completed orders) */}
       {order.status === "completed" && order.deliveredFiles?.length > 0 && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-6">
@@ -1045,6 +1050,214 @@ function ProfileView({ user, onUpdate }) {
             Update Password
           </button>
         </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Listing Launch Deliverables ───────────────────────────────────────────────
+
+const GRAPHIC_STAGES = [
+  { key: "forSale",       label: "For Sale",        color: "#22c55e" },
+  { key: "justListed",    label: "Just Listed",      color: "#3b82f6" },
+  { key: "underContract", label: "Under Contract",   color: "#f59e0b" },
+  { key: "priceRefresh",  label: "Price Refresh",    color: "#8b5cf6" },
+  { key: "sold",          label: "Sold",             color: "#ef4444" },
+];
+
+function ListingLaunchDeliverables({ order }) {
+  const fd         = order.formData || {};
+  const agent      = fd.agent || {};
+  const listing    = fd.listing || {};
+  const photoUrls  = fd.photoUrls || [];
+  const [svgs, setSvgs]         = useState({});
+  const [loadings, setLoadings] = useState({});
+  const [errors, setErrors]     = useState({});
+  const [photos, setPhotos]     = useState([]); // [base64, ...]
+  const [photosLoaded, setPhotosLoaded] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const landingUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/listing-page/${order.id}`
+    : `/listing-page/${order.id}`;
+
+  // Load photos from saved URLs once
+  useEffect(() => {
+    if (!photoUrls.length) { setPhotosLoaded(true); return; }
+    async function loadPhotos() {
+      const results = await Promise.allSettled(
+        photoUrls.slice(0, 10).map(url =>
+          fetch(`/api/listing-launch/proxy-photo?url=${encodeURIComponent(url)}`)
+            .then(r => r.blob())
+            .then(blob => new Promise(res => {
+              const reader = new FileReader();
+              reader.onload = () => res(reader.result.replace(/^data:[^;]+;base64,/, ""));
+              reader.readAsDataURL(blob);
+            }))
+        )
+      );
+      setPhotos(results.map(r => r.status === "fulfilled" ? r.value : null).filter(Boolean));
+      setPhotosLoaded(true);
+    }
+    loadPhotos();
+  }, [order.id]);
+
+  async function generateOne(stage) {
+    setLoadings(p => ({ ...p, [stage]: true }));
+    setErrors(p => ({ ...p, [stage]: "" }));
+    try {
+      const primary = photos[0] || null;
+      const secondary = photos.slice(1).sort(() => Math.random() - 0.5).slice(0, 2);
+      const res = await fetch("/api/listing-launch/graphic", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agent, listing,
+          stage,
+          primaryPhoto: primary,
+          secondaryPhotos: secondary,
+          team: null,
+        }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Generation failed");
+      setSvgs(p => ({ ...p, [stage]: data.svg }));
+    } catch (err) {
+      setErrors(p => ({ ...p, [stage]: err.message }));
+    } finally {
+      setLoadings(p => ({ ...p, [stage]: false }));
+    }
+  }
+
+  function generateAll() {
+    GRAPHIC_STAGES.forEach(s => generateOne(s.key));
+  }
+
+  function downloadPNG(svg, filename) {
+    const blob = new Blob([svg], { type: "image/svg+xml" });
+    const url  = URL.createObjectURL(blob);
+    const img  = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1080; canvas.height = 1350;
+      canvas.getContext("2d").drawImage(img, 0, 0, 1080, 1350);
+      canvas.toBlob(pngBlob => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(pngBlob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }, "image/png");
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(landingUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  const address = listing.address || order.address || "Listing";
+
+  return (
+    <div className="mb-6 space-y-4">
+      {/* Landing page link */}
+      <div className="bg-white rounded-2xl border border-border p-6">
+        <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-coral mb-3">Shareable Landing Page</p>
+        <p className="font-sans text-[0.82rem] text-slate mb-3">Share this link with buyers and on social media:</p>
+        <div className="flex gap-2 items-center">
+          <div className="flex-1 font-sans text-[0.82rem] text-deep bg-light-gray rounded-xl px-4 py-2.5 border border-border truncate select-all">
+            {landingUrl}
+          </div>
+          <button
+            onClick={copyLink}
+            className="flex-shrink-0 font-sans text-[0.82rem] font-semibold px-4 py-2.5 rounded-xl border-none cursor-pointer transition-colors"
+            style={{ background: copied ? "#22c55e" : "#C8102E", color: "#fff" }}
+          >
+            {copied ? "Copied!" : "Copy Link"}
+          </button>
+          <a
+            href={landingUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="flex-shrink-0 font-sans text-[0.82rem] font-semibold px-4 py-2.5 rounded-xl border border-border text-slate hover:border-coral hover:text-coral transition-colors no-underline"
+          >
+            Preview ↗
+          </a>
+        </div>
+      </div>
+
+      {/* Graphics */}
+      <div className="bg-white rounded-2xl border border-border p-6">
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
+          <div>
+            <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-coral mb-0.5">Your Graphics</p>
+            <p className="font-sans text-[0.82rem] text-slate">Download your 5 AI-generated social media graphics (1080×1350 PNG, no watermark).</p>
+          </div>
+          <button
+            onClick={generateAll}
+            disabled={!photosLoaded}
+            className="font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full border-none cursor-pointer transition-colors disabled:opacity-50"
+            style={{ background: "#C8102E", color: "#fff" }}
+          >
+            {photosLoaded ? "✨ Generate All 5" : "Loading photos…"}
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {GRAPHIC_STAGES.map(({ key, label, color }) => {
+            const svg  = svgs[key];
+            const loading = loadings[key];
+            const err  = errors[key];
+            const slug = `${key}-${address.replace(/\s+/g, "-").toLowerCase()}`;
+            return (
+              <div key={key} className="border border-border rounded-xl p-4">
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
+                    <span className="font-sans text-[0.9rem] font-semibold text-deep">{label}</span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {svg ? (
+                      <>
+                        <button
+                          onClick={() => downloadPNG(svg, `${slug}.png`)}
+                          className="font-sans text-[0.82rem] font-semibold px-4 py-2 rounded-full border-none cursor-pointer transition-colors"
+                          style={{ background: "#C8102E", color: "#fff" }}
+                        >
+                          ⬇ Download PNG
+                        </button>
+                        <button
+                          onClick={() => { setSvgs(p => ({ ...p, [key]: null })); generateOne(key); }}
+                          className="font-sans text-[0.82rem] px-4 py-2 rounded-full border border-border text-slate bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors"
+                        >
+                          ↻ Regenerate
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => generateOne(key)}
+                        disabled={loading || !photosLoaded}
+                        className="font-sans text-[0.82rem] font-semibold px-4 py-2 rounded-full border border-border text-slate bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors disabled:opacity-50"
+                      >
+                        {loading ? <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-coral border-t-transparent animate-spin inline-block" /> Designing…</span> : "Design"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {err && <p className="font-sans text-[0.78rem] text-coral mt-2">{err}</p>}
+                {svg && (
+                  <div className="mt-3 rounded-xl overflow-hidden border border-border" style={{ maxWidth: 280 }}>
+                    <div dangerouslySetInnerHTML={{ __html: svg.replace("<svg", '<svg width="100%" height="100%"') }} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

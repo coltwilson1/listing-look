@@ -429,6 +429,7 @@ export default function ListingLaunchPage() {
   const [importing, setImporting] = useState(false);
   const [importMsg, setImportMsg] = useState({ type: "", text: "" });
   const [pickerPhotos, setPickerPhotos] = useState([]);       // URLs found from import
+  const [savedPhotoUrls, setSavedPhotoUrls] = useState([]);  // original URLs kept for portal
   const [pickerSelected, setPickerSelected] = useState(new Set());
   const [pickerImporting, setPickerImporting] = useState(false);
 
@@ -478,6 +479,7 @@ export default function ListingLaunchPage() {
           captions: result?.generated?.captions,
           graphicText: result?.generated?.graphicText,
           landingPage: result?.generated?.landingPage,
+          photoUrls: savedPhotoUrls,
         },
       };
       let res;
@@ -639,6 +641,7 @@ export default function ListingLaunchPage() {
     if (valid.length === 0) {
       setImportMsg({ type: "err", text: "Couldn't load those photos — try uploading them manually below." });
     } else {
+      setSavedPhotoUrls(selected); // save original URLs before clearing
       setPrimaryPhoto(valid[0]);
       setAdditionalPhotos(valid.slice(1));
       setPickerPhotos([]);
@@ -987,8 +990,6 @@ export default function ListingLaunchPage() {
                           <PreviewWatermark small />
                         </div>
                         <div className="flex gap-3 flex-wrap">
-                          <button onClick={() => downloadPNG(svg, `${slug}.png`)} className="flex items-center gap-2 bg-coral text-white font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors">⬇ Download PNG</button>
-                          <button onClick={() => downloadSVG(svg, `${slug}.svg`)} className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors">⬇ Download SVG</button>
                           <button onClick={() => { setSvgGraphics(p => ({ ...p, [key]: null })); generateGraphic(l, agent, key); }} className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors">↻ Regenerate</button>
                         </div>
                       </div>
