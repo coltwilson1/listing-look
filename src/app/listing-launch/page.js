@@ -480,6 +480,8 @@ export default function ListingLaunchPage() {
           graphicText: result?.generated?.graphicText,
           landingPage: result?.generated?.landingPage,
           photoUrls: savedPhotoUrls,
+          addressSlug: (result?.listing?.address || listing.address || "")
+            .trim().toLowerCase().replace(/[^\w\s]/g, "").replace(/\s+/g, "-"),
         },
       };
       let res;

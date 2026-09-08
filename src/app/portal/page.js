@@ -1077,9 +1077,10 @@ function ListingLaunchDeliverables({ order }) {
   const [photosLoaded, setPhotosLoaded] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  const slug = fd.addressSlug || order.id;
   const landingUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/listing-page/${order.id}`
-    : `/listing-page/${order.id}`;
+    ? `${window.location.origin}/listing-page/${slug}`
+    : `/listing-page/${slug}`;
 
   // Load photos from saved URLs once
   useEffect(() => {
