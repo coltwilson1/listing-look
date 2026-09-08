@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { generateOrderId } from "@/app/lib/auth";
+import SuccessWithAccount from "@/app/components/SuccessWithAccount";
 
 // ── Google Maps loader (singleton) ────────────────────────────────────────────
 let _mapsReady = false;
@@ -105,6 +107,30 @@ function ProgressBar({ step }) {
           </div>
           <span className={`font-sans text-[0.8rem] font-medium hidden sm:block ${i === step ? "text-deep" : "text-slate/50"}`}>{label}</span>
           {i < STEPS.length - 1 && <div className={`w-8 h-px mx-1 ${i < step ? "bg-coral" : "bg-border"}`} />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Preview watermark ─────────────────────────────────────────────────────────
+
+function PreviewWatermark({ small = false }) {
+  const lines = small ? 8 : 14;
+  return (
+    <div className="absolute inset-0 pointer-events-none select-none z-20 overflow-hidden" aria-hidden="true">
+      {Array.from({ length: lines }).map((_, i) => (
+        <div
+          key={i}
+          className="absolute left-[-20%] w-[160%] font-sans font-black uppercase text-black/[0.07] whitespace-nowrap"
+          style={{
+            fontSize: small ? "0.7rem" : "1.3rem",
+            letterSpacing: "0.28em",
+            top: `${i * (small ? 13 : 8) - 3}%`,
+            transform: "rotate(-32deg)",
+          }}
+        >
+          PREVIEW ONLY &nbsp;&nbsp;&nbsp; PREVIEW ONLY &nbsp;&nbsp;&nbsp; PREVIEW ONLY &nbsp;&nbsp;&nbsp; PREVIEW ONLY
         </div>
       ))}
     </div>
@@ -401,6 +427,70 @@ export default function ListingLaunchPage() {
   const [pickerSelected, setPickerSelected] = useState(new Set());
   const [pickerImporting, setPickerImporting] = useState(false);
 
+  const [purchaseOpen, setPurchaseOpen]       = useState(false);
+  const [purchaseName, setPurchaseName]       = useState("");
+  const [purchaseEmail, setPurchaseEmail]     = useState("");
+  const [purchaseStep, setPurchaseStep]       = useState("form"); // "form" | "account"
+  const [purchaseOrder, setPurchaseOrder]     = useState(null);
+  const [purchaseLoading, setPurchaseLoading] = useState(false);
+  const [purchaseError, setPurchaseError]     = useState("");
+
+  function openPurchase() {
+    setPurchaseName(result?.agent?.name || agent.name || "");
+    setPurchaseEmail("");
+    setPurchaseStep("form");
+    setPurchaseOrder(null);
+    setPurchaseError("");
+    setPurchaseOpen(true);
+  }
+
+  async function handlePurchaseSubmit(e) {
+    e.preventDefault();
+    if (!purchaseName.trim() || !purchaseEmail.trim()) {
+      setPurchaseError("Please fill in all fields.");
+      return;
+    }
+    setPurchaseLoading(true);
+    setPurchaseError("");
+    try {
+      const order = {
+        id: generateOrderId(),
+        type: "listing-launch",
+        typeLabel: "Listing Launch",
+        address: result?.listing?.address || listing.address,
+        listingPrice: result?.listing?.price || listing.price,
+        submittedAt: new Date().toISOString(),
+        status: "submitted",
+        notes: [],
+        paid: false,
+        venmoRef: "",
+        deliveredFiles: [],
+        deliveryMessage: "",
+        adminNotes: "",
+        formData: {
+          agent: result?.agent || agent,
+          listing: result?.listing || listing,
+          captions: result?.generated?.captions,
+          graphicText: result?.generated?.graphicText,
+          landingPage: result?.generated?.landingPage,
+        },
+      };
+      const res = await fetch("/api/orders/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order, clientName: purchaseName.trim(), clientEmail: purchaseEmail.trim() }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Failed to submit order");
+      setPurchaseOrder(order);
+      setPurchaseStep("account");
+    } catch (err) {
+      setPurchaseError(err.message);
+    } finally {
+      setPurchaseLoading(false);
+    }
+  }
+
   const addressRef = useRef(null);
   const acRef = useRef(null);
 
@@ -599,6 +689,7 @@ export default function ListingLaunchPage() {
   // ── Results view ─────────────────────────────────────────────────────────────
   if (step === 4 && result) {
     const { generated, listing: l, agent: a } = result;
+    const iCls2 = "w-full bg-white border border-border rounded-xl px-4 py-3 text-deep text-[0.9rem] placeholder:text-slate/40 focus:outline-none focus:border-coral transition-colors font-sans";
     const GRAPHIC_TYPES = [
       { key: "forSale",       label: "For Sale",       color: "#22c55e" },
       { key: "justListed",    label: "Just Listed",    color: "#E8825A" },
@@ -608,6 +699,79 @@ export default function ListingLaunchPage() {
     ];
 
     return (
+      <>
+      {/* ── Purchase modal ── */}
+      {purchaseOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+          onClick={e => { if (e.target === e.currentTarget) setPurchaseOpen(false); }}
+        >
+          <div className="bg-white rounded-3xl w-full max-w-[480px] shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-8 pt-7 pb-4 border-b border-border">
+              <h2 className="font-serif text-[1.4rem] text-deep">Complete Your Order</h2>
+              <button onClick={() => setPurchaseOpen(false)} className="w-8 h-8 rounded-full bg-light-gray flex items-center justify-center font-sans text-[1rem] text-slate hover:text-coral border-none cursor-pointer bg-transparent">×</button>
+            </div>
+
+            <div className="px-8 py-6">
+              {purchaseStep === "form" ? (
+                <>
+                  {/* What's included */}
+                  <div className="bg-light-gray rounded-2xl p-5 mb-6">
+                    <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-coral mb-3">What's Included</p>
+                    {[
+                      "Live shareable landing page with your listing details",
+                      "5 social media graphics (For Sale, Just Listed, Under Contract, Price Refresh, Sold)",
+                      "5 ready-to-post captions — in your posting style",
+                      "Access to your order in the client portal",
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-2 mb-2 last:mb-0">
+                        <span className="text-coral font-bold mt-0.5 text-[0.8rem]">✓</span>
+                        <span className="font-sans text-[0.85rem] text-slate leading-snug">{item}</span>
+                      </div>
+                    ))}
+                    <div className="border-t border-border mt-4 pt-4 flex items-center justify-between">
+                      <span className="font-sans text-[0.85rem] font-semibold text-deep">Listing Launch Package</span>
+                      <span className="font-serif text-[1.3rem] text-coral font-bold">$149</span>
+                    </div>
+                  </div>
+
+                  {/* Contact form */}
+                  <form onSubmit={handlePurchaseSubmit} className="space-y-4">
+                    <div>
+                      <label className="block font-sans text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-slate mb-1.5">Your Name</label>
+                      <input className={iCls2} placeholder="Jane Smith" value={purchaseName} onChange={e => setPurchaseName(e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="block font-sans text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-slate mb-1.5">Email Address</label>
+                      <input className={iCls2} type="email" placeholder="jane@kwchattanooga.com" value={purchaseEmail} onChange={e => setPurchaseEmail(e.target.value)} />
+                    </div>
+                    {purchaseError && <p className="font-sans text-[0.82rem] text-coral">{purchaseError}</p>}
+                    <button
+                      type="submit"
+                      disabled={purchaseLoading}
+                      className="w-full bg-coral text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {purchaseLoading
+                        ? <span className="flex items-center justify-center gap-2"><span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin inline-block"/>Submitting…</span>
+                        : "Continue →"}
+                    </button>
+                    <p className="font-sans text-[0.72rem] text-slate/50 text-center">Payment via Venmo @TheListingLook after checkout</p>
+                  </form>
+                </>
+              ) : purchaseOrder ? (
+                <SuccessWithAccount
+                  contactName={purchaseName}
+                  email={purchaseEmail}
+                  order={purchaseOrder}
+                  onReset={() => { setPurchaseOpen(false); setStep(0); setResult(null); setCaptions({}); }}
+                  onClose={() => setPurchaseOpen(false)}
+                />
+              ) : null}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="min-h-screen bg-cream">
         <div className="max-w-[1100px] mx-auto px-6 py-12">
           <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
@@ -616,9 +780,17 @@ export default function ListingLaunchPage() {
               <h1 className="font-serif text-[2rem] text-deep">{l.address}</h1>
               <p className="font-sans text-[0.88rem] text-slate mt-1">${parseInt(l.price).toLocaleString()} · {l.beds} bd · {l.baths} ba · {parseInt(l.sqft || 0).toLocaleString()} sqft</p>
             </div>
-            <button onClick={() => { setStep(0); setResult(null); setCaptions({}); }} className="font-sans text-[0.85rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-4 py-2 bg-transparent cursor-pointer">
-              ← New Listing
-            </button>
+            <div className="flex items-center gap-3 flex-wrap">
+              <button onClick={() => { setStep(0); setResult(null); setCaptions({}); }} className="font-sans text-[0.85rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-4 py-2 bg-transparent cursor-pointer">
+                ← New Listing
+              </button>
+              <button
+                onClick={openPurchase}
+                className="font-sans text-[0.88rem] font-semibold bg-coral text-white px-5 py-2 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors shadow-sm"
+              >
+                Complete Purchase →
+              </button>
+            </div>
           </div>
 
           {/* Tabs */}
@@ -708,7 +880,10 @@ export default function ListingLaunchPage() {
                 </div>
               )}
 
-              <LandingPreview lp={generated.landingPage} listing={l} agent={agent} primaryPhoto={primaryPhoto} additionalPhotos={additionalPhotos} team={team} />
+              <div className="relative overflow-hidden rounded-3xl">
+                <LandingPreview lp={generated.landingPage} listing={l} agent={agent} primaryPhoto={primaryPhoto} additionalPhotos={additionalPhotos} team={team} />
+                <PreviewWatermark />
+              </div>
             </div>
           )}
 
@@ -792,9 +967,10 @@ export default function ListingLaunchPage() {
                     )}
                     {svg && (
                       <div>
-                        <div className="rounded-2xl overflow-hidden border border-border mb-4" style={{ maxWidth: 400 }}
-                          dangerouslySetInnerHTML={{ __html: svg.replace("<svg", '<svg width="100%" height="100%"') }}
-                        />
+                        <div className="relative rounded-2xl overflow-hidden border border-border mb-4" style={{ maxWidth: 400 }}>
+                          <div dangerouslySetInnerHTML={{ __html: svg.replace("<svg", '<svg width="100%" height="100%"') }} />
+                          <PreviewWatermark small />
+                        </div>
                         <div className="flex gap-3 flex-wrap">
                           <button onClick={() => downloadPNG(svg, `${slug}.png`)} className="flex items-center gap-2 bg-coral text-white font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors">⬇ Download PNG</button>
                           <button onClick={() => downloadSVG(svg, `${slug}.svg`)} className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors">⬇ Download SVG</button>
@@ -839,6 +1015,7 @@ export default function ListingLaunchPage() {
           )}
         </div>
       </div>
+      </>
     );
   }
 
