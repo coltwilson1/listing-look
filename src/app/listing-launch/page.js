@@ -1,8 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { generateOrderId } from "@/app/lib/auth";
 import SuccessWithAccount from "@/app/components/SuccessWithAccount";
+
+function generateOrderId() {
+  const year = new Date().getFullYear();
+  const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `TLL-${year}-${rand}`;
+}
 
 // ── Google Maps loader (singleton) ────────────────────────────────────────────
 let _mapsReady = false;
@@ -475,13 +480,23 @@ export default function ListingLaunchPage() {
           landingPage: result?.generated?.landingPage,
         },
       };
-      const res = await fetch("/api/orders/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ order, clientName: purchaseName.trim(), clientEmail: purchaseEmail.trim() }),
-      });
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error || "Failed to submit order");
+      let res;
+      try {
+        res = await fetch("/api/orders/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order, clientName: purchaseName.trim(), clientEmail: purchaseEmail.trim() }),
+        });
+      } catch (networkErr) {
+        throw new Error("Network error — check your connection and try again.");
+      }
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`Server error (${res.status}) — please try again.`);
+      }
+      if (!data.ok) throw new Error(data.error || `Error ${res.status}`);
       setPurchaseOrder(order);
       setPurchaseStep("account");
     } catch (err) {
