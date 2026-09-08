@@ -411,6 +411,7 @@ export default function ListingLaunchPage() {
   const [svgGraphics, setSvgGraphics] = useState({});
   const [graphicLoadings, setGraphicLoadings] = useState({});
   const [graphicErrors, setGraphicErrors] = useState({});
+  const [regenCounts, setRegenCounts] = useState({});
 
   const [kwError, setKwError] = useState("");
   const [phoneErrors, setPhoneErrors] = useState({ officePhone: false, mobilePhone: false });
@@ -473,16 +474,23 @@ export default function ListingLaunchPage() {
         deliveredFiles: [],
         deliveryMessage: "",
         adminNotes: "",
-        formData: {
-          agent: result?.agent || agent,
-          listing: result?.listing || listing,
-          captions: result?.generated?.captions,
-          graphicText: result?.generated?.graphicText,
-          landingPage: result?.generated?.landingPage,
-          photoUrls: savedPhotoUrls,
-          addressSlug: (result?.listing?.address || listing.address || "")
-            .trim().toLowerCase().replace(/[^\w\s]/g, "").replace(/\s+/g, "-"),
-        },
+        formData: (() => {
+          const fd = {
+            agent: result?.agent || agent,
+            listing: result?.listing || listing,
+            captions: result?.generated?.captions,
+            graphicText: result?.generated?.graphicText,
+            landingPage: result?.generated?.landingPage,
+            photoUrls: savedPhotoUrls,
+            addressSlug: (result?.listing?.address || listing.address || "")
+              .trim().toLowerCase().replace(/[^\w\s]/g, "").replace(/\s+/g, "-"),
+          };
+          // Attach generated SVGs if within size budget
+          if (Object.keys(svgGraphics).length > 0 && JSON.stringify(svgGraphics).length < 3_000_000) {
+            fd.graphics = svgGraphics;
+          }
+          return fd;
+        })(),
       };
       let res;
       try {
@@ -957,6 +965,7 @@ export default function ListingLaunchPage() {
                 const svg = svgGraphics[key];
                 const loading = graphicLoadings[key];
                 const err = graphicErrors[key];
+                const regenUsed = (regenCounts[key] || 0) >= 1;
                 const slug = `${key}-${l.address.replace(/\s+/g, "-").toLowerCase()}`;
                 return (
                   <div key={key} className="bg-light-gray rounded-2xl p-6">
@@ -991,8 +1000,21 @@ export default function ListingLaunchPage() {
                           <div dangerouslySetInnerHTML={{ __html: svg.replace("<svg", '<svg width="100%" height="100%"') }} />
                           <PreviewWatermark small />
                         </div>
-                        <div className="flex gap-3 flex-wrap">
-                          <button onClick={() => { setSvgGraphics(p => ({ ...p, [key]: null })); generateGraphic(l, agent, key); }} className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors">↻ Regenerate</button>
+                        <div className="flex gap-3 flex-wrap items-center">
+                          {!regenUsed ? (
+                            <button
+                              onClick={() => {
+                                setRegenCounts(p => ({ ...p, [key]: (p[key] || 0) + 1 }));
+                                setSvgGraphics(p => ({ ...p, [key]: null }));
+                                generateGraphic(l, agent, key);
+                              }}
+                              className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors"
+                            >
+                              ↻ Regenerate
+                            </button>
+                          ) : (
+                            <span className="font-sans text-[0.78rem] text-slate/50 italic">Design locked — download available after purchase</span>
+                          )}
                         </div>
                       </div>
                     )}

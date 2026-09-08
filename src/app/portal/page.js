@@ -460,7 +460,9 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
   const [showCancel, setShowCancel]     = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelConfirm, setCancelConfirm] = useState(false);
-  const s = STATUS[order.status] || STATUS.submitted;
+  const s = order.type === "listing-launch"
+    ? STATUS.completed
+    : (STATUS[order.status] || STATUS.submitted);
 
   // Mark admin messages as read when order is opened
   useEffect(() => {
@@ -542,8 +544,8 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
         </span>
       </div>
 
-      {/* Timeline */}
-      <div className="bg-white rounded-2xl border border-border p-6 mb-6">
+      {/* Timeline — hidden for listing-launch (self-serve, always complete) */}
+      {order.type !== "listing-launch" && <div className="bg-white rounded-2xl border border-border p-6 mb-6">
         <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-slate mb-4">Progress</p>
         <div className="flex items-start gap-0 relative">
           {TIMELINE_STAGES.map((stage, i) => {
@@ -576,7 +578,7 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
             );
           })}
         </div>
-      </div>
+      </div>}
 
       {/* Approval area */}
       {order.status === "awaiting-approval" && (
@@ -1066,15 +1068,16 @@ const GRAPHIC_STAGES = [
 ];
 
 function ListingLaunchDeliverables({ order }) {
-  const fd         = order.formData || {};
-  const agent      = fd.agent || {};
-  const listing    = fd.listing || {};
-  const photoUrls  = fd.photoUrls || [];
-  const [svgs, setSvgs]         = useState({});
+  const fd            = order.formData || {};
+  const agent         = fd.agent || {};
+  const listing       = fd.listing || {};
+  const photoUrls     = fd.photoUrls || [];
+  const savedGraphics = fd.graphics || {};
+  const [svgs, setSvgs]         = useState(savedGraphics);
   const [loadings, setLoadings] = useState({});
   const [errors, setErrors]     = useState({});
-  const [photos, setPhotos]     = useState([]); // [base64, ...]
-  const [photosLoaded, setPhotosLoaded] = useState(false);
+  const [photos, setPhotos]     = useState([]);
+  const [photosLoaded, setPhotosLoaded] = useState(!photoUrls.length);
   const [copied, setCopied] = useState(false);
 
   const slug = fd.addressSlug || order.id;
