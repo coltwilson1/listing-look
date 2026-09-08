@@ -30,7 +30,10 @@ export async function POST(req) {
 
     if (orderError) {
       console.error("Order insert failed:", orderError);
-      return NextResponse.json({ error: orderError.message }, { status: 500 });
+      const msg = orderError.message?.toLowerCase().includes("fetch")
+        ? "Cannot reach the database — the Supabase project may be paused. Check supabase.com/dashboard."
+        : orderError.message;
+      return NextResponse.json({ error: msg }, { status: 500 });
     }
 
     await supabase.from("admin_notifications").insert({
@@ -46,6 +49,9 @@ export async function POST(req) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("Order submit error:", err);
-    return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
+    const msg = err.message?.toLowerCase().includes("fetch")
+      ? "Cannot reach the database — the Supabase project may be paused. Check supabase.com/dashboard."
+      : (err.message || "Internal server error");
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
