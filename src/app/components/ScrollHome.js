@@ -147,9 +147,9 @@ function Hero() {
             Done‑for‑you marketing
           </div>
           <h1 className="ev-rise font-serif text-[clamp(3.4rem,11vw,9.5rem)] leading-[0.95] text-ink" style={{ animationDelay: "120ms" }}>
-            Your social media.
+            Your marketing.
             <br />
-            <em className="italic text-brass">Done for you.</em>
+            <em className="italic text-brass">Elevated.</em>
           </h1>
           <p className="ev-rise text-[clamp(1rem,1.5vw,1.3rem)] text-slate leading-[1.7] max-w-[620px] mx-auto mt-9" style={{ animationDelay: "260ms" }}>
             Custom branded graphics, captions, and consistent posting — every week, without you lifting a finger.
