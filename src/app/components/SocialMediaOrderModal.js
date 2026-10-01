@@ -314,7 +314,7 @@ export default function SocialMediaOrderModal({ open, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-center sm:p-4"
-      style={{ background: "rgba(15,26,43,0.6)", backdropFilter: "blur(4px)" }}
+      style={{ background: "rgba(20,36,58,0.6)", backdropFilter: "blur(4px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="bg-ivory w-full h-dvh sm:h-auto sm:max-w-[640px] sm:rounded-3xl sm:max-h-[90vh] shadow-2xl flex flex-col">

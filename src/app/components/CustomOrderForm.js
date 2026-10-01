@@ -91,12 +91,13 @@ export default function CustomOrderForm() {
           onChange={handleChange}
           className={inputClass + " appearance-none cursor-pointer"}
         >
-          <option value="" style={{ background: "#0F1A2B" }}>Select a plan...</option>
-          <option style={{ background: "#0F1A2B" }}>Essential — $450/month</option>
-          <option style={{ background: "#0F1A2B" }}>Growth — $600/month</option>
-          <option style={{ background: "#0F1A2B" }}>Signature — $750/month</option>
-          <option style={{ background: "#0F1A2B" }}>Listing Launch — $99 one-time</option>
-          <option style={{ background: "#0F1A2B" }}>Not sure yet — just exploring</option>
+          <option value="" style={{ background: "#14243A" }}>Select a plan...</option>
+          <option style={{ background: "#14243A" }}>Starter — $300/month</option>
+          <option style={{ background: "#14243A" }}>Essential — $450/month</option>
+          <option style={{ background: "#14243A" }}>Growth — $600/month</option>
+          <option style={{ background: "#14243A" }}>Signature — $750/month</option>
+          <option style={{ background: "#14243A" }}>Listing Launch — $99 one-time</option>
+          <option style={{ background: "#14243A" }}>Not sure yet — just exploring</option>
         </select>
       </div>
 

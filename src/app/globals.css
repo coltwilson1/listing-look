@@ -2,7 +2,7 @@
 
 :root {
   --background: #F7F5F0;
-  --foreground: #0F1A2B;
+  --foreground: #14243A;
 }
 
 @theme inline {
@@ -13,12 +13,12 @@
 
   /* Elevate Marketing Co. — Midnight & Brass */
   --color-ivory: #F7F5F0;
-  --color-champagne: #D9C3A0;
+  --color-champagne: #C6AA76;
   --color-brass: #8F6F3E;
   --color-brass-dark: #74592F;
-  --color-ink: #0F1A2B;
+  --color-ink: #14243A;
   --color-slate: #555E6D;
-  --color-gold: #C4A46B;
+  --color-gold: #C6AA76;
   --color-light-gray: #EFECE6;
   --color-border: #E2DED6;
 
@@ -81,7 +81,7 @@ body {
   z-index: 9999 !important;
   border-radius: 12px;
   border: 1px solid #E2DED6;
-  box-shadow: 0 8px 24px rgba(15,26,43,0.12);
+  box-shadow: 0 8px 24px rgba(20,36,58,0.12);
   font-family: var(--font-dm-sans), sans-serif;
   margin-top: 4px;
 }
@@ -91,7 +91,7 @@ body {
   cursor: pointer;
 }
 .pac-item:hover { background: #F7F5F0; }
-.pac-item-query { font-weight: 600; color: #0F1A2B; }
+.pac-item-query { font-weight: 600; color: #14243A; }
 
 /* Cormorant sits small on the line — give headings a touch more presence */
 @layer base {

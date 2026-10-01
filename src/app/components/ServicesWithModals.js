@@ -33,9 +33,9 @@ export default function ServicesWithModals({ content: c }) {
           {c.items.map(({ icon, title, description, listItems, price, buttonText, badge }, i) => (
             <div
               key={i}
-              className={`relative rounded-[4px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_rgba(15,26,43,0.14)] ${
+              className={`relative rounded-[4px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_rgba(20,36,58,0.14)] ${
                 badge
-                  ? "bg-ink border border-ink shadow-[0_18px_40px_rgba(15,26,43,0.18)]"
+                  ? "bg-ink border border-ink shadow-[0_18px_40px_rgba(20,36,58,0.18)]"
                   : "bg-white border border-border"
               }`}
             >

@@ -372,7 +372,7 @@ function OrderCard({ order, onClick }) {
 
   return (
     <div
-      className="bg-white rounded-2xl border border-border p-6 hover:shadow-[0_8px_24px_rgba(15,26,43,0.08)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+      className="bg-white rounded-2xl border border-border p-6 hover:shadow-[0_8px_24px_rgba(20,36,58,0.08)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
       onClick={onClick}
     >
       <div className="flex items-start justify-between gap-4">

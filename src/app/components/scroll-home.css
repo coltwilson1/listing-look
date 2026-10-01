@@ -1,0 +1,42 @@
+/* Scroll-driven homepage. Each scene exposes --p (0 → 1) as it scrolls. */
+.ev-page { background: #F7F5F0; color: #14243A; }
+.ev-ease { transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Reveal on enter */
+.ev-rv { opacity: 0; transform: translateY(44px); transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.1s cubic-bezier(0.16, 1, 0.3, 1); will-change: opacity, transform; }
+.ev-rv.ev-in { opacity: 1; transform: none; }
+
+/* Hero */
+.ev-hero-copy { transform: scale(calc(1 + var(--p, 0) * 0.18)); opacity: calc(1 - var(--p, 0) * 2.2); will-change: transform, opacity; }
+.ev-hero-glow { transform: translate3d(0, calc(var(--p, 0) * -18vh), 0) scale(calc(1 + var(--p, 0) * 0.6)); }
+@keyframes evDrift { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(3vw, -2vh, 0); } }
+.ev-drift { animation: evDrift 14s ease-in-out infinite; }
+@keyframes evRise { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+.ev-rise { animation: evRise 1.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes evHint { 0%, 100% { transform: translateY(0); opacity: 0.9; } 50% { transform: translateY(8px); opacity: 0.35; } }
+.ev-hint { animation: evHint 2.2s ease-in-out infinite; }
+
+/* Phone scene */
+.ev-phone { transform: perspective(1400px) rotateY(calc((var(--p, 0) - 0.5) * -22deg)) rotateX(calc((0.5 - var(--p, 0)) * 8deg)) scale(calc(0.92 + var(--p, 0) * 0.1)); will-change: transform; }
+.ev-screen { opacity: 0; transform: scale(1.06); transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+.ev-screen.ev-on { opacity: 1; transform: none; }
+.ev-cap { opacity: 0; transform: translateY(28px); transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; }
+.ev-cap.ev-on { opacity: 1; transform: none; }
+.ev-cap.ev-past { transform: translateY(-28px); }
+
+/* Word-by-word statement */
+.ev-word { opacity: clamp(0.14, calc(var(--p, 0) * var(--n) * 1.25 - var(--i)), 1); }
+
+/* Horizontal steps */
+.ev-track { transform: translate3d(calc(var(--p, 0) * (100vw - 100%)), 0, 0); will-change: transform; }
+.ev-bar { transform: scaleX(var(--p, 0)); transform-origin: left; }
+
+/* Plans */
+.ev-plan { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.ev-plan:hover { transform: translateY(-8px); box-shadow: 0 40px 80px -30px rgba(20,36,58, 0.35); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ev-rv, .ev-rise { opacity: 1; transform: none; animation: none; transition: none; }
+  .ev-hero-copy, .ev-phone, .ev-hero-glow { transform: none; }
+  .ev-drift, .ev-hint { animation: none; }
+}
