@@ -181,24 +181,24 @@ export default function PostcardOrderModal({ open, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-center sm:p-4"
-      style={{ background: "rgba(28,28,46,0.6)", backdropFilter: "blur(4px)" }}
+      style={{ background: "rgba(15,26,43,0.6)", backdropFilter: "blur(4px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-cream w-full h-dvh sm:h-auto sm:max-w-[640px] sm:rounded-3xl sm:max-h-[90vh] shadow-2xl flex flex-col">
+      <div className="bg-ivory w-full h-dvh sm:h-auto sm:max-w-[640px] sm:rounded-3xl sm:max-h-[90vh] shadow-2xl flex flex-col">
 
         {/* ── Header (sticky) ── */}
         <div
-          className="bg-deep flex-shrink-0"
+          className="bg-ink flex-shrink-0"
           style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
         >
           <div className="flex justify-between items-center px-5 pt-5 pb-3 sm:px-8 sm:pt-7">
             <div>
-              <p className="font-sans text-[0.65rem] uppercase tracking-[0.15em] text-blush/70 mb-0.5">Order Form</p>
+              <p className="font-sans text-[0.65rem] uppercase tracking-[0.15em] text-champagne/70 mb-0.5">Order Form</p>
               <h2 className="font-serif text-[1.25rem] sm:text-[1.4rem] text-white leading-tight">Postcards & Print</h2>
             </div>
             <div className="flex items-center gap-2">
               {sessionUser && (
-                <div className="w-8 h-8 rounded-full bg-coral flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-brass flex items-center justify-center flex-shrink-0">
                   <span className="font-sans text-[0.75rem] font-bold text-white leading-none">
                     {sessionUser.name?.charAt(0)?.toUpperCase() || "?"}
                   </span>
@@ -229,15 +229,15 @@ export default function PostcardOrderModal({ open, onClose }) {
                     <div key={n} className="flex-1 flex flex-col items-center relative">
                       {i > 0 && (
                         <div className="absolute right-1/2 left-0 top-[13px] h-px transition-colors duration-300"
-                          style={{ background: done || current ? "#E8825A" : "rgba(255,255,255,0.2)" }} />
+                          style={{ background: done || current ? "#8F6F3E" : "rgba(255,255,255,0.2)" }} />
                       )}
                       {i < PC_STEP_LABELS.length - 1 && (
                         <div className="absolute left-1/2 right-0 top-[13px] h-px transition-colors duration-300"
-                          style={{ background: done ? "#E8825A" : "rgba(255,255,255,0.2)" }} />
+                          style={{ background: done ? "#8F6F3E" : "rgba(255,255,255,0.2)" }} />
                       )}
                       <div className={`relative z-10 w-[26px] h-[26px] rounded-full flex items-center justify-center font-sans text-[0.68rem] font-bold transition-all duration-300 ${
-                        done ? "bg-coral text-white" :
-                        current ? "bg-coral text-white ring-4 ring-coral/25" :
+                        done ? "bg-brass text-white" :
+                        current ? "bg-brass text-white ring-4 ring-brass/25" :
                         "bg-white/10 text-white/40"
                       }`}>
                         {done ? (
@@ -247,7 +247,7 @@ export default function PostcardOrderModal({ open, onClose }) {
                         ) : n}
                       </div>
                       <p className={`font-sans text-[0.6rem] text-center mt-1.5 leading-tight px-0.5 transition-colors duration-300 ${
-                        current ? "text-blush font-semibold" : done ? "text-blush/60" : "text-white/30"
+                        current ? "text-champagne font-semibold" : done ? "text-champagne/60" : "text-white/30"
                       }`}>
                         {label}
                       </p>
@@ -272,15 +272,15 @@ export default function PostcardOrderModal({ open, onClose }) {
               <div className="space-y-1.5">
                 <div className="flex justify-between font-sans text-[0.82rem]">
                   <span className="text-slate">Type</span>
-                  <span className="text-deep font-medium capitalize">{print.postcardType?.replace(/-/g," ")}</span>
+                  <span className="text-ink font-medium capitalize">{print.postcardType?.replace(/-/g," ")}</span>
                 </div>
                 <div className="flex justify-between font-sans text-[0.82rem]">
                   <span className="text-slate">Address</span>
-                  <span className="text-deep font-medium text-right max-w-[55%]">{listing.address}</span>
+                  <span className="text-ink font-medium text-right max-w-[55%]">{listing.address}</span>
                 </div>
                 <div className="flex justify-between font-sans text-[0.82rem]">
                   <span className="text-slate">Quantity</span>
-                  <span className="text-deep font-medium">{print.quantity}</span>
+                  <span className="text-ink font-medium">{print.quantity}</span>
                 </div>
               </div>
             </SuccessWithAccount>
@@ -316,7 +316,7 @@ export default function PostcardOrderModal({ open, onClose }) {
                 />
               )}
               {Object.keys(errors).length > 0 && (
-                <p className="font-sans text-[0.8rem] text-coral mt-3">
+                <p className="font-sans text-[0.8rem] text-brass mt-3">
                   Please fill in all required fields above.
                 </p>
               )}
@@ -327,13 +327,13 @@ export default function PostcardOrderModal({ open, onClose }) {
         {/* ── Footer ── */}
         {!submitted && (
           <div
-            className="px-5 pt-4 border-t border-border flex justify-between items-center flex-shrink-0 bg-cream sm:px-8 sm:py-5"
+            className="px-5 pt-4 border-t border-border flex justify-between items-center flex-shrink-0 bg-ivory sm:px-8 sm:py-5"
             style={{ paddingBottom: "max(env(safe-area-inset-bottom), 20px)" }}
           >
             {step > 1 ? (
               <button
                 onClick={() => { setStep((s) => s - 1); setErrors({}); }}
-                className="min-h-[44px] font-sans text-[0.88rem] text-slate hover:text-deep active:text-deep transition-colors flex items-center gap-1.5 px-2"
+                className="min-h-[44px] font-sans text-[0.88rem] text-slate hover:text-ink active:text-ink transition-colors flex items-center gap-1.5 px-2"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <path d="M10 3L5 8l5 5"/>
@@ -346,7 +346,7 @@ export default function PostcardOrderModal({ open, onClose }) {
             <button
               onClick={handleNext}
               disabled={submitting}
-              className="min-h-[44px] font-sans bg-coral text-white font-semibold text-[0.9rem] px-8 py-3 rounded-full hover:bg-coral-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(232,130,90,0.4)] active:bg-coral-dark transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="min-h-[44px] font-sans bg-brass text-white font-semibold text-[0.9rem] px-8 py-3 rounded-full hover:bg-brass-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(143,111,62,0.4)] active:bg-brass-dark transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {submitting ? "Submitting…" : step === 3 ? "Submit Order" : "Continue"}
               {!submitting && step < 3 && (
@@ -369,8 +369,8 @@ function PrintStep({ data, onChange, errors, headshotRef, logoRef }) {
     <div className="step-animate space-y-7">
       {/* Design tiles */}
       <div>
-        <p className={labelCls}>Choose a Design Style {errors.designId && <span className="text-coral normal-case font-normal tracking-normal ml-2">{errors.designId}</span>}</p>
-        <div className={`grid grid-cols-4 sm:grid-cols-6 gap-2 mt-2 rounded-2xl transition-all ${errors.designId ? "ring-2 ring-coral/50 bg-coral/5 p-2" : ""}`}>
+        <p className={labelCls}>Choose a Design Style {errors.designId && <span className="text-brass normal-case font-normal tracking-normal ml-2">{errors.designId}</span>}</p>
+        <div className={`grid grid-cols-4 sm:grid-cols-6 gap-2 mt-2 rounded-2xl transition-all ${errors.designId ? "ring-2 ring-brass/50 bg-brass/5 p-2" : ""}`}>
           {DESIGN_TILES.map((t) => (
             <button
               key={t.id}
@@ -379,7 +379,7 @@ function PrintStep({ data, onChange, errors, headshotRef, logoRef }) {
               title={t.name}
               className={`relative rounded-xl overflow-hidden aspect-square transition-all duration-150 ${
                 data.designId === t.id
-                  ? "ring-2 ring-coral ring-offset-2 ring-offset-cream scale-105"
+                  ? "ring-2 ring-brass ring-offset-2 ring-offset-ivory scale-105"
                   : "hover:scale-105 opacity-80 hover:opacity-100"
               }`}
               style={{ background: t.bg }}
@@ -403,7 +403,7 @@ function PrintStep({ data, onChange, errors, headshotRef, logoRef }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>
-            Postcard Type {errors.postcardType && <span className="text-coral normal-case font-normal tracking-normal ml-2">Required</span>}
+            Postcard Type {errors.postcardType && <span className="text-brass normal-case font-normal tracking-normal ml-2">Required</span>}
           </label>
           <select
             className={sc(errors.postcardType)}
@@ -441,7 +441,7 @@ function PrintStep({ data, onChange, errors, headshotRef, logoRef }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>
-            Mailing Quantity {errors.quantity && <span className="text-coral normal-case font-normal tracking-normal ml-2">Required</span>}
+            Mailing Quantity {errors.quantity && <span className="text-brass normal-case font-normal tracking-normal ml-2">Required</span>}
           </label>
           <select
             className={sc(errors.quantity)}
@@ -473,7 +473,7 @@ function PrintStep({ data, onChange, errors, headshotRef, logoRef }) {
 
       {/* Back of postcard — agent info */}
       <div>
-        <p className={labelCls + " text-[0.7rem] font-bold text-coral mb-3"}>Back of Postcard — Agent Info</p>
+        <p className={labelCls + " text-[0.7rem] font-bold text-brass mb-3"}>Back of Postcard — Agent Info</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={labelCls}>Agent Name</label>
@@ -544,14 +544,14 @@ function FileUploadField({ label, hint, fileRef, fileName, onChange }) {
       <button
         type="button"
         onClick={() => fileRef.current?.click()}
-        className="w-full border-2 border-dashed border-border rounded-xl py-4 px-4 text-center hover:border-coral transition-colors duration-200 group"
+        className="w-full border-2 border-dashed border-border rounded-xl py-4 px-4 text-center hover:border-brass transition-colors duration-200 group"
       >
         {fileName ? (
-          <span className="font-sans text-[0.82rem] text-deep font-medium break-all">{fileName}</span>
+          <span className="font-sans text-[0.82rem] text-ink font-medium break-all">{fileName}</span>
         ) : (
           <>
             <span className="block text-xl mb-1 opacity-50 group-hover:opacity-80 transition-opacity">📎</span>
-            <span className="font-sans text-[0.8rem] text-slate group-hover:text-coral transition-colors">
+            <span className="font-sans text-[0.8rem] text-slate group-hover:text-brass transition-colors">
               Click to attach
             </span>
             <span className="block font-sans text-[0.7rem] text-slate/50 mt-0.5">{hint}</span>

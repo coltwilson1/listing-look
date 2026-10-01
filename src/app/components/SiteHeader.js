@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getCurrentUser, login, createAccount, logout } from "@/app/lib/auth";
+import Logo from "./Logo";
 
 export default function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -92,34 +93,29 @@ export default function SiteHeader() {
   const firstName = currentUser?.name?.split(" ")[0] || null;
 
   const inputClass =
-    "w-full bg-light-gray border border-border rounded-xl px-4 py-3 text-deep text-sm focus:outline-none focus:border-coral transition-colors placeholder:text-slate/40";
+    "w-full bg-light-gray border border-border rounded-xl px-4 py-3 text-ink text-sm focus:outline-none focus:border-brass transition-colors placeholder:text-slate/40";
   const labelClass =
     "block text-xs font-semibold text-slate uppercase tracking-wider mb-1.5";
 
   return (
     <>
       {/* ── Nav ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 h-[70px] flex items-center justify-between px-8 bg-cream/[0.92] backdrop-blur-md border-b border-border">
-        <a
-          href="#"
-          className="font-serif text-[1.4rem] text-deep tracking-[0.02em] no-underline"
-        >
-          The Listing <span className="text-coral">Look</span>
-        </a>
+      <nav className="fixed top-0 left-0 right-0 z-50 h-[76px] flex items-center justify-between px-6 md:px-10 bg-ivory/[0.94] backdrop-blur-md border-b border-border">
+        <Logo href="#" />
 
-        <ul className="hidden md:flex gap-8 items-center list-none m-0 p-0">
+        <ul className="hidden md:flex gap-10 items-center list-none m-0 p-0">
           <li>
-            <a href="#how-it-works" className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors">
+            <a href="#how-it-works" className="text-slate text-[0.78rem] font-medium uppercase tracking-[0.16em] no-underline hover:text-ink transition-colors">
               How It Works
             </a>
           </li>
           <li>
-            <a href="#services" className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors">
+            <a href="#services" className="text-slate text-[0.78rem] font-medium uppercase tracking-[0.16em] no-underline hover:text-ink transition-colors">
               Pricing
             </a>
           </li>
           <li>
-            <a href="#faq" className="text-slate text-[0.9rem] font-medium no-underline hover:text-coral transition-colors">
+            <a href="#faq" className="text-slate text-[0.78rem] font-medium uppercase tracking-[0.16em] no-underline hover:text-ink transition-colors">
               FAQ
             </a>
           </li>
@@ -127,7 +123,7 @@ export default function SiteHeader() {
             <li>
               <button
                 onClick={() => openModal("signup")}
-                className="bg-coral text-white px-5 py-2 rounded-full text-[0.9rem] font-semibold hover:bg-coral-dark transition-colors border-none cursor-pointer"
+                className="bg-ink text-white px-6 py-2.5 rounded-[3px] text-[0.75rem] font-semibold uppercase tracking-[0.16em] hover:bg-brass transition-colors border-none cursor-pointer"
               >
                 Get Started
               </button>
@@ -143,13 +139,13 @@ export default function SiteHeader() {
             </span>
             <a
               href="/portal"
-              className="bg-coral text-white px-4 py-2 rounded-full text-[0.85rem] font-semibold hover:bg-coral-dark transition-colors no-underline"
+              className="bg-ink text-white px-5 py-2.5 rounded-[3px] text-[0.75rem] font-semibold uppercase tracking-[0.14em] hover:bg-brass transition-colors no-underline"
             >
               Agent Portal
             </a>
             <button
               onClick={handleLogout}
-              className="font-sans text-[0.8rem] text-slate/60 hover:text-coral transition-colors border-none bg-transparent cursor-pointer"
+              className="font-sans text-[0.8rem] text-slate/60 hover:text-brass transition-colors border-none bg-transparent cursor-pointer"
             >
               Log out
             </button>
@@ -157,7 +153,7 @@ export default function SiteHeader() {
         ) : (
           <button
             onClick={() => openModal("login")}
-            className="border border-border text-slate text-[0.85rem] font-medium px-4 py-2 rounded-full hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer"
+            className="border border-ink/20 text-ink text-[0.75rem] font-semibold uppercase tracking-[0.14em] px-5 py-2.5 rounded-[3px] hover:border-ink hover:bg-ink hover:text-white transition-all bg-transparent cursor-pointer"
           >
             Log In
           </button>
@@ -167,7 +163,7 @@ export default function SiteHeader() {
       {/* ── Auth Modal ── */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-deep/70 backdrop-blur-[6px] z-[2000] flex items-center justify-center p-8"
+          className="fixed inset-0 bg-ink/70 backdrop-blur-[6px] z-[2000] flex items-center justify-center p-8"
           onClick={(e) => e.target === e.currentTarget && closeModal()}
         >
           <div className="bg-white rounded-3xl p-10 w-full max-w-[480px] relative shadow-2xl">
@@ -178,7 +174,7 @@ export default function SiteHeader() {
               ✕
             </button>
 
-            <h2 className="font-serif text-[1.8rem] text-deep mb-1">
+            <h2 className="font-serif text-[2.1rem] text-ink mb-1">
               {activeTab === "login" ? "Welcome Back" : "Create Account"}
             </h2>
             <p className="text-slate text-sm mb-6">
@@ -195,7 +191,7 @@ export default function SiteHeader() {
                   onClick={() => { setActiveTab(tab); setLoginError(""); setSignupError(""); }}
                   className={`flex-1 py-2 rounded-[0.5rem] text-[0.9rem] font-medium transition-all border-none cursor-pointer ${
                     activeTab === tab
-                      ? "bg-white text-deep font-semibold shadow-sm"
+                      ? "bg-white text-ink font-semibold shadow-sm"
                       : "text-slate bg-transparent"
                   }`}
                 >
@@ -226,11 +222,11 @@ export default function SiteHeader() {
                     onChange={(e) => setLoginPassword(e.target.value)}
                   />
                 </div>
-                {loginError && <p className="font-sans text-[0.82rem] text-coral">{loginError}</p>}
+                {loginError && <p className="font-sans text-[0.82rem] text-brass">{loginError}</p>}
                 <button
                   type="submit"
                   disabled={loginLoading}
-                  className="w-full bg-coral text-white font-semibold py-4 rounded-full hover:bg-coral-dark transition-all mt-2 cursor-pointer border-none text-[0.95rem] disabled:opacity-60"
+                  className="w-full bg-brass text-white font-semibold uppercase tracking-[0.14em] py-4 rounded-[3px] hover:bg-brass-dark transition-all mt-2 cursor-pointer border-none text-[0.8rem] disabled:opacity-60"
                 >
                   {loginLoading ? "Logging in…" : "Log In to My Account"}
                 </button>
@@ -289,11 +285,11 @@ export default function SiteHeader() {
                     onChange={(e) => setSignupPassword(e.target.value)}
                   />
                 </div>
-                {signupError && <p className="font-sans text-[0.82rem] text-coral">{signupError}</p>}
+                {signupError && <p className="font-sans text-[0.82rem] text-brass">{signupError}</p>}
                 <button
                   type="submit"
                   disabled={signupLoading}
-                  className="w-full bg-coral text-white font-semibold py-4 rounded-full hover:bg-coral-dark transition-all mt-2 cursor-pointer border-none text-[0.95rem] disabled:opacity-60"
+                  className="w-full bg-brass text-white font-semibold uppercase tracking-[0.14em] py-4 rounded-[3px] hover:bg-brass-dark transition-all mt-2 cursor-pointer border-none text-[0.8rem] disabled:opacity-60"
                 >
                   {signupLoading ? "Creating Account…" : "Create My Account"}
                 </button>

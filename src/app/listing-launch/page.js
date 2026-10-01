@@ -106,12 +106,12 @@ function ProgressBar({ step }) {
       {STEPS.map((label, i) => (
         <div key={i} className="flex items-center gap-2">
           <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[0.75rem] font-bold transition-all ${
-            i < step ? "bg-coral text-white" : i === step ? "bg-deep text-white" : "bg-border text-slate/50"
+            i < step ? "bg-brass text-white" : i === step ? "bg-ink text-white" : "bg-border text-slate/50"
           }`}>
             {i < step ? "✓" : i + 1}
           </div>
-          <span className={`font-sans text-[0.8rem] font-medium hidden sm:block ${i === step ? "text-deep" : "text-slate/50"}`}>{label}</span>
-          {i < STEPS.length - 1 && <div className={`w-8 h-px mx-1 ${i < step ? "bg-coral" : "bg-border"}`} />}
+          <span className={`font-sans text-[0.8rem] font-medium hidden sm:block ${i === step ? "text-ink" : "text-slate/50"}`}>{label}</span>
+          {i < STEPS.length - 1 && <div className={`w-8 h-px mx-1 ${i < step ? "bg-brass" : "bg-border"}`} />}
         </div>
       ))}
     </div>
@@ -200,21 +200,21 @@ function CaptionCard({ label, caption, color, onUpdate, onRegenerate, regenerati
         <div className="flex items-center gap-1">
           {editing ? (
             <>
-              <button onClick={save} className="font-sans text-[0.75rem] font-semibold text-white bg-coral px-3 py-1 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors">Save</button>
-              <button onClick={cancel} className="font-sans text-[0.75rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-3 py-1 bg-transparent cursor-pointer">Cancel</button>
+              <button onClick={save} className="font-sans text-[0.75rem] font-semibold text-white bg-brass px-3 py-1 rounded-full border-none cursor-pointer hover:bg-brass-dark transition-colors">Save</button>
+              <button onClick={cancel} className="font-sans text-[0.75rem] text-slate hover:text-brass transition-colors border border-border rounded-full px-3 py-1 bg-transparent cursor-pointer">Cancel</button>
             </>
           ) : (
             <>
-              <button onClick={copy} className="font-sans text-[0.75rem] text-slate hover:text-coral transition-colors border-none bg-transparent cursor-pointer px-2 py-1">
+              <button onClick={copy} className="font-sans text-[0.75rem] text-slate hover:text-brass transition-colors border-none bg-transparent cursor-pointer px-2 py-1">
                 {copied ? "✓ Copied" : "Copy"}
               </button>
-              <button onClick={() => { setDraft(caption); setEditing(true); }} className="font-sans text-[0.75rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-3 py-1 bg-transparent cursor-pointer">
+              <button onClick={() => { setDraft(caption); setEditing(true); }} className="font-sans text-[0.75rem] text-slate hover:text-brass transition-colors border border-border rounded-full px-3 py-1 bg-transparent cursor-pointer">
                 ✏️ Edit
               </button>
               <button
                 onClick={onRegenerate}
                 disabled={regenerating}
-                className="font-sans text-[0.75rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-3 py-1 bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                className="font-sans text-[0.75rem] text-slate hover:text-brass transition-colors border border-border rounded-full px-3 py-1 bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
               >
                 {regenerating ? <><span className="w-3 h-3 rounded-full border border-slate border-t-transparent animate-spin inline-block" /> Generating…</> : "↻ Regenerate"}
               </button>
@@ -553,7 +553,7 @@ export default function ListingLaunchPage() {
     };
   }, [step]);
 
-  const iCls = "w-full bg-white border border-border rounded-xl px-4 py-3 text-deep text-[0.9rem] placeholder:text-slate/40 focus:outline-none focus:border-coral transition-colors font-sans";
+  const iCls = "w-full bg-white border border-border rounded-xl px-4 py-3 text-ink text-[0.9rem] placeholder:text-slate/40 focus:outline-none focus:border-brass transition-colors font-sans";
   const lCls = "block font-sans text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-slate mb-1.5";
 
   async function generate() {
@@ -717,7 +717,7 @@ export default function ListingLaunchPage() {
   // ── Results view ─────────────────────────────────────────────────────────────
   if (step === 4 && result) {
     const { generated, listing: l, agent: a } = result;
-    const iCls2 = "w-full bg-white border border-border rounded-xl px-4 py-3 text-deep text-[0.9rem] placeholder:text-slate/40 focus:outline-none focus:border-coral transition-colors font-sans";
+    const iCls2 = "w-full bg-white border border-border rounded-xl px-4 py-3 text-ink text-[0.9rem] placeholder:text-slate/40 focus:outline-none focus:border-brass transition-colors font-sans";
     const GRAPHIC_TYPES = [
       { key: "forSale",       label: "For Sale",       color: "#22c55e" },
       { key: "justListed",    label: "Just Listed",    color: "#E8825A" },
@@ -736,8 +736,8 @@ export default function ListingLaunchPage() {
         >
           <div className="bg-white rounded-3xl w-full max-w-[480px] shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-8 pt-7 pb-4 border-b border-border">
-              <h2 className="font-serif text-[1.4rem] text-deep">Complete Your Order</h2>
-              <button onClick={() => setPurchaseOpen(false)} className="w-8 h-8 rounded-full bg-light-gray flex items-center justify-center font-sans text-[1rem] text-slate hover:text-coral border-none cursor-pointer bg-transparent">×</button>
+              <h2 className="font-serif text-[1.4rem] text-ink">Complete Your Order</h2>
+              <button onClick={() => setPurchaseOpen(false)} className="w-8 h-8 rounded-full bg-light-gray flex items-center justify-center font-sans text-[1rem] text-slate hover:text-brass border-none cursor-pointer bg-transparent">×</button>
             </div>
 
             <div className="px-8 py-6">
@@ -745,7 +745,7 @@ export default function ListingLaunchPage() {
                 <>
                   {/* What's included */}
                   <div className="bg-light-gray rounded-2xl p-5 mb-6">
-                    <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-coral mb-3">What's Included</p>
+                    <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-brass mb-3">What's Included</p>
                     {[
                       "Live shareable landing page with your listing details",
                       "5 social media graphics (For Sale, Just Listed, Under Contract, Price Refresh, Sold)",
@@ -753,13 +753,13 @@ export default function ListingLaunchPage() {
                       "Access to your order in the client portal",
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-2 mb-2 last:mb-0">
-                        <span className="text-coral font-bold mt-0.5 text-[0.8rem]">✓</span>
+                        <span className="text-brass font-bold mt-0.5 text-[0.8rem]">✓</span>
                         <span className="font-sans text-[0.85rem] text-slate leading-snug">{item}</span>
                       </div>
                     ))}
                     <div className="border-t border-border mt-4 pt-4 flex items-center justify-between">
-                      <span className="font-sans text-[0.85rem] font-semibold text-deep">Listing Launch Package</span>
-                      <span className="font-serif text-[1.3rem] text-coral font-bold">$99</span>
+                      <span className="font-sans text-[0.85rem] font-semibold text-ink">Listing Launch Package</span>
+                      <span className="font-serif text-[1.3rem] text-brass font-bold">$99</span>
                     </div>
                   </div>
 
@@ -773,11 +773,11 @@ export default function ListingLaunchPage() {
                       <label className="block font-sans text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-slate mb-1.5">Email Address</label>
                       <input className={iCls2} type="email" placeholder="your@email.com" value={purchaseEmail} onChange={e => setPurchaseEmail(e.target.value)} />
                     </div>
-                    {purchaseError && <p className="font-sans text-[0.82rem] text-coral">{purchaseError}</p>}
+                    {purchaseError && <p className="font-sans text-[0.82rem] text-brass">{purchaseError}</p>}
                     <button
                       type="submit"
                       disabled={purchaseLoading}
-                      className="w-full bg-coral text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      className="w-full bg-brass text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-brass-dark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       {purchaseLoading
                         ? <span className="flex items-center justify-center gap-2"><span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin inline-block"/>Submitting…</span>
@@ -800,21 +800,21 @@ export default function ListingLaunchPage() {
         </div>
       )}
 
-      <div className="min-h-screen bg-cream">
+      <div className="min-h-screen bg-ivory">
         <div className="max-w-[1100px] mx-auto px-6 py-12">
           <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
             <div>
-              <div className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.12em] text-coral mb-1">Listing Launch</div>
-              <h1 className="font-serif text-[2rem] text-deep">{l.address}</h1>
+              <div className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.12em] text-brass mb-1">Listing Launch</div>
+              <h1 className="font-serif text-[2rem] text-ink">{l.address}</h1>
               <p className="font-sans text-[0.88rem] text-slate mt-1">${parseInt(l.price).toLocaleString()} · {l.beds} bd · {l.baths} ba · {parseInt(l.sqft || 0).toLocaleString()} sqft</p>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
-              <button onClick={() => { setStep(0); setResult(null); setCaptions({}); }} className="font-sans text-[0.85rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-4 py-2 bg-transparent cursor-pointer">
+              <button onClick={() => { setStep(0); setResult(null); setCaptions({}); }} className="font-sans text-[0.85rem] text-slate hover:text-brass transition-colors border border-border rounded-full px-4 py-2 bg-transparent cursor-pointer">
                 ← New Listing
               </button>
               <button
                 onClick={openPurchase}
-                className="font-sans text-[0.88rem] font-semibold bg-coral text-white px-5 py-2 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors shadow-sm"
+                className="font-sans text-[0.88rem] font-semibold bg-brass text-white px-5 py-2 rounded-full border-none cursor-pointer hover:bg-brass-dark transition-colors shadow-sm"
               >
                 Complete Purchase →
               </button>
@@ -832,7 +832,7 @@ export default function ListingLaunchPage() {
                 key={t.id}
                 onClick={() => setActiveTab(t.id)}
                 className={`flex-1 font-sans text-[0.88rem] font-semibold py-2.5 px-4 rounded-xl border-none cursor-pointer transition-all ${
-                  activeTab === t.id ? "bg-deep text-white" : "text-slate bg-transparent hover:bg-light-gray"
+                  activeTab === t.id ? "bg-ink text-white" : "text-slate bg-transparent hover:bg-light-gray"
                 }`}
               >
                 {t.label}
@@ -843,10 +843,10 @@ export default function ListingLaunchPage() {
           {activeTab === "landing" && (
             <div>
               <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-                <p className="font-sans text-[0.85rem] text-slate">AI-powered landing page for <strong>{l.address}</strong>. Send to The Listing Look team to publish as a live shareable link.</p>
+                <p className="font-sans text-[0.85rem] text-slate">AI-powered landing page for <strong>{l.address}</strong>. Send to the Elevate Marketing Co. team to publish as a live shareable link.</p>
                 <button
                   onClick={() => setThemeOpen(o => !o)}
-                  className="flex items-center gap-2 font-sans text-[0.85rem] font-semibold px-4 py-2 rounded-full border border-border bg-white hover:border-coral hover:text-coral transition-colors cursor-pointer text-slate"
+                  className="flex items-center gap-2 font-sans text-[0.85rem] font-semibold px-4 py-2 rounded-full border border-border bg-white hover:border-brass hover:text-brass transition-colors cursor-pointer text-slate"
                 >
                   🎨 {themeOpen ? "Close Theme" : "Edit Theme"}
                 </button>
@@ -855,10 +855,10 @@ export default function ListingLaunchPage() {
               {themeOpen && (
                 <div className="bg-white border border-border rounded-2xl p-5 mb-5 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-sans text-[0.95rem] font-semibold text-deep">Customize Theme</h3>
+                    <h3 className="font-sans text-[0.95rem] font-semibold text-ink">Customize Theme</h3>
                     <button
                       onClick={() => setAgent(a => ({ ...a, primaryColor: "#C8102E", accentColor: "#ffffff", labelColor: "", bodyColor: "#475569", footerTextColor: "#ffffff" }))}
-                      className="font-sans text-[0.78rem] text-slate hover:text-coral transition-colors cursor-pointer border-none bg-transparent"
+                      className="font-sans text-[0.78rem] text-slate hover:text-brass transition-colors cursor-pointer border-none bg-transparent"
                     >
                       Reset to defaults
                     </button>
@@ -871,7 +871,7 @@ export default function ListingLaunchPage() {
                       { label: "Body Text",          key: "bodyColor",    hint: "Paragraph text" },
                     ].map(({ label, key, hint, fallback }) => (
                       <div key={key}>
-                        <p className="font-sans text-[0.75rem] font-semibold text-deep mb-0.5">{label}</p>
+                        <p className="font-sans text-[0.75rem] font-semibold text-ink mb-0.5">{label}</p>
                         <p className="font-sans text-[0.7rem] text-slate/60 mb-2 leading-snug">{hint}</p>
                         <div className="flex items-center gap-2">
                           <input
@@ -886,7 +886,7 @@ export default function ListingLaunchPage() {
                     ))}
                   </div>
                   <div className="border-t border-border pt-4">
-                    <p className="font-sans text-[0.75rem] font-semibold text-deep mb-0.5">Footer Text</p>
+                    <p className="font-sans text-[0.75rem] font-semibold text-ink mb-0.5">Footer Text</p>
                     <p className="font-sans text-[0.7rem] text-slate/60 mb-2 leading-snug">Name &amp; phone text on the colored footer</p>
                     <div className="flex gap-2">
                       {[{ label: "White", value: "#ffffff" }, { label: "Black", value: "#000000" }].map(({ label, value }) => (
@@ -895,7 +895,7 @@ export default function ListingLaunchPage() {
                           onClick={() => setAgent(a => ({ ...a, footerTextColor: value }))}
                           className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-sans text-[0.8rem] font-semibold cursor-pointer transition-all ${
                             (agent.footerTextColor || "#ffffff") === value
-                              ? "border-coral text-coral bg-coral/5"
+                              ? "border-brass text-brass bg-brass/5"
                               : "border-border text-slate bg-white hover:border-slate/40"
                           }`}
                         >
@@ -921,7 +921,7 @@ export default function ListingLaunchPage() {
                 <p className="font-sans text-[0.85rem] text-slate">Generate a custom 1080×1080 graphic for each stage — download as PNG or SVG and post directly.</p>
                 <button
                   onClick={() => setThemeOpen(o => !o)}
-                  className="flex items-center gap-2 font-sans text-[0.85rem] font-semibold px-4 py-2 rounded-full border border-border bg-white hover:border-coral hover:text-coral transition-colors cursor-pointer text-slate"
+                  className="flex items-center gap-2 font-sans text-[0.85rem] font-semibold px-4 py-2 rounded-full border border-border bg-white hover:border-brass hover:text-brass transition-colors cursor-pointer text-slate"
                 >
                   🎨 {themeOpen ? "Close Theme" : "Edit Theme"}
                 </button>
@@ -930,10 +930,10 @@ export default function ListingLaunchPage() {
               {themeOpen && (
                 <div className="bg-white border border-border rounded-2xl p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-sans text-[0.95rem] font-semibold text-deep">Customize Theme</h3>
+                    <h3 className="font-sans text-[0.95rem] font-semibold text-ink">Customize Theme</h3>
                     <button
                       onClick={() => setAgent(a => ({ ...a, primaryColor: "#C8102E", accentColor: "#ffffff" }))}
-                      className="font-sans text-[0.78rem] text-slate hover:text-coral transition-colors cursor-pointer border-none bg-transparent"
+                      className="font-sans text-[0.78rem] text-slate hover:text-brass transition-colors cursor-pointer border-none bg-transparent"
                     >
                       Reset to defaults
                     </button>
@@ -944,7 +944,7 @@ export default function ListingLaunchPage() {
                       { label: "Accent / Highlight",  key: "accentColor",  hint: "Price text, accent lines" },
                     ].map(({ label, key, hint }) => (
                       <div key={key}>
-                        <p className="font-sans text-[0.75rem] font-semibold text-deep mb-0.5">{label}</p>
+                        <p className="font-sans text-[0.75rem] font-semibold text-ink mb-0.5">{label}</p>
                         <p className="font-sans text-[0.7rem] text-slate/60 mb-2 leading-snug">{hint}</p>
                         <div className="flex items-center gap-2">
                           <input
@@ -972,24 +972,24 @@ export default function ListingLaunchPage() {
                     <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
                       <div>
                         <div className="inline-block w-2.5 h-2.5 rounded-full mr-2" style={{ background: color }} />
-                        <span className="font-sans text-[0.95rem] font-semibold text-deep">{label} Graphic</span>
+                        <span className="font-sans text-[0.95rem] font-semibold text-ink">{label} Graphic</span>
                         <p className="font-sans text-[0.8rem] text-slate mt-0.5">AI-powered custom graphic — 1080×1350 (4:5), ready to post.</p>
                       </div>
                       {!svg && (
                         <button
                           onClick={() => generateGraphic(l, agent, key)}
                           disabled={loading}
-                          className="flex-shrink-0 flex items-center gap-2 bg-deep text-white font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full border-none cursor-pointer hover:bg-coral transition-colors disabled:opacity-60"
+                          className="flex-shrink-0 flex items-center gap-2 bg-ink text-white font-sans text-[0.85rem] font-semibold px-5 py-2.5 rounded-full border-none cursor-pointer hover:bg-brass transition-colors disabled:opacity-60"
                         >
                           {loading ? <><span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Designing…</> : "✨ Design Graphic"}
                         </button>
                       )}
                     </div>
-                    {err && <p className="font-sans text-[0.82rem] text-coral mb-3">{err}</p>}
+                    {err && <p className="font-sans text-[0.82rem] text-brass mb-3">{err}</p>}
                     {loading && !svg && (
                       <div className="bg-white rounded-2xl border border-border flex items-center justify-center" style={{ aspectRatio: "1/1", maxWidth: 380 }}>
                         <div className="text-center">
-                          <div className="w-10 h-10 rounded-full border-2 border-coral border-t-transparent animate-spin mx-auto mb-3" />
+                          <div className="w-10 h-10 rounded-full border-2 border-brass border-t-transparent animate-spin mx-auto mb-3" />
                           <p className="font-sans text-[0.85rem] text-slate">Designing your {label} graphic…</p>
                         </div>
                       </div>
@@ -1008,7 +1008,7 @@ export default function ListingLaunchPage() {
                                 setSvgGraphics(p => ({ ...p, [key]: null }));
                                 generateGraphic(l, agent, key);
                               }}
-                              className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors"
+                              className="flex items-center gap-2 border border-border text-slate font-sans text-[0.85rem] px-5 py-2.5 rounded-full bg-transparent cursor-pointer hover:border-brass hover:text-brass transition-colors"
                             >
                               ↻ Regenerate
                             </button>
@@ -1061,13 +1061,13 @@ export default function ListingLaunchPage() {
 
   // ── Form wizard ───────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center px-6 py-16">
+    <div className="min-h-screen bg-ivory flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-[580px]">
 
         {/* Header */}
         <div className="text-center mb-8">
-          <a href="/" className="font-serif text-[1.2rem] text-deep no-underline">The Listing <span className="text-coral">Look</span></a>
-          <h1 className="font-serif text-[2rem] text-deep mt-4 mb-1">Listing Launch</h1>
+          <a href="/" className="font-serif text-[1.2rem] text-ink no-underline">Elevate <span className="italic text-brass">Marketing Co.</span></a>
+          <h1 className="font-serif text-[2rem] text-ink mt-4 mb-1">Listing Launch</h1>
           <p className="font-sans text-[0.9rem] text-slate">Get a landing page, social graphics, and ready-to-post captions — powered by AI in seconds.</p>
         </div>
 
@@ -1078,7 +1078,7 @@ export default function ListingLaunchPage() {
           {step === 0 && (
             <div className="space-y-5">
               <div>
-                <h2 className="font-serif text-[1.5rem] text-deep mb-1">Tell us about you</h2>
+                <h2 className="font-serif text-[1.5rem] text-ink mb-1">Tell us about you</h2>
                 <p className="font-sans text-[0.87rem] text-slate mb-1">This personalizes everything we generate for your brand.</p>
                 <div className="inline-flex items-center gap-1.5 bg-red-50 border border-red-100 rounded-full px-3 py-1 mb-5">
                   <span className="text-[0.7rem]">🔒</span>
@@ -1108,11 +1108,11 @@ export default function ListingLaunchPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={lCls}>
-                    Office Phone <span className="text-coral">*</span>
-                    {phoneErrors.officePhone && <span className="text-coral normal-case font-normal tracking-normal ml-1">— incomplete number</span>}
+                    Office Phone <span className="text-brass">*</span>
+                    {phoneErrors.officePhone && <span className="text-brass normal-case font-normal tracking-normal ml-1">— incomplete number</span>}
                   </label>
                   <input
-                    className={`${iCls} ${phoneErrors.officePhone ? "border-coral ring-2 ring-coral/20" : ""}`}
+                    className={`${iCls} ${phoneErrors.officePhone ? "border-brass ring-2 ring-brass/20" : ""}`}
                     placeholder="(423) 000-0000"
                     value={agent.officePhone}
                     onChange={e => { setAgent(a => ({ ...a, officePhone: formatPhone(e.target.value) })); setPhoneErrors(p => ({ ...p, officePhone: false })); }}
@@ -1122,11 +1122,11 @@ export default function ListingLaunchPage() {
                 </div>
                 <div>
                   <label className={lCls}>
-                    Mobile Phone <span className="text-coral">*</span>
-                    {phoneErrors.mobilePhone && <span className="text-coral normal-case font-normal tracking-normal ml-1">— incomplete number</span>}
+                    Mobile Phone <span className="text-brass">*</span>
+                    {phoneErrors.mobilePhone && <span className="text-brass normal-case font-normal tracking-normal ml-1">— incomplete number</span>}
                   </label>
                   <input
-                    className={`${iCls} ${phoneErrors.mobilePhone ? "border-coral ring-2 ring-coral/20" : ""}`}
+                    className={`${iCls} ${phoneErrors.mobilePhone ? "border-brass ring-2 ring-brass/20" : ""}`}
                     placeholder="(423) 000-0000"
                     value={agent.mobilePhone}
                     onChange={e => { setAgent(a => ({ ...a, mobilePhone: formatPhone(e.target.value) })); setPhoneErrors(p => ({ ...p, mobilePhone: false })); }}
@@ -1142,9 +1142,9 @@ export default function ListingLaunchPage() {
                     <button
                       key={s.id}
                       onClick={() => setAgent(a => ({ ...a, style: s.id }))}
-                      className={`rounded-xl p-3 text-left border-2 transition-all cursor-pointer bg-transparent ${agent.style === s.id ? "border-coral bg-coral/5" : "border-border hover:border-slate/30"}`}
+                      className={`rounded-xl p-3 text-left border-2 transition-all cursor-pointer bg-transparent ${agent.style === s.id ? "border-brass bg-brass/5" : "border-border hover:border-slate/30"}`}
                     >
-                      <div className={`font-sans text-[0.85rem] font-semibold mb-0.5 ${agent.style === s.id ? "text-coral" : "text-deep"}`}>{s.label}</div>
+                      <div className={`font-sans text-[0.85rem] font-semibold mb-0.5 ${agent.style === s.id ? "text-brass" : "text-ink"}`}>{s.label}</div>
                       <div className="font-sans text-[0.72rem] text-slate leading-snug">{s.desc}</div>
                     </button>
                   ))}
@@ -1185,7 +1185,7 @@ export default function ListingLaunchPage() {
                   onClick={() => setShowTeam(v => !v)}
                   className="w-full flex items-center justify-between px-4 py-3 bg-transparent border-none cursor-pointer hover:bg-light-gray transition-colors"
                 >
-                  <span className="font-sans text-[0.88rem] font-semibold text-deep">Are you part of a team? <span className="font-normal text-slate">(optional)</span></span>
+                  <span className="font-sans text-[0.88rem] font-semibold text-ink">Are you part of a team? <span className="font-normal text-slate">(optional)</span></span>
                   <span className="font-sans text-[0.8rem] text-slate">{showTeam ? "▲" : "▼"}</span>
                 </button>
                 {showTeam && (
@@ -1220,7 +1220,7 @@ export default function ListingLaunchPage() {
                           <img src={team.logo} alt="Team logo" className="h-12 w-auto object-contain rounded-lg border border-border p-1 bg-white" />
                           <button
                             onClick={() => setTeam(t => ({ ...t, logo: null }))}
-                            className="font-sans text-[0.78rem] text-slate hover:text-coral transition-colors border-none bg-transparent cursor-pointer"
+                            className="font-sans text-[0.78rem] text-slate hover:text-brass transition-colors border-none bg-transparent cursor-pointer"
                           >
                             Remove
                           </button>
@@ -1228,7 +1228,7 @@ export default function ListingLaunchPage() {
                       ) : (
                         <button
                           onClick={() => teamLogoRef.current?.click()}
-                          className="mt-1 w-full border-2 border-dashed border-border rounded-xl py-3 font-sans text-[0.85rem] text-slate hover:border-coral hover:text-coral transition-colors bg-transparent cursor-pointer"
+                          className="mt-1 w-full border-2 border-dashed border-border rounded-xl py-3 font-sans text-[0.85rem] text-slate hover:border-brass hover:text-brass transition-colors bg-transparent cursor-pointer"
                         >
                           + Upload Team Logo
                         </button>
@@ -1246,7 +1246,7 @@ export default function ListingLaunchPage() {
               <button
                 onClick={() => { setKwError(""); setStep(1); }}
                 disabled={!agent.name || !phoneComplete(agent.officePhone) || !phoneComplete(agent.mobilePhone)}
-                className="w-full bg-coral text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                className="w-full bg-brass text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-brass-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
               >
                 Continue →
               </button>
@@ -1257,13 +1257,13 @@ export default function ListingLaunchPage() {
           {step === 1 && (
             <div className="space-y-5">
               <div>
-                <h2 className="font-serif text-[1.5rem] text-deep mb-1">The property</h2>
+                <h2 className="font-serif text-[1.5rem] text-ink mb-1">The property</h2>
                 <p className="font-sans text-[0.87rem] text-slate mb-4">Paste your listing link to pull the address and price — or enter them manually below.</p>
               </div>
 
               {/* ── Import from listing link (step 1 — address + price only) ── */}
               <div className="border border-border rounded-2xl p-4 bg-light-gray/40">
-                <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.08em] text-coral mb-2">Import from Listing Link</p>
+                <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.08em] text-brass mb-2">Import from Listing Link</p>
                 <div className="flex gap-2">
                   <input
                     className={iCls + " flex-1 text-[0.85rem] py-2.5"}
@@ -1276,7 +1276,7 @@ export default function ListingLaunchPage() {
                   <button
                     onClick={handleImport}
                     disabled={importing || !importUrl.trim()}
-                    className="flex-shrink-0 bg-coral text-white font-sans text-[0.83rem] font-semibold px-4 py-2.5 rounded-xl border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5"
+                    className="flex-shrink-0 bg-brass text-white font-sans text-[0.83rem] font-semibold px-4 py-2.5 rounded-xl border-none cursor-pointer hover:bg-brass-dark transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5"
                   >
                     {importing
                       ? <><span className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Looking up…</>
@@ -1284,7 +1284,7 @@ export default function ListingLaunchPage() {
                   </button>
                 </div>
                 {importMsg.text && (
-                  <p className={`font-sans text-[0.78rem] mt-2 ${importMsg.type === "ok" ? "text-green-700" : "text-coral"}`}>
+                  <p className={`font-sans text-[0.78rem] mt-2 ${importMsg.type === "ok" ? "text-green-700" : "text-brass"}`}>
                     {importMsg.type === "ok" ? "✓ " : "⚠ "}{importMsg.text}
                   </p>
                 )}
@@ -1322,11 +1322,11 @@ export default function ListingLaunchPage() {
                 </div>
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setStep(0)} className="flex-1 border border-border text-slate font-sans font-semibold py-3.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors">← Back</button>
+                <button onClick={() => setStep(0)} className="flex-1 border border-border text-slate font-sans font-semibold py-3.5 rounded-full bg-transparent cursor-pointer hover:border-brass hover:text-brass transition-colors">← Back</button>
                 <button
                   onClick={() => setStep(2)}
                   disabled={!listing.address || !listing.city || !listing.state || !listing.price}
-                  className="flex-[2] bg-coral text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-[2] bg-brass text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-brass-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Continue →
                 </button>
@@ -1338,14 +1338,14 @@ export default function ListingLaunchPage() {
           {step === 2 && (
             <div className="space-y-5">
               <div>
-                <h2 className="font-serif text-[1.5rem] text-deep mb-1">Property details</h2>
+                <h2 className="font-serif text-[1.5rem] text-ink mb-1">Property details</h2>
                 <p className="font-sans text-[0.87rem] text-slate mb-4">Fill in the details below — or paste your KW, Zillow, or Realtor.com listing link to pull details and photos automatically.</p>
               </div>
 
               {/* ── Import from listing link ── */}
               <div className="border border-border rounded-2xl overflow-hidden">
                 <div className="p-4 bg-light-gray/40">
-                  <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.08em] text-coral mb-2">Import from Listing Link</p>
+                  <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.08em] text-brass mb-2">Import from Listing Link</p>
                   <div className="flex gap-2">
                     <input
                       className={iCls + " flex-1 text-[0.85rem] py-2.5"}
@@ -1358,7 +1358,7 @@ export default function ListingLaunchPage() {
                     <button
                       onClick={handleImport}
                       disabled={importing || !importUrl.trim()}
-                      className="flex-shrink-0 bg-coral text-white font-sans text-[0.83rem] font-semibold px-4 py-2.5 rounded-xl border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5"
+                      className="flex-shrink-0 bg-brass text-white font-sans text-[0.83rem] font-semibold px-4 py-2.5 rounded-xl border-none cursor-pointer hover:bg-brass-dark transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5"
                     >
                       {importing
                         ? <><span className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Looking up…</>
@@ -1366,7 +1366,7 @@ export default function ListingLaunchPage() {
                     </button>
                   </div>
                   {importMsg.text && (
-                    <p className={`font-sans text-[0.78rem] mt-2 ${importMsg.type === "ok" ? "text-green-700" : "text-coral"}`}>
+                    <p className={`font-sans text-[0.78rem] mt-2 ${importMsg.type === "ok" ? "text-green-700" : "text-brass"}`}>
                       {importMsg.type === "ok" ? "✓ " : "⚠ "}{importMsg.text}
                     </p>
                   )}
@@ -1376,12 +1376,12 @@ export default function ListingLaunchPage() {
                 {pickerPhotos.length > 0 && (
                   <div className="p-4 border-t border-border">
                     <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-                      <p className="font-sans text-[0.82rem] font-semibold text-deep">
+                      <p className="font-sans text-[0.82rem] font-semibold text-ink">
                         Select up to 10 photos <span className="font-normal text-slate/60">— first selected becomes primary</span>
                       </p>
                       <div className="flex items-center gap-3">
                         <span className="font-sans text-[0.75rem] text-slate">{pickerSelected.size}/10</span>
-                        <button onClick={() => setPickerSelected(new Set(pickerPhotos.slice(0, 10).map((_, i) => i)))} className="font-sans text-[0.75rem] text-coral border-none bg-transparent cursor-pointer hover:underline">First 10</button>
+                        <button onClick={() => setPickerSelected(new Set(pickerPhotos.slice(0, 10).map((_, i) => i)))} className="font-sans text-[0.75rem] text-brass border-none bg-transparent cursor-pointer hover:underline">First 10</button>
                         <button onClick={() => setPickerSelected(new Set())} className="font-sans text-[0.75rem] text-slate border-none bg-transparent cursor-pointer hover:underline">None</button>
                       </div>
                     </div>
@@ -1393,7 +1393,7 @@ export default function ListingLaunchPage() {
                           <div
                             key={i}
                             onClick={() => togglePicker(i)}
-                            className={`relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all ${sel ? "border-coral" : "border-transparent hover:border-border"}`}
+                            className={`relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all ${sel ? "border-brass" : "border-transparent hover:border-border"}`}
                             style={{ aspectRatio: "4/3" }}
                           >
                             <img
@@ -1403,12 +1403,12 @@ export default function ListingLaunchPage() {
                               onError={e => { e.target.style.display = "none"; e.target.parentElement.style.background = "#f1f5f9"; }}
                             />
                             {sel && (
-                              <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-coral rounded-full flex items-center justify-center">
+                              <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-brass rounded-full flex items-center justify-center">
                                 <span className="text-white text-[0.6rem] font-bold">✓</span>
                               </div>
                             )}
                             {isFirst && (
-                              <div className="absolute bottom-0 left-0 right-0 bg-coral/90 text-white font-sans text-[0.6rem] font-bold text-center py-0.5 uppercase tracking-wide">
+                              <div className="absolute bottom-0 left-0 right-0 bg-brass/90 text-white font-sans text-[0.6rem] font-bold text-center py-0.5 uppercase tracking-wide">
                                 Primary
                               </div>
                             )}
@@ -1419,7 +1419,7 @@ export default function ListingLaunchPage() {
                     <button
                       onClick={importSelectedPhotos}
                       disabled={pickerSelected.size === 0 || pickerImporting}
-                      className="w-full bg-coral text-white font-sans text-[0.88rem] font-semibold py-3 rounded-xl border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="w-full bg-brass text-white font-sans text-[0.88rem] font-semibold py-3 rounded-xl border-none cursor-pointer hover:bg-brass-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {pickerImporting
                         ? <><span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin inline-block" /> Importing…</>
@@ -1463,7 +1463,7 @@ export default function ListingLaunchPage() {
               </div>
               {/* Primary photo */}
               <div>
-                <label className={lCls}>Primary Photo <span className="text-coral normal-case font-normal tracking-normal">— used in social media graphics</span></label>
+                <label className={lCls}>Primary Photo <span className="text-brass normal-case font-normal tracking-normal">— used in social media graphics</span></label>
                 <input ref={primaryPhotoRef} type="file" accept="image/*" hidden onChange={async e => {
                   const file = e.target.files?.[0];
                   if (!file) return;
@@ -1475,12 +1475,12 @@ export default function ListingLaunchPage() {
                   <div className="flex items-center gap-4 mt-2">
                     <div className="relative flex-shrink-0">
                       <img src={`data:image/jpeg;base64,${primaryPhoto.base64}`} alt={primaryPhoto.name} className="w-28 h-28 object-cover rounded-xl border border-border" />
-                      <button onClick={() => setPrimaryPhoto(null)} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-deep text-white rounded-full text-[0.65rem] font-bold border-none cursor-pointer flex items-center justify-center">×</button>
+                      <button onClick={() => setPrimaryPhoto(null)} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-ink text-white rounded-full text-[0.65rem] font-bold border-none cursor-pointer flex items-center justify-center">×</button>
                     </div>
-                    <button type="button" onClick={() => primaryPhotoRef.current?.click()} className="font-sans text-[0.82rem] text-slate hover:text-coral transition-colors border border-border rounded-full px-4 py-2 bg-transparent cursor-pointer">Replace photo</button>
+                    <button type="button" onClick={() => primaryPhotoRef.current?.click()} className="font-sans text-[0.82rem] text-slate hover:text-brass transition-colors border border-border rounded-full px-4 py-2 bg-transparent cursor-pointer">Replace photo</button>
                   </div>
                 ) : (
-                  <button type="button" onClick={() => primaryPhotoRef.current?.click()} className="w-full border-2 border-dashed border-border rounded-xl py-6 text-center cursor-pointer hover:border-coral transition-colors bg-transparent mt-1">
+                  <button type="button" onClick={() => primaryPhotoRef.current?.click()} className="w-full border-2 border-dashed border-border rounded-xl py-6 text-center cursor-pointer hover:border-brass transition-colors bg-transparent mt-1">
                     <div className="font-sans text-[0.88rem] text-slate">Click to upload primary photo</div>
                     <div className="font-sans text-[0.75rem] text-slate/50 mt-1">1 photo — becomes the graphic background</div>
                   </button>
@@ -1497,7 +1497,7 @@ export default function ListingLaunchPage() {
                   e.target.value = "";
                 }} />
                 {additionalPhotos.length === 0 ? (
-                  <button type="button" onClick={() => additionalPhotosRef.current?.click()} className="w-full border-2 border-dashed border-border rounded-xl py-4 text-center cursor-pointer hover:border-coral transition-colors bg-transparent mt-1">
+                  <button type="button" onClick={() => additionalPhotosRef.current?.click()} className="w-full border-2 border-dashed border-border rounded-xl py-4 text-center cursor-pointer hover:border-brass transition-colors bg-transparent mt-1">
                     <div className="font-sans text-[0.85rem] text-slate">+ Add photos for the website gallery</div>
                     <div className="font-sans text-[0.72rem] text-slate/50 mt-0.5">JPG, PNG — up to 10 photos</div>
                   </button>
@@ -1507,11 +1507,11 @@ export default function ListingLaunchPage() {
                       {additionalPhotos.map((p, i) => (
                         <div key={i} className="relative">
                           <img src={`data:image/jpeg;base64,${p.base64}`} alt={p.name} className="w-20 h-20 object-cover rounded-xl border border-border" />
-                          <button onClick={() => setAdditionalPhotos(prev => prev.filter((_, j) => j !== i))} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-deep text-white rounded-full text-[0.65rem] font-bold border-none cursor-pointer flex items-center justify-center">×</button>
+                          <button onClick={() => setAdditionalPhotos(prev => prev.filter((_, j) => j !== i))} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-ink text-white rounded-full text-[0.65rem] font-bold border-none cursor-pointer flex items-center justify-center">×</button>
                         </div>
                       ))}
                       {additionalPhotos.length < 10 && (
-                        <button type="button" onClick={() => additionalPhotosRef.current?.click()} className="w-20 h-20 border-2 border-dashed border-border rounded-xl flex items-center justify-center cursor-pointer hover:border-coral transition-colors bg-transparent">
+                        <button type="button" onClick={() => additionalPhotosRef.current?.click()} className="w-20 h-20 border-2 border-dashed border-border rounded-xl flex items-center justify-center cursor-pointer hover:border-brass transition-colors bg-transparent">
                           <span className="text-slate text-[1.5rem]">+</span>
                         </button>
                       )}
@@ -1521,11 +1521,11 @@ export default function ListingLaunchPage() {
                 )}
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setStep(1)} className="flex-1 border border-border text-slate font-sans font-semibold py-3.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors">← Back</button>
+                <button onClick={() => setStep(1)} className="flex-1 border border-border text-slate font-sans font-semibold py-3.5 rounded-full bg-transparent cursor-pointer hover:border-brass hover:text-brass transition-colors">← Back</button>
                 <button
                   onClick={() => setStep(3)}
                   disabled={!listing.beds || !listing.baths || !listing.sqft}
-                  className="flex-[2] bg-coral text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-[2] bg-brass text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-brass-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Continue →
                 </button>
@@ -1537,7 +1537,7 @@ export default function ListingLaunchPage() {
           {step === 3 && (
             <div className="space-y-5">
               <div>
-                <h2 className="font-serif text-[1.5rem] text-deep mb-1">Ready to generate</h2>
+                <h2 className="font-serif text-[1.5rem] text-ink mb-1">Ready to generate</h2>
                 <p className="font-sans text-[0.87rem] text-slate mb-6">Here's what we'll create for <strong>{listing.address}</strong>:</p>
               </div>
               <div className="space-y-3">
@@ -1549,19 +1549,19 @@ export default function ListingLaunchPage() {
                   <div key={label} className="flex items-start gap-4 bg-light-gray rounded-2xl p-4">
                     <span className="text-xl">{icon}</span>
                     <div>
-                      <div className="font-sans text-[0.9rem] font-semibold text-deep">{label}</div>
+                      <div className="font-sans text-[0.9rem] font-semibold text-ink">{label}</div>
                       <div className="font-sans text-[0.8rem] text-slate mt-0.5">{desc}</div>
                     </div>
                   </div>
                 ))}
               </div>
-              {error && <p className="font-sans text-[0.82rem] text-coral">{error}</p>}
+              {error && <p className="font-sans text-[0.82rem] text-brass">{error}</p>}
               <div className="flex gap-3">
-                <button onClick={() => setStep(2)} className="flex-1 border border-border text-slate font-sans font-semibold py-3.5 rounded-full bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors" disabled={loading}>← Back</button>
+                <button onClick={() => setStep(2)} className="flex-1 border border-border text-slate font-sans font-semibold py-3.5 rounded-full bg-transparent cursor-pointer hover:border-brass hover:text-brass transition-colors" disabled={loading}>← Back</button>
                 <button
                   onClick={generate}
                   disabled={loading}
-                  className="flex-[2] bg-coral text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-coral-dark transition-colors disabled:opacity-60"
+                  className="flex-[2] bg-brass text-white font-sans font-semibold py-3.5 rounded-full border-none cursor-pointer hover:bg-brass-dark transition-colors disabled:opacity-60"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">

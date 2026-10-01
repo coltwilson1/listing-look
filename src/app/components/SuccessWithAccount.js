@@ -15,7 +15,7 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
   const [done, setDone]       = useState(false);
   const [alreadyLoggedIn, setAlreadyLoggedIn] = useState(false);
 
-  const iCls = "w-full font-sans text-[0.9rem] text-deep bg-cream border border-border rounded-xl px-4 py-2.5 outline-none focus:border-coral focus:ring-2 focus:ring-coral/20 transition-all placeholder:text-slate/40";
+  const iCls = "w-full font-sans text-[0.9rem] text-ink bg-ivory border border-border rounded-xl px-4 py-2.5 outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all placeholder:text-slate/40";
   const lCls = "block font-sans text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-slate mb-1.5";
 
   // Check if already logged in
@@ -65,15 +65,15 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
     return (
       <div className="step-animate space-y-5">
         <div className="text-center">
-          <div className="w-14 h-14 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-3 text-2xl">🎉</div>
-          <h3 className="font-serif text-[1.5rem] text-deep mb-1">Order Received!</h3>
+          <div className="w-14 h-14 rounded-full bg-brass/10 flex items-center justify-center mx-auto mb-3 text-2xl">🎉</div>
+          <h3 className="font-serif text-[1.5rem] text-ink mb-1">Order Received!</h3>
           <p className="font-sans text-[0.85rem] text-slate">We'll have your proof ready within 48 hours.</p>
         </div>
 
         {children && <div className="bg-light-gray rounded-2xl p-4">{children}</div>}
 
-        <div className="bg-deep rounded-2xl p-5">
-          <p className="font-sans text-[0.75rem] text-blush/70 uppercase tracking-[0.1em] mb-1.5">Complete Your Payment</p>
+        <div className="bg-ink rounded-2xl p-5">
+          <p className="font-sans text-[0.75rem] text-champagne/70 uppercase tracking-[0.1em] mb-1.5">Complete Your Payment</p>
           <p className="font-sans text-[0.85rem] text-white/75 leading-relaxed mb-4">
             Send payment via Venmo to get started. Include your property address in the note.
           </p>
@@ -88,13 +88,13 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
         <div className="flex gap-3 justify-center flex-wrap">
           <a
             href="/portal"
-            className="font-sans bg-coral text-white font-semibold text-[0.9rem] px-7 py-2.5 rounded-full hover:bg-coral-dark transition-colors duration-200 no-underline inline-block"
+            className="font-sans bg-brass text-white font-semibold text-[0.9rem] px-7 py-2.5 rounded-full hover:bg-brass-dark transition-colors duration-200 no-underline inline-block"
           >
             View My Orders →
           </a>
           <button
             onClick={onReset}
-            className="font-sans text-[0.88rem] text-slate border border-border px-6 py-2.5 rounded-full hover:border-coral hover:text-coral transition-all duration-200"
+            className="font-sans text-[0.88rem] text-slate border border-border px-6 py-2.5 rounded-full hover:border-brass hover:text-brass transition-all duration-200"
           >
             Start Another Order
           </button>
@@ -106,21 +106,21 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
   if (done) {
     return (
       <div className="step-animate text-center py-4">
-        <div className="w-16 h-16 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-4 text-3xl">🎉</div>
-        <h3 className="font-serif text-[1.6rem] text-deep mb-2">You're all set!</h3>
+        <div className="w-16 h-16 rounded-full bg-brass/10 flex items-center justify-center mx-auto mb-4 text-3xl">🎉</div>
+        <h3 className="font-serif text-[1.6rem] text-ink mb-2">You're all set!</h3>
         <p className="font-sans text-[0.9rem] text-slate leading-relaxed mb-6 max-w-[380px] mx-auto">
           Your account is ready and your order is saved. Check your email for confirmation details.
         </p>
         <div className="flex gap-3 justify-center flex-wrap">
           <a
             href="/portal"
-            className="font-sans bg-coral text-white font-semibold text-[0.9rem] px-8 py-2.5 rounded-full hover:bg-coral-dark transition-colors duration-200 no-underline inline-block"
+            className="font-sans bg-brass text-white font-semibold text-[0.9rem] px-8 py-2.5 rounded-full hover:bg-brass-dark transition-colors duration-200 no-underline inline-block"
           >
             Go to My Portal →
           </a>
           <button
             onClick={onReset}
-            className="font-sans text-[0.88rem] text-slate border border-border px-6 py-2.5 rounded-full hover:border-coral hover:text-coral transition-all duration-200"
+            className="font-sans text-[0.88rem] text-slate border border-border px-6 py-2.5 rounded-full hover:border-brass hover:text-brass transition-all duration-200"
           >
             Start Another Order
           </button>
@@ -132,8 +132,8 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
   return (
     <div className="step-animate space-y-6">
       <div className="text-center">
-        <div className="w-14 h-14 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-3 text-2xl">🎉</div>
-        <h3 className="font-serif text-[1.5rem] text-deep mb-1">Your request has been submitted!</h3>
+        <div className="w-14 h-14 rounded-full bg-brass/10 flex items-center justify-center mx-auto mb-3 text-2xl">🎉</div>
+        <h3 className="font-serif text-[1.5rem] text-ink mb-1">Your request has been submitted!</h3>
         <p className="font-sans text-[0.85rem] text-slate">We'll get started on your design within 48 hours.</p>
       </div>
 
@@ -142,7 +142,7 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
       )}
 
       <div className="border-t border-border pt-5">
-        <h4 className="font-serif text-[1.15rem] text-deep mb-1">
+        <h4 className="font-serif text-[1.15rem] text-ink mb-1">
           {mode === "create" ? "Create your free account to track your order" : "Log in to attach this order"}
         </h4>
         <p className="font-sans text-[0.82rem] text-slate leading-relaxed mb-4">
@@ -169,11 +169,11 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
               <label className={lCls}>Confirm Password</label>
               <input className={iCls} type="password" placeholder="Re-enter password" value={confirmPassword} onChange={(e) => setConfirmPw(e.target.value)} />
             </div>
-            {error && <p className="font-sans text-[0.8rem] text-coral">{error}</p>}
+            {error && <p className="font-sans text-[0.8rem] text-brass">{error}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="w-full font-sans bg-coral text-white font-semibold text-[0.9rem] py-3 rounded-full hover:bg-coral-dark transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full font-sans bg-brass text-white font-semibold text-[0.9rem] py-3 rounded-full hover:bg-brass-dark transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? "Creating Account…" : "Create My Account & View Order"}
             </button>
@@ -188,11 +188,11 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
               <label className={lCls}>Password</label>
               <input className={iCls} type="password" placeholder="••••••••" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
             </div>
-            {error && <p className="font-sans text-[0.8rem] text-coral">{error}</p>}
+            {error && <p className="font-sans text-[0.8rem] text-brass">{error}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="w-full font-sans bg-coral text-white font-semibold text-[0.9rem] py-3 rounded-full hover:bg-coral-dark transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full font-sans bg-brass text-white font-semibold text-[0.9rem] py-3 rounded-full hover:bg-brass-dark transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? "Logging In…" : "Log In & Attach Order"}
             </button>
@@ -204,7 +204,7 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
             <button
               type="button"
               onClick={() => { setMode("login"); setError(""); }}
-              className="font-sans text-[0.82rem] text-slate hover:text-coral transition-colors underline"
+              className="font-sans text-[0.82rem] text-slate hover:text-brass transition-colors underline"
             >
               Already have an account? Log in here
             </button>
@@ -212,7 +212,7 @@ export default function SuccessWithAccount({ contactName, email, order, onReset,
             <button
               type="button"
               onClick={() => { setMode("create"); setError(""); }}
-              className="font-sans text-[0.82rem] text-slate hover:text-coral transition-colors underline"
+              className="font-sans text-[0.82rem] text-slate hover:text-brass transition-colors underline"
             >
               Don't have an account? Create one free
             </button>

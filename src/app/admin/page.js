@@ -42,7 +42,7 @@ async function apiUpdateOrder(id, updates) {
 const STATUS = {
   "submitted":         { label: "Submitted",             badge: "bg-slate/10 text-slate",          dot: "bg-slate/50" },
   "in-design":         { label: "In Design",             badge: "bg-blue-50 text-blue-600",         dot: "bg-blue-400" },
-  "awaiting-approval": { label: "Awaiting Approval",     badge: "bg-coral/10 text-coral",           dot: "bg-coral", pulse: true },
+  "awaiting-approval": { label: "Awaiting Approval",     badge: "bg-brass/10 text-brass",           dot: "bg-brass", pulse: true },
   "revision":          { label: "Revision Requested",    badge: "bg-amber-50 text-amber-600",       dot: "bg-amber-400" },
   "completed":         { label: "Completed",             badge: "bg-emerald-50 text-emerald-700",   dot: "bg-emerald-500" },
   "cancelled":         { label: "Cancelled",             badge: "bg-rose-50 text-rose-600",         dot: "bg-rose-400" },
@@ -170,7 +170,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-[#F5F3EF] flex font-sans">
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-deep/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-ink/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       <AdminSidebar
@@ -193,7 +193,7 @@ export default function AdminPage() {
               <path d="M3 5h14M3 10h14M3 15h14" />
             </svg>
           </button>
-          <span className="font-serif text-deep text-[1.1rem] lg:hidden">Admin</span>
+          <span className="font-serif text-ink text-[1.1rem] lg:hidden">Admin</span>
           <span className="hidden lg:block font-sans text-[0.85rem] text-slate">
             {view === "detail" && selectedOrder
               ? `Order ${selectedOrder.id}`
@@ -246,7 +246,7 @@ export default function AdminPage() {
       {/* Global toast */}
       {toast && (
         <div className={`fixed bottom-6 right-6 z-[9999] px-5 py-3.5 rounded-2xl shadow-xl font-sans text-[0.88rem] font-semibold flex items-center gap-2.5 animate-[toastIn_0.25s_ease-out] ${
-          toast.type === "error" ? "bg-red-600 text-white" : "bg-deep text-white"
+          toast.type === "error" ? "bg-red-600 text-white" : "bg-ink text-white"
         }`}>
           <span>{toast.type === "error" ? "⚠️" : "✓"}</span>
           {toast.msg}
@@ -273,15 +273,15 @@ function AdminLoginScreen({ onLogin }) {
   }
 
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center px-4">
+    <div className="min-h-screen bg-ivory flex items-center justify-center px-4">
       <div className="w-full max-w-[400px]">
         <div className="mb-8">
-          <p className="font-serif text-[1.5rem] text-deep">
-            The Listing <span className="text-coral">Look</span>
+          <p className="font-serif text-[1.5rem] text-ink">
+            Elevate <span className="italic text-brass">Marketing Co.</span>
           </p>
           <p className="font-sans text-[0.78rem] text-slate/60 mt-0.5 uppercase tracking-[0.1em]">Admin Dashboard</p>
         </div>
-        <h1 className="font-serif text-[2rem] text-deep mb-1">Sign In</h1>
+        <h1 className="font-serif text-[2rem] text-ink mb-1">Sign In</h1>
         <p className="font-sans text-[0.88rem] text-slate mb-7">Enter your admin password to continue.</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -289,17 +289,17 @@ function AdminLoginScreen({ onLogin }) {
             <input
               type="password"
               placeholder="••••••••"
-              className="w-full font-sans text-[0.9rem] bg-white border border-border rounded-xl px-4 py-3 text-deep outline-none focus:border-coral focus:ring-2 focus:ring-coral/20 transition-all"
+              className="w-full font-sans text-[0.9rem] bg-white border border-border rounded-xl px-4 py-3 text-ink outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all"
               value={pw}
               onChange={(e) => setPw(e.target.value)}
               autoFocus
             />
           </div>
-          {error && <p className="font-sans text-[0.82rem] text-coral">{error}</p>}
+          {error && <p className="font-sans text-[0.82rem] text-brass">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full font-sans bg-coral text-white font-semibold py-3.5 rounded-full hover:bg-coral-dark transition-colors text-[0.95rem] disabled:opacity-60 border-none cursor-pointer"
+            className="w-full font-sans bg-brass text-white font-semibold py-3.5 rounded-full hover:bg-brass-dark transition-colors text-[0.95rem] disabled:opacity-60 border-none cursor-pointer"
           >
             {loading ? "Signing in…" : "Sign In to Admin"}
           </button>
@@ -320,11 +320,11 @@ function AdminSidebar({ view, navigate, awaitingCount, onLogout, open }) {
   ];
 
   return (
-    <aside className={`fixed inset-y-0 left-0 z-50 w-60 bg-deep flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${open ? "translate-x-0" : "-translate-x-full"}`}>
+    <aside className={`fixed inset-y-0 left-0 z-50 w-60 bg-ink flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${open ? "translate-x-0" : "-translate-x-full"}`}>
       {/* Logo */}
       <div className="px-6 pt-7 pb-5 border-b border-white/10">
         <p className="font-serif text-[1.2rem] text-white">
-          The Listing <span className="text-coral">Look</span>
+          Elevate <span className="italic text-champagne">Marketing Co.</span>
         </p>
         <p className="font-sans text-[0.68rem] text-white/40 mt-0.5 uppercase tracking-[0.12em]">Admin Panel</p>
       </div>
@@ -338,7 +338,7 @@ function AdminSidebar({ view, navigate, awaitingCount, onLogout, open }) {
               key={item.id}
               onClick={() => navigate(item.id)}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left font-sans text-[0.875rem] transition-all duration-150 border-none cursor-pointer ${
-                active ? "bg-coral text-white font-semibold" : "text-white/65 hover:bg-white/10 hover:text-white"
+                active ? "bg-brass text-white font-semibold" : "text-white/65 hover:bg-white/10 hover:text-white"
               }`}
             >
               <span className="flex items-center gap-2.5">
@@ -346,7 +346,7 @@ function AdminSidebar({ view, navigate, awaitingCount, onLogout, open }) {
                 {item.label}
               </span>
               {item.badge > 0 && (
-                <span className="bg-coral text-white text-[0.65rem] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
+                <span className="bg-brass text-white text-[0.65rem] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
                   {item.badge}
                 </span>
               )}
@@ -392,7 +392,7 @@ function NotificationBell({ notifications, unreadCount, onMarkRead, onClickOrder
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>
         </svg>
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-coral rounded-full text-white text-[0.6rem] font-bold flex items-center justify-center leading-none">
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-brass rounded-full text-white text-[0.6rem] font-bold flex items-center justify-center leading-none">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -401,8 +401,8 @@ function NotificationBell({ notifications, unreadCount, onMarkRead, onClickOrder
       {open && (
         <div className="absolute right-0 top-11 w-80 bg-white rounded-2xl shadow-2xl border border-border z-50 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-            <p className="font-sans text-[0.82rem] font-bold text-deep">Notifications</p>
-            <button onClick={onMarkRead} className="font-sans text-[0.75rem] text-coral hover:underline border-none bg-transparent cursor-pointer">
+            <p className="font-sans text-[0.82rem] font-bold text-ink">Notifications</p>
+            <button onClick={onMarkRead} className="font-sans text-[0.75rem] text-brass hover:underline border-none bg-transparent cursor-pointer">
               Mark all read
             </button>
           </div>
@@ -414,15 +414,15 @@ function NotificationBell({ notifications, unreadCount, onMarkRead, onClickOrder
                 <button
                   key={n.id}
                   onClick={() => { setOpen(false); onClickOrder(n.orderId); }}
-                  className={`w-full text-left px-4 py-3 hover:bg-light-gray transition-colors border-none cursor-pointer ${!n.read ? "bg-coral/5" : ""}`}
+                  className={`w-full text-left px-4 py-3 hover:bg-light-gray transition-colors border-none cursor-pointer ${!n.read ? "bg-brass/5" : ""}`}
                 >
                   <div className="flex items-start gap-2.5">
                     <span className="text-base mt-0.5">{NOTIF_ICONS[n.type] || "🔔"}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-sans text-[0.82rem] text-deep leading-snug">{n.text}</p>
+                      <p className="font-sans text-[0.82rem] text-ink leading-snug">{n.text}</p>
                       <p className="font-sans text-[0.72rem] text-slate/50 mt-0.5">{fmtDate(n.timestamp)} · {fmtTime(n.timestamp)}</p>
                     </div>
-                    {!n.read && <span className="w-2 h-2 rounded-full bg-coral flex-shrink-0 mt-1.5" />}
+                    {!n.read && <span className="w-2 h-2 rounded-full bg-brass flex-shrink-0 mt-1.5" />}
                   </div>
                 </button>
               ))}
@@ -472,7 +472,7 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
   return (
     <div className="max-w-[1100px] mx-auto px-6 py-8">
       <div className="mb-7">
-        <h1 className="font-serif text-[1.9rem] text-deep">Dashboard</h1>
+        <h1 className="font-serif text-[1.9rem] text-ink">Dashboard</h1>
         <p className="font-sans text-[0.88rem] text-slate mt-0.5">Overview of all client orders and revenue.</p>
       </div>
 
@@ -486,12 +486,12 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
               type="button"
               onClick={() => setActiveStatus(isActive ? null : s.filter)}
               className={`text-left rounded-2xl p-5 border transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer ${
-                isActive ? "border-coral bg-coral/5 shadow-md" :
-                s.alert ? "border-coral/40 bg-coral/5 bg-white" : "border-border bg-white"
+                isActive ? "border-brass bg-brass/5 shadow-md" :
+                s.alert ? "border-brass/40 bg-brass/5 bg-white" : "border-border bg-white"
               }`}
             >
-              <div className={`font-serif text-[2rem] ${isActive || s.alert ? "text-coral" : "text-deep"}`}>{s.value}</div>
-              <div className="font-sans text-[0.82rem] font-semibold text-deep mt-0.5">{s.label}</div>
+              <div className={`font-serif text-[2rem] ${isActive || s.alert ? "text-brass" : "text-ink"}`}>{s.value}</div>
+              <div className="font-sans text-[0.82rem] font-semibold text-ink mt-0.5">{s.label}</div>
               <div className="font-sans text-[0.72rem] text-slate/50 mt-0.5">{s.sub}</div>
             </button>
           );
@@ -513,8 +513,8 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
                 }`}
               >
                 <div className="flex justify-between mb-1.5">
-                  <span className={`font-sans text-[0.78rem] font-medium ${activeStatus === key ? "text-deep" : "text-deep/80"}`}>{label}</span>
-                  <span className="font-sans text-[0.78rem] font-bold text-deep">{count}</span>
+                  <span className={`font-sans text-[0.78rem] font-medium ${activeStatus === key ? "text-ink" : "text-ink/80"}`}>{label}</span>
+                  <span className="font-sans text-[0.78rem] font-bold text-ink">{count}</span>
                 </div>
                 <div className="h-2 bg-light-gray rounded-full overflow-hidden">
                   <div
@@ -539,12 +539,12 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
                  STATUS[activeStatus]?.label ?? "Filtered Orders"}
               </p>
               {activeStatus && (
-                <button onClick={() => setActiveStatus(null)} className="font-sans text-[0.7rem] text-slate/50 hover:text-coral border-none bg-transparent cursor-pointer underline">
+                <button onClick={() => setActiveStatus(null)} className="font-sans text-[0.7rem] text-slate/50 hover:text-brass border-none bg-transparent cursor-pointer underline">
                   clear
                 </button>
               )}
             </div>
-            <button onClick={() => navigate("all-orders")} className="font-sans text-[0.78rem] text-coral hover:underline border-none bg-transparent cursor-pointer">
+            <button onClick={() => navigate("all-orders")} className="font-sans text-[0.78rem] text-brass hover:underline border-none bg-transparent cursor-pointer">
               View all →
             </button>
           </div>
@@ -563,9 +563,9 @@ function DashboardView({ orders, onSelectOrder, navigate }) {
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-sans text-[0.8rem] font-semibold text-deep truncate">{o.clientName}</span>
+                        <span className="font-sans text-[0.8rem] font-semibold text-ink truncate">{o.clientName}</span>
                         {msgs > 0 && (
-                          <span className="bg-coral text-white text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full leading-none">{msgs}</span>
+                          <span className="bg-brass text-white text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full leading-none">{msgs}</span>
                         )}
                       </div>
                       <p className="font-sans text-[0.75rem] text-slate truncate">{o.id} · {o.address || "—"}</p>
@@ -641,7 +641,7 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
   function SortTh({ col, children }) {
     return (
       <th
-        className="px-4 py-3 text-left font-sans text-[0.7rem] font-bold uppercase tracking-[0.08em] text-slate cursor-pointer hover:text-deep select-none whitespace-nowrap"
+        className="px-4 py-3 text-left font-sans text-[0.7rem] font-bold uppercase tracking-[0.08em] text-slate cursor-pointer hover:text-ink select-none whitespace-nowrap"
         onClick={() => toggleSort(col)}
       >
         {children} {sortKey === col ? (sortAsc ? "↑" : "↓") : ""}
@@ -668,7 +668,7 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
   return (
     <div className="max-w-[1200px] mx-auto px-6 py-8">
       <div className="mb-6">
-        <h1 className="font-serif text-[1.9rem] text-deep">
+        <h1 className="font-serif text-[1.9rem] text-ink">
           {filterStatus?.length === 1 && filterStatus[0] === "awaiting-approval" ? "Awaiting Approval" :
            filterStatus?.includes("submitted") ? "In Progress" :
            filterStatus?.includes("completed") ? "Completed" : "Active Orders"}
@@ -679,14 +679,14 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-border p-4 mb-5 flex flex-wrap gap-3">
         <input
-          className="flex-1 min-w-[180px] font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3.5 py-2 outline-none focus:border-coral transition-all"
+          className="flex-1 min-w-[180px] font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3.5 py-2 outline-none focus:border-brass transition-all"
           placeholder="Search name, email, order ID…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         {!filterStatus && (
           <select
-            className="font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3 py-2 outline-none focus:border-coral transition-all cursor-pointer"
+            className="font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3 py-2 outline-none focus:border-brass transition-all cursor-pointer"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -695,7 +695,7 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
           </select>
         )}
         <select
-          className="font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3 py-2 outline-none focus:border-coral transition-all cursor-pointer"
+          className="font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3 py-2 outline-none focus:border-brass transition-all cursor-pointer"
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
         >
@@ -703,10 +703,10 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
           <option value="social">Social Media</option>
           <option value="postcard">Postcards</option>
         </select>
-        <input type="date" className="font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3 py-2 outline-none focus:border-coral transition-all" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
-        <input type="date" className="font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3 py-2 outline-none focus:border-coral transition-all" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+        <input type="date" className="font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3 py-2 outline-none focus:border-brass transition-all" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+        <input type="date" className="font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3 py-2 outline-none focus:border-brass transition-all" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
         {(search || statusFilter || typeFilter || dateFrom || dateTo) && (
-          <button onClick={() => { setSearch(""); setStatusFilter(""); setTypeFilter(""); setDateFrom(""); setDateTo(""); }} className="font-sans text-[0.82rem] text-slate hover:text-coral border-none bg-transparent cursor-pointer">
+          <button onClick={() => { setSearch(""); setStatusFilter(""); setTypeFilter(""); setDateFrom(""); setDateTo(""); }} className="font-sans text-[0.82rem] text-slate hover:text-brass border-none bg-transparent cursor-pointer">
             Clear
           </button>
         )}
@@ -740,21 +740,21 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
                   <tr key={o.id} onClick={() => onSelectOrder(o)} className="hover:bg-light-gray/50 transition-colors cursor-pointer">
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-sans text-[0.8rem] font-semibold text-coral underline underline-offset-2">{o.id}</span>
-                        {msgs > 0 && <span className="bg-coral text-white text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full leading-none">{msgs}</span>}
+                        <span className="font-sans text-[0.8rem] font-semibold text-brass underline underline-offset-2">{o.id}</span>
+                        {msgs > 0 && <span className="bg-brass text-white text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full leading-none">{msgs}</span>}
                       </div>
                     </td>
                     <td className="px-4 py-3.5">
-                      <p className="font-sans text-[0.82rem] font-semibold text-deep">{o.clientName}</p>
+                      <p className="font-sans text-[0.82rem] font-semibold text-ink">{o.clientName}</p>
                       <p className="font-sans text-[0.75rem] text-slate">{o.clientEmail}</p>
                     </td>
                     <td className="px-4 py-3.5">
-                      <p className="font-sans text-[0.8rem] text-deep">{o.typeLabel}</p>
+                      <p className="font-sans text-[0.8rem] text-ink">{o.typeLabel}</p>
                       <p className="font-sans text-[0.75rem] text-slate">{o.graphicTypeLabel || o.postcardTypeLabel || "—"}</p>
                     </td>
                     <td className="px-4 py-3.5">
-                      <p className="font-sans text-[0.82rem] text-deep">{o.package || "—"}</p>
-                      <p className="font-sans text-[0.75rem] text-coral font-semibold">{o.packagePrice || (o.quantity ? `${o.quantity} qty` : "—")}</p>
+                      <p className="font-sans text-[0.82rem] text-ink">{o.package || "—"}</p>
+                      <p className="font-sans text-[0.75rem] text-brass font-semibold">{o.packagePrice || (o.quantity ? `${o.quantity} qty` : "—")}</p>
                     </td>
                     <td className="px-4 py-3.5 font-sans text-[0.8rem] text-slate whitespace-nowrap">{fmtDate(o.submittedAt)}</td>
                     <td className="px-4 py-3.5">
@@ -772,32 +772,32 @@ function AllOrdersView({ orders, filterStatus, initialSearch, onSelectOrder, onU
                       <div className="relative inline-block" ref={isActionOpen ? actionRef : null}>
                         <button
                           onClick={(e) => { e.stopPropagation(); setActionOrderId(isActionOpen ? null : o.id); setQuickStatus({}); }}
-                          className="font-sans text-[0.8rem] font-semibold text-slate border border-border px-3 py-1.5 rounded-xl hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer"
+                          className="font-sans text-[0.8rem] font-semibold text-slate border border-border px-3 py-1.5 rounded-xl hover:border-brass hover:text-brass transition-all bg-transparent cursor-pointer"
                         >
                           Actions ▾
                         </button>
                         {isActionOpen && (
                           <div className="absolute right-0 mt-1.5 w-52 bg-white rounded-2xl shadow-xl border border-border z-50 overflow-hidden">
-                            <button onClick={() => { onSelectOrder(o); setActionOrderId(null); }} className="w-full text-left px-4 py-2.5 font-sans text-[0.85rem] text-deep hover:bg-light-gray border-none cursor-pointer transition-colors">
+                            <button onClick={() => { onSelectOrder(o); setActionOrderId(null); }} className="w-full text-left px-4 py-2.5 font-sans text-[0.85rem] text-ink hover:bg-light-gray border-none cursor-pointer transition-colors">
                               👁 View Full Details
                             </button>
                             <div className="border-t border-border/50">
                               {isQuickOpen ? (
                                 <div className="p-2 space-y-0.5">
                                   {STATUS_OPTIONS.map((opt) => (
-                                    <button key={opt.value} onClick={() => applyQuickStatus(o, opt.value)} className={`w-full text-left px-3 py-2 font-sans text-[0.82rem] rounded-xl transition-colors border-none cursor-pointer ${o.status === opt.value ? "bg-coral/10 text-coral font-semibold" : "hover:bg-light-gray text-deep"}`}>
+                                    <button key={opt.value} onClick={() => applyQuickStatus(o, opt.value)} className={`w-full text-left px-3 py-2 font-sans text-[0.82rem] rounded-xl transition-colors border-none cursor-pointer ${o.status === opt.value ? "bg-brass/10 text-brass font-semibold" : "hover:bg-light-gray text-ink"}`}>
                                       {opt.label}
                                     </button>
                                   ))}
                                 </div>
                               ) : (
-                                <button onClick={() => setQuickStatus({ [o.id]: true })} className="w-full text-left px-4 py-2.5 font-sans text-[0.85rem] text-deep hover:bg-light-gray border-none cursor-pointer transition-colors">
+                                <button onClick={() => setQuickStatus({ [o.id]: true })} className="w-full text-left px-4 py-2.5 font-sans text-[0.85rem] text-ink hover:bg-light-gray border-none cursor-pointer transition-colors">
                                   ↺ Update Status
                                 </button>
                               )}
                             </div>
                             <div className="border-t border-border/50">
-                              <button onClick={() => markPaid(o)} className="w-full text-left px-4 py-2.5 font-sans text-[0.85rem] text-deep hover:bg-light-gray border-none cursor-pointer transition-colors">
+                              <button onClick={() => markPaid(o)} className="w-full text-left px-4 py-2.5 font-sans text-[0.85rem] text-ink hover:bg-light-gray border-none cursor-pointer transition-colors">
                                 {o.paid ? "✕ Remove Paid Mark" : "✓ Mark as Paid"}
                               </button>
                             </div>
@@ -843,7 +843,7 @@ function AdminOrderDetailView({ order, onBack, onUpdate, showToast }) {
       {/* Back */}
       <button
         onClick={onBack}
-        className="flex items-center gap-2 font-sans text-[0.85rem] text-slate hover:text-deep mb-5 border-none bg-transparent cursor-pointer p-0 transition-colors"
+        className="flex items-center gap-2 font-sans text-[0.85rem] text-slate hover:text-ink mb-5 border-none bg-transparent cursor-pointer p-0 transition-colors"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10 3L5 8l5 5"/></svg>
         Back to Orders
@@ -852,8 +852,8 @@ function AdminOrderDetailView({ order, onBack, onUpdate, showToast }) {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
         <div>
-          <p className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] text-coral mb-1">{currentOrder.typeLabel}</p>
-          <h1 className="font-serif text-[1.8rem] text-deep leading-tight">{currentOrder.address || "Order Detail"}</h1>
+          <p className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.12em] text-brass mb-1">{currentOrder.typeLabel}</p>
+          <h1 className="font-serif text-[1.8rem] text-ink leading-tight">{currentOrder.address || "Order Detail"}</h1>
           <p className="font-sans text-[0.85rem] text-slate mt-0.5">
             {currentOrder.id} · {currentOrder.clientName} · {fmtDate(currentOrder.submittedAt)}
           </p>
@@ -964,7 +964,7 @@ function AdminOrderDetailView({ order, onBack, onUpdate, showToast }) {
           {/* Form notes */}
           {(formData.listing?.highlights || print.notes) && (
             <InfoCard title="Client Notes from Form">
-              <p className="font-sans text-[0.88rem] text-deep">{formData.listing?.highlights || print.notes}</p>
+              <p className="font-sans text-[0.88rem] text-ink">{formData.listing?.highlights || print.notes}</p>
             </InfoCard>
           )}
 
@@ -1001,7 +1001,7 @@ function InfoGrid({ items, cols = 2 }) {
       {items.map(([k, v]) => v ? (
         <div key={k}>
           <p className="font-sans text-[0.68rem] uppercase tracking-[0.08em] text-slate/60">{k}</p>
-          <p className="font-sans text-[0.85rem] text-deep mt-0.5 break-words">{v}</p>
+          <p className="font-sans text-[0.85rem] text-ink mt-0.5 break-words">{v}</p>
         </div>
       ) : null)}
     </div>
@@ -1049,7 +1049,7 @@ function ClientBrandAssetsCard({ order }) {
         ].map(([k, v]) => v ? (
           <div key={k}>
             <p className="font-sans text-[0.68rem] uppercase tracking-[0.08em] text-slate/60">{k}</p>
-            <p className="font-sans text-[0.82rem] text-deep mt-0.5 break-all">{v}</p>
+            <p className="font-sans text-[0.82rem] text-ink mt-0.5 break-all">{v}</p>
           </div>
         ) : null)}
       </div>
@@ -1069,7 +1069,7 @@ function ClientBrandAssetsCard({ order }) {
             <button
               onClick={() => downloadAsset(field, label)}
               disabled={!urls[field]}
-              className="w-full font-sans text-[0.75rem] font-semibold text-slate border border-border px-3 py-1.5 rounded-full hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-full font-sans text-[0.75rem] font-semibold text-slate border border-border px-3 py-1.5 rounded-full hover:border-brass hover:text-brass transition-all bg-transparent cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Download
             </button>
@@ -1105,7 +1105,7 @@ function StatusUpdaterCard({ order, onUpdate, showToast }) {
     <div className="bg-white rounded-2xl border border-border p-5">
       <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-slate mb-3">Update Status</p>
       <select
-        className="w-full font-sans text-[0.88rem] bg-light-gray border border-border rounded-xl px-4 py-3 outline-none focus:border-coral transition-all cursor-pointer mb-3"
+        className="w-full font-sans text-[0.88rem] bg-light-gray border border-border rounded-xl px-4 py-3 outline-none focus:border-brass transition-all cursor-pointer mb-3"
         value={status}
         onChange={(e) => setStatus(e.target.value)}
       >
@@ -1114,7 +1114,7 @@ function StatusUpdaterCard({ order, onUpdate, showToast }) {
       <button
         onClick={save}
         disabled={saving || status === order.status}
-        className="w-full font-sans bg-coral text-white font-semibold py-2.5 rounded-full hover:bg-coral-dark transition-colors border-none cursor-pointer text-[0.88rem] disabled:opacity-50"
+        className="w-full font-sans bg-brass text-white font-semibold py-2.5 rounded-full hover:bg-brass-dark transition-colors border-none cursor-pointer text-[0.88rem] disabled:opacity-50"
       >
         {saving ? "Saving…" : "Save Status"}
       </button>
@@ -1170,7 +1170,7 @@ function FileDeliveryCard({ order, onUpdate, showToast }) {
         <div className="mb-4 space-y-1.5">
           <p className="font-sans text-[0.72rem] text-slate/60 uppercase tracking-[0.06em]">Delivered ({existing.length})</p>
           {existing.map((f, i) => (
-            <div key={i} className="flex items-center gap-2 font-sans text-[0.8rem] text-deep bg-light-gray rounded-lg px-3 py-1.5">
+            <div key={i} className="flex items-center gap-2 font-sans text-[0.8rem] text-ink bg-light-gray rounded-lg px-3 py-1.5">
               <span>📎</span>
               <span className="truncate">{f.name}</span>
               <span className="ml-auto text-slate/50 text-[0.72rem] flex-shrink-0">{Math.round(f.size / 1024)}KB</span>
@@ -1180,7 +1180,7 @@ function FileDeliveryCard({ order, onUpdate, showToast }) {
       )}
 
       {/* Upload new */}
-      <label className="block border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-coral transition-colors mb-3">
+      <label className="block border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-brass transition-colors mb-3">
         <p className="font-sans text-[0.82rem] text-slate">Tap to select files</p>
         <p className="font-sans text-[0.72rem] text-slate/50 mt-0.5">PNG, JPG, PDF, MP4, ZIP · up to 10 files</p>
         <input type="file" multiple accept=".png,.jpg,.jpeg,.pdf,.mp4,.zip" className="hidden" onChange={handleFilePick} />
@@ -1189,17 +1189,17 @@ function FileDeliveryCard({ order, onUpdate, showToast }) {
       {files.length > 0 && (
         <div className="space-y-1.5 mb-3">
           {files.map((f, i) => (
-            <div key={i} className="flex items-center gap-2 font-sans text-[0.8rem] text-deep bg-blue-50 rounded-lg px-3 py-1.5">
+            <div key={i} className="flex items-center gap-2 font-sans text-[0.8rem] text-ink bg-blue-50 rounded-lg px-3 py-1.5">
               <span>📄</span>
               <span className="flex-1 truncate">{f.name}</span>
-              <button onClick={() => removeFile(i)} className="text-slate/50 hover:text-coral border-none bg-transparent cursor-pointer text-[0.85rem]">✕</button>
+              <button onClick={() => removeFile(i)} className="text-slate/50 hover:text-brass border-none bg-transparent cursor-pointer text-[0.85rem]">✕</button>
             </div>
           ))}
         </div>
       )}
 
       <textarea
-        className="w-full font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3.5 py-2.5 outline-none focus:border-coral transition-all resize-none mb-3 placeholder:text-slate/40"
+        className="w-full font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3.5 py-2.5 outline-none focus:border-brass transition-all resize-none mb-3 placeholder:text-slate/40"
         rows={2}
         placeholder="Optional message to client…"
         value={message}
@@ -1209,7 +1209,7 @@ function FileDeliveryCard({ order, onUpdate, showToast }) {
       <button
         onClick={handleSend}
         disabled={sending || files.length === 0}
-        className="w-full font-sans bg-deep text-white font-semibold py-2.5 rounded-full hover:bg-coral transition-colors border-none cursor-pointer text-[0.88rem] disabled:opacity-50"
+        className="w-full font-sans bg-ink text-white font-semibold py-2.5 rounded-full hover:bg-brass transition-colors border-none cursor-pointer text-[0.88rem] disabled:opacity-50"
       >
         {sending ? "Sending…" : `Send to Client ${files.length > 0 ? `(${files.length} file${files.length > 1 ? "s" : ""})` : ""}`}
       </button>
@@ -1260,7 +1260,7 @@ function PaymentCard({ order, onUpdate, showToast }) {
       <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-slate mb-3">Payment</p>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="font-sans text-[0.85rem] text-deep font-semibold">{order.packagePrice || "Custom pricing"}</p>
+          <p className="font-sans text-[0.85rem] text-ink font-semibold">{order.packagePrice || "Custom pricing"}</p>
           <p className="font-sans text-[0.75rem] text-slate">{order.package || order.typeLabel}</p>
         </div>
         <button
@@ -1268,7 +1268,7 @@ function PaymentCard({ order, onUpdate, showToast }) {
           className={`font-sans text-[0.82rem] font-semibold px-4 py-2 rounded-full border transition-all cursor-pointer ${
             order.paid
               ? "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100"
-              : "bg-light-gray text-slate border-border hover:border-coral hover:text-coral"
+              : "bg-light-gray text-slate border-border hover:border-brass hover:text-brass"
           }`}
         >
           {order.paid ? "✓ Paid" : "Mark as Paid"}
@@ -1276,7 +1276,7 @@ function PaymentCard({ order, onUpdate, showToast }) {
       </div>
       <div className="flex gap-2">
         <input
-          className="flex-1 font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3.5 py-2 outline-none focus:border-coral transition-all placeholder:text-slate/40"
+          className="flex-1 font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3.5 py-2 outline-none focus:border-brass transition-all placeholder:text-slate/40"
           placeholder="Venmo transaction ID…"
           value={venmo}
           onChange={(e) => setVenmo(e.target.value)}
@@ -1284,7 +1284,7 @@ function PaymentCard({ order, onUpdate, showToast }) {
         <button
           onClick={saveVenmo}
           disabled={saving}
-          className="font-sans text-[0.82rem] font-semibold text-coral border border-coral px-4 py-2 rounded-xl hover:bg-coral hover:text-white transition-all bg-transparent cursor-pointer disabled:opacity-50"
+          className="font-sans text-[0.82rem] font-semibold text-brass border border-brass px-4 py-2 rounded-xl hover:bg-brass hover:text-white transition-all bg-transparent cursor-pointer disabled:opacity-50"
         >
           {saving ? "…" : "Save"}
         </button>
@@ -1330,12 +1330,12 @@ function MessagesCard({ order, onUpdate, showToast }) {
         <button
           type="button"
           onClick={jumpToMessages}
-          className="w-full flex items-center justify-between gap-3 bg-coral/8 border border-coral/25 rounded-xl px-3.5 py-2.5 mb-3 hover:bg-coral/15 transition-colors cursor-pointer"
+          className="w-full flex items-center justify-between gap-3 bg-brass/8 border border-brass/25 rounded-xl px-3.5 py-2.5 mb-3 hover:bg-brass/15 transition-colors cursor-pointer"
         >
-          <span className="font-sans text-[0.82rem] text-coral font-semibold">
+          <span className="font-sans text-[0.82rem] text-brass font-semibold">
             💬 {unread} unread message{unread > 1 ? "s" : ""} from {order.clientName?.split(" ")[0]}
           </span>
-          <span className="font-sans text-[0.75rem] text-coral/70 whitespace-nowrap">Jump to ↓</span>
+          <span className="font-sans text-[0.75rem] text-brass/70 whitespace-nowrap">Jump to ↓</span>
         </button>
       )}
 
@@ -1344,14 +1344,14 @@ function MessagesCard({ order, onUpdate, showToast }) {
       ) : (
         <div ref={scrollBoxRef} className="space-y-2.5 mb-4 max-h-56 overflow-y-auto pr-1">
           {notes.map((n, i) => (
-            <div key={i} className={`rounded-xl px-3.5 py-2.5 ${n.from === "admin" ? "bg-deep/5 border border-deep/10" : "bg-light-gray"}`}>
+            <div key={i} className={`rounded-xl px-3.5 py-2.5 ${n.from === "admin" ? "bg-ink/5 border border-ink/10" : "bg-light-gray"}`}>
               <div className="flex items-center justify-between mb-1">
-                <span className={`font-sans text-[0.68rem] font-bold uppercase tracking-[0.06em] ${n.from === "admin" ? "text-deep/60" : n.text?.startsWith("REVISION REQUEST:") ? "text-amber-600" : "text-coral/70"}`}>
+                <span className={`font-sans text-[0.68rem] font-bold uppercase tracking-[0.06em] ${n.from === "admin" ? "text-ink/60" : n.text?.startsWith("REVISION REQUEST:") ? "text-amber-600" : "text-brass/70"}`}>
                   {n.from === "admin" ? "You (Admin)" : order.clientName}
                 </span>
                 <span className="font-sans text-[0.68rem] text-slate/40">{fmtDate(n.createdAt)}</span>
               </div>
-              <p className="font-sans text-[0.85rem] text-deep">
+              <p className="font-sans text-[0.85rem] text-ink">
                 {n.text?.startsWith("REVISION REQUEST:") ? n.text.replace("REVISION REQUEST:", "✏️ Revision:") : n.text}
               </p>
             </div>
@@ -1361,7 +1361,7 @@ function MessagesCard({ order, onUpdate, showToast }) {
       )}
       <form onSubmit={sendMessage} className="flex gap-2">
         <input
-          className="flex-1 font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3.5 py-2.5 outline-none focus:border-coral transition-all placeholder:text-slate/40"
+          className="flex-1 font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3.5 py-2.5 outline-none focus:border-brass transition-all placeholder:text-slate/40"
           placeholder="Type a message to the client…"
           value={msg}
           onChange={(e) => setMsg(e.target.value)}
@@ -1369,7 +1369,7 @@ function MessagesCard({ order, onUpdate, showToast }) {
         <button
           type="submit"
           disabled={sending || !msg.trim()}
-          className="font-sans bg-coral text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-coral-dark transition-colors border-none cursor-pointer text-[0.85rem] disabled:opacity-50"
+          className="font-sans bg-brass text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-brass-dark transition-colors border-none cursor-pointer text-[0.85rem] disabled:opacity-50"
         >
           Send
         </button>
@@ -1396,7 +1396,7 @@ function AdminNotesCard({ order, onUpdate, showToast }) {
       <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-slate mb-1">Internal Notes</p>
       <p className="font-sans text-[0.72rem] text-slate/50 mb-3">Only visible to you. Not shown to client.</p>
       <textarea
-        className="w-full font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3.5 py-2.5 outline-none focus:border-coral transition-all resize-none mb-3 placeholder:text-slate/40"
+        className="w-full font-sans text-[0.85rem] bg-light-gray border border-border rounded-xl px-3.5 py-2.5 outline-none focus:border-brass transition-all resize-none mb-3 placeholder:text-slate/40"
         rows={3}
         placeholder="Design notes, reminders, file locations…"
         value={notes}
@@ -1405,7 +1405,7 @@ function AdminNotesCard({ order, onUpdate, showToast }) {
       <button
         onClick={save}
         disabled={saving}
-        className="font-sans text-[0.82rem] font-semibold text-slate border border-border px-5 py-2 rounded-full hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer disabled:opacity-50"
+        className="font-sans text-[0.82rem] font-semibold text-slate border border-border px-5 py-2 rounded-full hover:border-brass hover:text-brass transition-all bg-transparent cursor-pointer disabled:opacity-50"
       >
         {saving ? "Saving…" : "Save Notes"}
       </button>
@@ -1452,7 +1452,7 @@ function CancelOrderCard({ order, onUpdate, showToast }) {
         )}
         <button
           onClick={handleUncancel}
-          className="font-sans text-[0.82rem] font-semibold text-slate border border-border px-5 py-2 rounded-full hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer"
+          className="font-sans text-[0.82rem] font-semibold text-slate border border-border px-5 py-2 rounded-full hover:border-brass hover:text-brass transition-all bg-transparent cursor-pointer"
         >
           Restore Order
         </button>

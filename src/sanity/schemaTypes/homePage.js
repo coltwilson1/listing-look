@@ -198,7 +198,7 @@ export default defineType({
         }),
         defineField({
           name: 'headlineEmphasis',
-          title: 'Headline — coral italic part',
+          title: 'Headline — accent italic part',
           type: 'string',
           description: 'e.g. "Beautiful Look"',
         }),

@@ -314,24 +314,24 @@ export default function SocialMediaOrderModal({ open, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-center sm:p-4"
-      style={{ background: "rgba(28,28,46,0.6)", backdropFilter: "blur(4px)" }}
+      style={{ background: "rgba(15,26,43,0.6)", backdropFilter: "blur(4px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-cream w-full h-dvh sm:h-auto sm:max-w-[640px] sm:rounded-3xl sm:max-h-[90vh] shadow-2xl flex flex-col">
+      <div className="bg-ivory w-full h-dvh sm:h-auto sm:max-w-[640px] sm:rounded-3xl sm:max-h-[90vh] shadow-2xl flex flex-col">
 
         {/* ── Header (sticky) ── */}
         <div
-          className="bg-deep flex-shrink-0"
+          className="bg-ink flex-shrink-0"
           style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
         >
           <div className="flex justify-between items-center px-5 pt-5 pb-3 sm:px-8 sm:pt-7">
             <div>
-              <p className="font-sans text-[0.65rem] uppercase tracking-[0.15em] text-blush/70 mb-0.5">Order Form</p>
+              <p className="font-sans text-[0.65rem] uppercase tracking-[0.15em] text-champagne/70 mb-0.5">Order Form</p>
               <h2 className="font-serif text-[1.25rem] sm:text-[1.4rem] text-white leading-tight">Social Media Graphics</h2>
             </div>
             <div className="flex items-center gap-2">
               {sessionUser && (
-                <div className="w-8 h-8 rounded-full bg-coral flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-brass flex items-center justify-center flex-shrink-0">
                   <span className="font-sans text-[0.75rem] font-bold text-white leading-none">
                     {sessionUser.name?.charAt(0)?.toUpperCase() || "?"}
                   </span>
@@ -363,17 +363,17 @@ export default function SocialMediaOrderModal({ open, onClose }) {
                       {/* Left connector */}
                       {i > 0 && (
                         <div className="absolute right-1/2 left-0 top-[13px] h-px transition-colors duration-300"
-                          style={{ background: done || current ? "#E8825A" : "rgba(255,255,255,0.2)" }} />
+                          style={{ background: done || current ? "#8F6F3E" : "rgba(255,255,255,0.2)" }} />
                       )}
                       {/* Right connector */}
                       {i < STEP_LABELS.length - 1 && (
                         <div className="absolute left-1/2 right-0 top-[13px] h-px transition-colors duration-300"
-                          style={{ background: done ? "#E8825A" : "rgba(255,255,255,0.2)" }} />
+                          style={{ background: done ? "#8F6F3E" : "rgba(255,255,255,0.2)" }} />
                       )}
                       {/* Circle */}
                       <div className={`relative z-10 w-[26px] h-[26px] rounded-full flex items-center justify-center font-sans text-[0.68rem] font-bold transition-all duration-300 ${
-                        done ? "bg-coral text-white" :
-                        current ? "bg-coral text-white ring-4 ring-coral/25" :
+                        done ? "bg-brass text-white" :
+                        current ? "bg-brass text-white ring-4 ring-brass/25" :
                         "bg-white/10 text-white/40"
                       }`}>
                         {done ? (
@@ -384,7 +384,7 @@ export default function SocialMediaOrderModal({ open, onClose }) {
                       </div>
                       {/* Label */}
                       <p className={`font-sans text-[0.6rem] text-center mt-1.5 leading-tight px-0.5 transition-colors duration-300 ${
-                        current ? "text-blush font-semibold" : done ? "text-blush/60" : "text-white/30"
+                        current ? "text-champagne font-semibold" : done ? "text-champagne/60" : "text-white/30"
                       }`}>
                         {label}
                       </p>
@@ -409,15 +409,15 @@ export default function SocialMediaOrderModal({ open, onClose }) {
               <div className="space-y-1.5">
                 <div className="flex justify-between font-sans text-[0.82rem]">
                   <span className="text-slate">Graphic Type</span>
-                  <span className="text-deep font-medium">{GRAPHIC_TYPES.find(t => t.id === listing.graphicType)?.label}</span>
+                  <span className="text-ink font-medium">{GRAPHIC_TYPES.find(t => t.id === listing.graphicType)?.label}</span>
                 </div>
                 <div className="flex justify-between font-sans text-[0.82rem]">
                   <span className="text-slate">Address</span>
-                  <span className="text-deep font-medium text-right max-w-[55%]">{listing.address}</span>
+                  <span className="text-ink font-medium text-right max-w-[55%]">{listing.address}</span>
                 </div>
                 <div className="flex justify-between font-sans text-[0.82rem]">
                   <span className="text-slate">Package</span>
-                  <span className="text-deep font-medium">{pkg.packageId && (pkg.packageId.charAt(0).toUpperCase() + pkg.packageId.slice(1))} — {{"starter":"$25","standard":"$35","premium":"$45"}[pkg.packageId]}</span>
+                  <span className="text-ink font-medium">{pkg.packageId && (pkg.packageId.charAt(0).toUpperCase() + pkg.packageId.slice(1))} — {{"starter":"$25","standard":"$35","premium":"$45"}[pkg.packageId]}</span>
                 </div>
               </div>
             </SuccessWithAccount>
@@ -476,7 +476,7 @@ export default function SocialMediaOrderModal({ open, onClose }) {
               )}
 
               {Object.keys(errors).length > 0 && (
-                <p className="font-sans text-[0.8rem] text-coral mt-3">
+                <p className="font-sans text-[0.8rem] text-brass mt-3">
                   Please fill in all required fields above.
                 </p>
               )}
@@ -487,13 +487,13 @@ export default function SocialMediaOrderModal({ open, onClose }) {
         {/* ── Footer ── */}
         {!submitted && (
           <div
-            className="px-5 pt-4 border-t border-border flex justify-between items-center flex-shrink-0 bg-cream sm:px-8 sm:py-5"
+            className="px-5 pt-4 border-t border-border flex justify-between items-center flex-shrink-0 bg-ivory sm:px-8 sm:py-5"
             style={{ paddingBottom: "max(env(safe-area-inset-bottom), 20px)" }}
           >
             {step > 1 ? (
               <button
                 onClick={() => { setStep((s) => s - 1); setErrors({}); }}
-                className="min-h-[44px] font-sans text-[0.88rem] text-slate hover:text-deep active:text-deep transition-colors flex items-center gap-1.5 px-2"
+                className="min-h-[44px] font-sans text-[0.88rem] text-slate hover:text-ink active:text-ink transition-colors flex items-center gap-1.5 px-2"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <path d="M10 3L5 8l5 5"/>
@@ -506,7 +506,7 @@ export default function SocialMediaOrderModal({ open, onClose }) {
             <button
               onClick={handleNext}
               disabled={submitting}
-              className="min-h-[44px] font-sans bg-coral text-white font-semibold text-[0.9rem] px-8 py-3 rounded-full hover:bg-coral-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(232,130,90,0.4)] active:bg-coral-dark transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="min-h-[44px] font-sans bg-brass text-white font-semibold text-[0.9rem] px-8 py-3 rounded-full hover:bg-brass-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(143,111,62,0.4)] active:bg-brass-dark transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {submitting ? "Submitting…" : step === 4 ? "Submit Order" : "Continue"}
               {!submitting && step < 4 && (
@@ -532,10 +532,10 @@ function Step2({ listing, onChange, errors }) {
         <p className={labelCls}>
           What type of graphic do you need? *
           {errors.graphicType && (
-            <span className="text-coral normal-case font-normal tracking-normal ml-2">Required</span>
+            <span className="text-brass normal-case font-normal tracking-normal ml-2">Required</span>
           )}
         </p>
-        <div className={`grid grid-cols-3 gap-2.5 mt-2 rounded-2xl transition-all ${errors.graphicType ? "ring-2 ring-coral/50 bg-coral/5 p-2" : ""}`}>
+        <div className={`grid grid-cols-3 gap-2.5 mt-2 rounded-2xl transition-all ${errors.graphicType ? "ring-2 ring-brass/50 bg-brass/5 p-2" : ""}`}>
           {GRAPHIC_TYPES.map((t) => (
             <button
               key={t.id}
@@ -543,14 +543,14 @@ function Step2({ listing, onChange, errors }) {
               onClick={() => onChange("graphicType", t.id)}
               className={`flex flex-col items-center gap-1.5 rounded-2xl py-4 px-2 border-2 transition-all duration-200 ${
                 listing.graphicType === t.id
-                  ? "border-coral bg-coral/8 shadow-[0_0_0_3px_rgba(232,130,90,0.15)]"
-                  : "border-border bg-white hover:border-coral/40 hover:bg-light-gray"
+                  ? "border-brass bg-brass/8 shadow-[0_0_0_3px_rgba(143,111,62,0.15)]"
+                  : "border-border bg-white hover:border-brass/40 hover:bg-light-gray"
               }`}
             >
               <span className="text-2xl leading-none">{t.emoji}</span>
               <span
                 className={`font-sans text-[0.78rem] font-semibold leading-tight text-center transition-colors ${
-                  listing.graphicType === t.id ? "text-coral" : "text-deep"
+                  listing.graphicType === t.id ? "text-brass" : "text-ink"
                 }`}
               >
                 {t.label}
@@ -565,7 +565,7 @@ function Step2({ listing, onChange, errors }) {
             <label className={labelCls}>
               Describe Your Custom Request *
               {errors.customRequest && (
-                <span className="text-coral normal-case font-normal tracking-normal ml-2">Required</span>
+                <span className="text-brass normal-case font-normal tracking-normal ml-2">Required</span>
               )}
             </label>
             <textarea
@@ -613,12 +613,12 @@ function Step3({
       <div>
         <p className={labelCls}>
           How will you provide photos?
-          {graphicType !== "custom" && <span className="text-coral ml-1 normal-case font-normal tracking-normal">*</span>}
+          {graphicType !== "custom" && <span className="text-brass ml-1 normal-case font-normal tracking-normal">*</span>}
           {errors.photoOption && (
-            <span className="text-coral normal-case font-normal tracking-normal ml-2">{errors.photoOption}</span>
+            <span className="text-brass normal-case font-normal tracking-normal ml-2">{errors.photoOption}</span>
           )}
         </p>
-        <div className={`space-y-2 mt-2 rounded-2xl transition-all ${errors.photoOption ? "ring-2 ring-coral/50 bg-coral/5 p-3" : ""}`}>
+        <div className={`space-y-2 mt-2 rounded-2xl transition-all ${errors.photoOption ? "ring-2 ring-brass/50 bg-brass/5 p-3" : ""}`}>
           {[
             { value: "mls",    label: "Use MLS photos — provide link below" },
             { value: "upload", label: "I will upload photos now" },
@@ -627,8 +627,8 @@ function Step3({
               <div
                 className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-150 ${
                   photos.photoOption === opt.value
-                    ? "border-coral bg-coral"
-                    : "border-border bg-white group-hover:border-coral/50"
+                    ? "border-brass bg-brass"
+                    : "border-border bg-white group-hover:border-brass/50"
                 }`}
                 style={{ width: 18, height: 18 }}
               >
@@ -638,7 +638,7 @@ function Step3({
               </div>
               <span
                 className={`font-sans text-[0.88rem] transition-colors ${
-                  photos.photoOption === opt.value ? "text-deep font-medium" : "text-slate group-hover:text-deep"
+                  photos.photoOption === opt.value ? "text-ink font-medium" : "text-slate group-hover:text-ink"
                 }`}
               >
                 {opt.label}
@@ -680,7 +680,7 @@ function Step3({
                     <button
                       type="button"
                       onClick={() => onPhotoRemove(i)}
-                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-deep/80 hover:bg-deep text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-ink/80 hover:bg-ink text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                       aria-label="Remove photo"
                     >
                       <svg width="8" height="8" viewBox="0 0 8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -697,9 +697,9 @@ function Step3({
               <button
                 type="button"
                 onClick={() => photoInputRef.current?.click()}
-                className="w-full border-2 border-dashed border-border rounded-xl py-3.5 text-center hover:border-coral transition-colors duration-200 group"
+                className="w-full border-2 border-dashed border-border rounded-xl py-3.5 text-center hover:border-brass transition-colors duration-200 group"
               >
-                <span className="font-sans text-[0.82rem] text-slate group-hover:text-coral transition-colors">
+                <span className="font-sans text-[0.82rem] text-slate group-hover:text-brass transition-colors">
                   + Add photos{photoFiles.length > 0 ? " (up to 5)" : ""}
                 </span>
               </button>
@@ -724,10 +724,10 @@ function Step3({
         <p className={labelCls}>
           Choose a Package *
           {errors.packageId && (
-            <span className="text-coral normal-case font-normal tracking-normal ml-2">{errors.packageId}</span>
+            <span className="text-brass normal-case font-normal tracking-normal ml-2">{errors.packageId}</span>
           )}
         </p>
-        <div className={`grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2 rounded-2xl transition-all ${errors.packageId ? "ring-2 ring-coral/50 bg-coral/5 p-2" : ""}`}>
+        <div className={`grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2 rounded-2xl transition-all ${errors.packageId ? "ring-2 ring-brass/50 bg-brass/5 p-2" : ""}`}>
           {packages.map((p) => (
             <button
               key={p.id}
@@ -735,29 +735,29 @@ function Step3({
               onClick={() => onPkgChange("packageId", p.id)}
               className={`relative text-left rounded-2xl p-4 border-2 transition-all duration-200 ${
                 pkg.packageId === p.id
-                  ? "border-coral bg-coral/5 shadow-[0_0_0_4px_rgba(232,130,90,0.12)]"
-                  : "border-border bg-white hover:border-coral/40"
+                  ? "border-brass bg-brass/5 shadow-[0_0_0_4px_rgba(143,111,62,0.12)]"
+                  : "border-border bg-white hover:border-brass/40"
               }`}
             >
               {p.popular && (
-                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-coral text-white text-[0.65rem] font-bold uppercase tracking-[0.1em] px-3 py-0.5 rounded-full whitespace-nowrap">
+                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-brass text-white text-[0.65rem] font-bold uppercase tracking-[0.1em] px-3 py-0.5 rounded-full whitespace-nowrap">
                   Most Popular
                 </span>
               )}
               {pkg.packageId === p.id && (
-                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-coral flex items-center justify-center">
+                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-brass flex items-center justify-center">
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                     <path d="M2 5l2 2 4-4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
               )}
-              <div className="font-serif text-[1.5rem] text-coral">{p.price}</div>
-              <div className="font-sans text-[0.9rem] font-semibold text-deep mb-1">{p.name}</div>
+              <div className="font-serif text-[1.5rem] text-brass">{p.price}</div>
+              <div className="font-sans text-[0.9rem] font-semibold text-ink mb-1">{p.name}</div>
               <p className="font-sans text-[0.75rem] text-slate leading-snug mb-2">{p.description}</p>
               <ul className="space-y-1 list-none p-0 mb-2">
                 {p.extras.map((item, i) => (
                   <li key={i} className="font-sans text-[0.72rem] text-slate flex items-start gap-1.5">
-                    <span className="text-coral mt-px">✓</span>
+                    <span className="text-brass mt-px">✓</span>
                     {item}
                   </li>
                 ))}
@@ -773,7 +773,7 @@ function Step3({
         <div className="step-animate space-y-6 border-t border-border pt-6">
           <div className="flex items-center gap-2">
             <span className="text-lg">✨</span>
-            <p className="font-sans text-[0.85rem] font-semibold text-deep">
+            <p className="font-sans text-[0.85rem] font-semibold text-ink">
               Customize Your Animated Graphic
             </p>
           </div>
@@ -789,12 +789,12 @@ function Step3({
                   onClick={() => onPkgChange("animationStyle", s.id)}
                   className={`text-left rounded-xl p-3 border-2 transition-all duration-200 ${
                     pkg.animationStyle === s.id
-                      ? "border-coral bg-coral/5 shadow-[0_0_0_3px_rgba(232,130,90,0.12)]"
-                      : "border-border bg-white hover:border-coral/40"
+                      ? "border-brass bg-brass/5 shadow-[0_0_0_3px_rgba(143,111,62,0.12)]"
+                      : "border-border bg-white hover:border-brass/40"
                   }`}
                 >
                   <span className="text-xl block mb-1">{s.emoji}</span>
-                  <span className={`font-sans text-[0.8rem] font-semibold block mb-0.5 ${pkg.animationStyle === s.id ? "text-coral" : "text-deep"}`}>
+                  <span className={`font-sans text-[0.8rem] font-semibold block mb-0.5 ${pkg.animationStyle === s.id ? "text-brass" : "text-ink"}`}>
                     {s.label}
                   </span>
                   <span className="font-sans text-[0.7rem] text-slate/70 leading-tight">{s.desc}</span>
@@ -814,12 +814,12 @@ function Step3({
                   onClick={() => onPkgChange("musicStyle", s.id)}
                   className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 border-2 transition-all duration-200 ${
                     pkg.musicStyle === s.id
-                      ? "border-coral bg-coral/5 shadow-[0_0_0_3px_rgba(232,130,90,0.12)]"
-                      : "border-border bg-white hover:border-coral/40"
+                      ? "border-brass bg-brass/5 shadow-[0_0_0_3px_rgba(143,111,62,0.12)]"
+                      : "border-border bg-white hover:border-brass/40"
                   }`}
                 >
                   <span className="text-base">{s.emoji}</span>
-                  <span className={`font-sans text-[0.78rem] font-medium leading-tight ${pkg.musicStyle === s.id ? "text-coral" : "text-slate"}`}>
+                  <span className={`font-sans text-[0.78rem] font-medium leading-tight ${pkg.musicStyle === s.id ? "text-brass" : "text-slate"}`}>
                     {s.label}
                   </span>
                 </button>
@@ -840,10 +840,10 @@ function Step4({ designId, onChange, errors }) {
       <p className={labelCls}>
         Choose a Design Style *
         {errors.designId && (
-          <span className="text-coral normal-case font-normal tracking-normal ml-2">{errors.designId}</span>
+          <span className="text-brass normal-case font-normal tracking-normal ml-2">{errors.designId}</span>
         )}
       </p>
-      <div className={`grid grid-cols-4 sm:grid-cols-6 gap-2 rounded-2xl transition-all ${errors.designId ? "ring-2 ring-coral/50 bg-coral/5 p-2" : ""}`}>
+      <div className={`grid grid-cols-4 sm:grid-cols-6 gap-2 rounded-2xl transition-all ${errors.designId ? "ring-2 ring-brass/50 bg-brass/5 p-2" : ""}`}>
         {DESIGN_TILES.map((t) => (
           <button
             key={t.id}
@@ -852,7 +852,7 @@ function Step4({ designId, onChange, errors }) {
             title={t.name}
             className={`relative rounded-xl overflow-hidden aspect-square transition-all duration-150 ${
               designId === t.id
-                ? "ring-2 ring-coral ring-offset-2 ring-offset-cream scale-105"
+                ? "ring-2 ring-brass ring-offset-2 ring-offset-ivory scale-105"
                 : "hover:scale-105 opacity-80 hover:opacity-100"
             }`}
             style={{ background: t.bg }}

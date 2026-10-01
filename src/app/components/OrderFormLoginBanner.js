@@ -4,7 +4,7 @@ import { useState } from "react";
 import { login } from "@/app/lib/auth";
 
 const iCls =
-  "w-full font-sans text-[0.88rem] text-deep bg-white border border-border rounded-xl px-3.5 py-2 outline-none focus:border-coral focus:ring-2 focus:ring-coral/20 transition-all placeholder:text-slate/40";
+  "w-full font-sans text-[0.88rem] text-ink bg-white border border-border rounded-xl px-3.5 py-2 outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all placeholder:text-slate/40";
 
 /**
  * Shown at the top of Step 1 when the user is NOT logged in.
@@ -34,13 +34,13 @@ export default function OrderFormLoginBanner({ onLogin }) {
       <div className="flex items-center justify-between gap-3 bg-light-gray px-4 py-3">
         <p className="font-sans text-[0.82rem] text-slate leading-snug">
           Already have an account?{" "}
-          <span className="text-deep font-medium">Log in to auto-fill your info and track this order.</span>
+          <span className="text-ink font-medium">Log in to auto-fill your info and track this order.</span>
         </p>
         {!expanded && (
           <button
             type="button"
             onClick={() => setExpanded(true)}
-            className="flex-shrink-0 font-sans text-[0.8rem] font-semibold text-coral border border-coral px-4 py-1.5 rounded-full hover:bg-coral hover:text-white transition-all duration-150 whitespace-nowrap"
+            className="flex-shrink-0 font-sans text-[0.8rem] font-semibold text-brass border border-brass px-4 py-1.5 rounded-full hover:bg-brass hover:text-white transition-all duration-150 whitespace-nowrap"
           >
             Log In
           </button>
@@ -73,19 +73,19 @@ export default function OrderFormLoginBanner({ onLogin }) {
               />
             </div>
           </div>
-          {error && <p className="font-sans text-[0.78rem] text-coral">{error}</p>}
+          {error && <p className="font-sans text-[0.78rem] text-brass">{error}</p>}
           <div className="flex items-center gap-3">
             <button
               type="submit"
               disabled={loading}
-              className="font-sans text-[0.85rem] font-semibold bg-coral text-white px-6 py-2 rounded-full hover:bg-coral-dark transition-colors border-none cursor-pointer disabled:opacity-60"
+              className="font-sans text-[0.85rem] font-semibold bg-brass text-white px-6 py-2 rounded-full hover:bg-brass-dark transition-colors border-none cursor-pointer disabled:opacity-60"
             >
               {loading ? "Logging in…" : "Log In"}
             </button>
             <button
               type="button"
               onClick={() => { setExpanded(false); setError(""); }}
-              className="font-sans text-[0.8rem] text-slate hover:text-coral transition-colors underline"
+              className="font-sans text-[0.8rem] text-slate hover:text-brass transition-colors underline"
             >
               Continue as guest instead
             </button>

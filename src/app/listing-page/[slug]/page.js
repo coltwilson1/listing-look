@@ -108,7 +108,7 @@ export default async function ListingPage({ params }) {
             <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.12em] mb-3" style={{ color: labelClr }}>Photos</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {galleryPhotos.map((url, i) => (
-                <img key={i} src={proxyUrl(url)} alt="" className="w-full rounded-xl object-cover border border-[#E2DDD6]" style={{ aspectRatio: "4/3" }} />
+                <img key={i} src={proxyUrl(url)} alt="" className="w-full rounded-xl object-cover border border-[#E2DED6]" style={{ aspectRatio: "4/3" }} />
               ))}
             </div>
           </div>

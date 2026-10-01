@@ -1,25 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FAF7F2;
-  --foreground: #1C1C2E;
+  --background: #F7F5F0;
+  --foreground: #0F1A2B;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-dm-sans);
-  --font-serif: var(--font-playfair);
+  --font-serif: var(--font-cormorant);
 
-  --color-cream: #FAF7F2;
-  --color-blush: #F2C4B0;
-  --color-coral: #E8825A;
-  --color-coral-dark: #d4714a;
-  --color-deep: #1C1C2E;
-  --color-slate: #4A4A6A;
-  --color-gold: #D4A853;
-  --color-light-gray: #F0EDE8;
-  --color-border: #E2DDD6;
+  /* Elevate Marketing Co. — Midnight & Brass */
+  --color-ivory: #F7F5F0;
+  --color-champagne: #D9C3A0;
+  --color-brass: #8F6F3E;
+  --color-brass-dark: #74592F;
+  --color-ink: #0F1A2B;
+  --color-slate: #555E6D;
+  --color-gold: #C4A46B;
+  --color-light-gray: #EFECE6;
+  --color-border: #E2DED6;
+
+  /* Tighter, more tailored corners */
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.625rem;
+  --radius-3xl: 0.875rem;
 }
 
 html {
@@ -30,6 +36,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
@@ -73,8 +80,8 @@ body {
 .pac-container {
   z-index: 9999 !important;
   border-radius: 12px;
-  border: 1px solid #e5e1d8;
-  box-shadow: 0 8px 24px rgba(28,28,46,0.12);
+  border: 1px solid #E2DED6;
+  box-shadow: 0 8px 24px rgba(15,26,43,0.12);
   font-family: var(--font-dm-sans), sans-serif;
   margin-top: 4px;
 }
@@ -83,5 +90,12 @@ body {
   font-size: 0.88rem;
   cursor: pointer;
 }
-.pac-item:hover { background: #f7f4ef; }
-.pac-item-query { font-weight: 600; color: #1c1c2e; }
+.pac-item:hover { background: #F7F5F0; }
+.pac-item-query { font-weight: 600; color: #0F1A2B; }
+
+/* Cormorant sits small on the line — give headings a touch more presence */
+@layer base {
+  h1, h2, h3, h4 { font-weight: 500; }
+  /* Cormorant defaults to old-style figures; lining reads cleaner for prices & stats */
+  .font-serif { font-variant-numeric: lining-nums; }
+}

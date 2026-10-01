@@ -15,7 +15,7 @@ import PostcardOrderModal from "@/app/components/PostcardOrderModal";
 const STATUS = {
   "submitted":         { label: "Submitted",              dot: "bg-slate/40",  badge: "bg-slate/10 text-slate" },
   "in-design":         { label: "In Design",              dot: "bg-blue-400",  badge: "bg-blue-50 text-blue-600" },
-  "awaiting-approval": { label: "Awaiting Your Approval", dot: "bg-coral",     badge: "bg-coral/10 text-coral", pulse: true },
+  "awaiting-approval": { label: "Awaiting Your Approval", dot: "bg-brass",     badge: "bg-brass/10 text-brass", pulse: true },
   "revision":          { label: "Revision Requested",     dot: "bg-amber-400", badge: "bg-amber-50 text-amber-600" },
   "completed":         { label: "Completed",              dot: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700" },
   "cancelled":         { label: "Cancelled",              dot: "bg-rose-400",  badge: "bg-rose-50 text-rose-600" },
@@ -64,8 +64,8 @@ export default function PortalPage() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-cream flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-coral border-t-transparent animate-spin" />
+    <div className="min-h-screen bg-ivory flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-2 border-brass border-t-transparent animate-spin" />
     </div>
   );
 
@@ -74,25 +74,25 @@ export default function PortalPage() {
   const firstName = user.name.split(" ")[0];
 
   return (
-    <div className="min-h-screen bg-cream flex">
+    <div className="min-h-screen bg-ivory flex">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-deep/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-ink/50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* ── Sidebar ── */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-deep flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-ink flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Logo */}
         <div className="px-6 pt-7 pb-6 border-b border-white/10">
           <a href="/" className="font-serif text-[1.25rem] text-white no-underline">
-            The Listing <span className="text-coral">Look</span>
+            Elevate <span className="italic text-champagne">Marketing Co.</span>
           </a>
           <p className="font-sans text-[0.72rem] text-white/40 mt-0.5">Client Portal</p>
         </div>
@@ -108,7 +108,7 @@ export default function PortalPage() {
               onClick={() => { setView(item.id); setSelectedOrder(null); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left font-sans text-[0.88rem] transition-all duration-150 border-none cursor-pointer ${
                 view === item.id && !selectedOrder
-                  ? "bg-coral text-white font-semibold"
+                  ? "bg-brass text-white font-semibold"
                   : "text-white/70 hover:bg-white/10 hover:text-white"
               }`}
             >
@@ -150,7 +150,7 @@ export default function PortalPage() {
       {/* ── Main content ── */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile topbar */}
-        <div className="lg:hidden flex items-center justify-between px-5 py-4 bg-deep border-b border-white/10">
+        <div className="lg:hidden flex items-center justify-between px-5 py-4 bg-ink border-b border-white/10">
           <button
             onClick={() => setSidebarOpen(true)}
             className="text-white p-1"
@@ -161,7 +161,7 @@ export default function PortalPage() {
             </svg>
           </button>
           <span className="font-serif text-white text-[1.1rem]">
-            The Listing <span className="text-coral">Look</span>
+            Elevate <span className="italic text-champagne">Marketing Co.</span>
           </span>
           <span className="w-8" />
         </div>
@@ -213,15 +213,15 @@ function LoginScreen({ onLogin }) {
     onLogin(result.user);
   }
 
-  const iCls = "w-full font-sans text-[0.9rem] bg-light-gray border border-border rounded-xl px-4 py-3 text-deep outline-none focus:border-coral focus:ring-2 focus:ring-coral/20 transition-all placeholder:text-slate/40";
+  const iCls = "w-full font-sans text-[0.9rem] bg-light-gray border border-border rounded-xl px-4 py-3 text-ink outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all placeholder:text-slate/40";
 
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center px-4">
+    <div className="min-h-screen bg-ivory flex items-center justify-center px-4">
       <div className="w-full max-w-[440px]">
-        <a href="/" className="font-serif text-[1.5rem] text-deep no-underline block mb-8">
-          The Listing <span className="text-coral">Look</span>
+        <a href="/" className="font-serif text-[1.5rem] text-ink no-underline block mb-8">
+          Elevate <span className="italic text-brass">Marketing Co.</span>
         </a>
-        <h1 className="font-serif text-[2rem] text-deep mb-1">Welcome back</h1>
+        <h1 className="font-serif text-[2rem] text-ink mb-1">Welcome back</h1>
         <p className="font-sans text-[0.9rem] text-slate mb-8">Log in to your client portal to track your orders.</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -232,18 +232,18 @@ function LoginScreen({ onLogin }) {
             <label className="block font-sans text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-slate mb-1.5">Password</label>
             <input className={iCls} type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
-          {error && <p className="font-sans text-[0.82rem] text-coral">{error}</p>}
+          {error && <p className="font-sans text-[0.82rem] text-brass">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full font-sans bg-coral text-white font-semibold py-3.5 rounded-full hover:bg-coral-dark transition-colors text-[0.95rem] disabled:opacity-60 cursor-pointer border-none mt-2"
+            className="w-full font-sans bg-brass text-white font-semibold py-3.5 rounded-full hover:bg-brass-dark transition-colors text-[0.95rem] disabled:opacity-60 cursor-pointer border-none mt-2"
           >
             {loading ? "Logging in…" : "Log In to My Portal"}
           </button>
         </form>
         <p className="font-sans text-[0.85rem] text-slate text-center mt-6">
           Don't have an account?{" "}
-          <a href="/#services" className="text-coral hover:underline no-underline">Place an order</a> to get started.
+          <a href="/#services" className="text-brass hover:underline no-underline">Place an order</a> to get started.
         </p>
       </div>
     </div>
@@ -275,13 +275,13 @@ function OrdersView({ user, firstName, onSelectOrder, onNewSocial, onNewPostcard
       {/* Welcome */}
       <div className="flex items-start justify-between gap-4 mb-8 flex-wrap">
         <div>
-          <h1 className="font-serif text-[2rem] text-deep">Welcome back, {firstName}!</h1>
+          <h1 className="font-serif text-[2rem] text-ink">Welcome back, {firstName}!</h1>
           <p className="font-sans text-[0.9rem] text-slate mt-1">Here's a summary of your design orders.</p>
         </div>
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen((o) => !o)}
-            className="flex items-center gap-2 font-sans bg-coral text-white font-semibold text-[0.88rem] px-5 py-2.5 rounded-full hover:bg-coral-dark transition-colors border-none cursor-pointer"
+            className="flex items-center gap-2 font-sans bg-brass text-white font-semibold text-[0.88rem] px-5 py-2.5 rounded-full hover:bg-brass-dark transition-colors border-none cursor-pointer"
           >
             + Submit New Order
             <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" className={`transition-transform duration-150 ${dropdownOpen ? "rotate-180" : ""}`}>
@@ -292,13 +292,13 @@ function OrdersView({ user, firstName, onSelectOrder, onNewSocial, onNewPostcard
             <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-border overflow-hidden z-50">
               <button
                 onClick={() => { setDropdownOpen(false); onNewSocial(); }}
-                className="w-full text-left flex items-center gap-3 px-4 py-3 font-sans text-[0.88rem] text-deep hover:bg-light-gray transition-colors border-none cursor-pointer"
+                className="w-full text-left flex items-center gap-3 px-4 py-3 font-sans text-[0.88rem] text-ink hover:bg-light-gray transition-colors border-none cursor-pointer"
               >
                 <span>📱</span> Social Media Graphics
               </button>
               <button
                 onClick={() => { setDropdownOpen(false); onNewPostcard(); }}
-                className="w-full text-left flex items-center gap-3 px-4 py-3 font-sans text-[0.88rem] text-deep hover:bg-light-gray transition-colors border-none cursor-pointer border-t border-border"
+                className="w-full text-left flex items-center gap-3 px-4 py-3 font-sans text-[0.88rem] text-ink hover:bg-light-gray transition-colors border-none cursor-pointer border-t border-border"
               >
                 <span>📮</span> Postcards & Print
               </button>
@@ -309,17 +309,17 @@ function OrdersView({ user, firstName, onSelectOrder, onNewSocial, onNewPostcard
 
       {/* Profile completion banner */}
       {profileIncomplete && (
-        <div className="flex items-center justify-between gap-4 bg-coral/8 border border-coral/25 rounded-2xl px-5 py-4 mb-6 flex-wrap gap-y-3">
+        <div className="flex items-center justify-between gap-4 bg-brass/8 border border-brass/25 rounded-2xl px-5 py-4 mb-6 flex-wrap gap-y-3">
           <div className="flex items-center gap-3">
             <span className="text-xl">👤</span>
             <div>
-              <p className="font-sans text-[0.88rem] font-semibold text-deep">Complete your marketing profile</p>
+              <p className="font-sans text-[0.88rem] font-semibold text-ink">Complete your marketing profile</p>
               <p className="font-sans text-[0.8rem] text-slate mt-0.5">Add your headshot, logo, and contact info so we can auto-fill your future orders.</p>
             </div>
           </div>
           <button
             onClick={onGoToProfile}
-            className="flex-shrink-0 font-sans text-[0.82rem] font-semibold bg-coral text-white px-5 py-2 rounded-full hover:bg-coral-dark transition-colors border-none cursor-pointer"
+            className="flex-shrink-0 font-sans text-[0.82rem] font-semibold bg-brass text-white px-5 py-2 rounded-full hover:bg-brass-dark transition-colors border-none cursor-pointer"
           >
             Go to My Profile →
           </button>
@@ -334,7 +334,7 @@ function OrdersView({ user, firstName, onSelectOrder, onNewSocial, onNewPostcard
           { label: "Completed",     value: completed },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-2xl p-5 border border-border text-center">
-            <div className="font-serif text-[2.2rem] text-coral">{s.value}</div>
+            <div className="font-serif text-[2.2rem] text-brass">{s.value}</div>
             <div className="font-sans text-[0.82rem] text-slate mt-0.5">{s.label}</div>
           </div>
         ))}
@@ -344,9 +344,9 @@ function OrdersView({ user, firstName, onSelectOrder, onNewSocial, onNewPostcard
       {orders.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-border">
           <div className="text-4xl mb-3">📭</div>
-          <h3 className="font-serif text-[1.3rem] text-deep mb-2">No orders yet</h3>
+          <h3 className="font-serif text-[1.3rem] text-ink mb-2">No orders yet</h3>
           <p className="font-sans text-[0.88rem] text-slate mb-5">Place your first order to get started.</p>
-          <a href="/#services" className="inline-block font-sans bg-coral text-white font-semibold px-6 py-2.5 rounded-full no-underline hover:bg-coral-dark transition-colors text-[0.9rem]">
+          <a href="/#services" className="inline-block font-sans bg-brass text-white font-semibold px-6 py-2.5 rounded-full no-underline hover:bg-brass-dark transition-colors text-[0.9rem]">
             Browse Services
           </a>
         </div>
@@ -371,15 +371,15 @@ function OrderCard({ order, onClick }) {
 
   return (
     <div
-      className="bg-white rounded-2xl border border-border p-6 hover:shadow-[0_8px_24px_rgba(28,28,46,0.08)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+      className="bg-white rounded-2xl border border-border p-6 hover:shadow-[0_8px_24px_rgba(15,26,43,0.08)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
       onClick={onClick}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.1em] text-coral">{order.typeLabel}</span>
+            <span className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.1em] text-brass">{order.typeLabel}</span>
             {unread > 0 && (
-              <span className="inline-flex items-center gap-1 bg-coral text-white font-sans text-[0.65rem] font-bold px-2 py-0.5 rounded-full">
+              <span className="inline-flex items-center gap-1 bg-brass text-white font-sans text-[0.65rem] font-bold px-2 py-0.5 rounded-full">
                 💬 {unread} new
               </span>
             )}
@@ -390,7 +390,7 @@ function OrderCard({ order, onClick }) {
               <span className="font-sans text-[0.7rem] text-slate/60">· {order.postcardTypeLabel}</span>
             )}
           </div>
-          <h3 className="font-sans text-[0.95rem] font-semibold text-deep truncate">{order.address || "—"}</h3>
+          <h3 className="font-sans text-[0.95rem] font-semibold text-ink truncate">{order.address || "—"}</h3>
           <div className="flex items-center gap-3 mt-1.5 flex-wrap">
             {order.package && (
               <span className="font-sans text-[0.8rem] text-slate">{order.package} {order.packagePrice}</span>
@@ -415,7 +415,7 @@ function OrderCard({ order, onClick }) {
         {isAwaiting && (
           <button
             onClick={(e) => { e.stopPropagation(); onClick(); }}
-            className="font-sans text-[0.82rem] font-semibold bg-coral text-white px-5 py-2 rounded-full hover:bg-coral-dark transition-colors border-none cursor-pointer"
+            className="font-sans text-[0.82rem] font-semibold bg-brass text-white px-5 py-2 rounded-full hover:bg-brass-dark transition-colors border-none cursor-pointer"
           >
             Review & Approve
           </button>
@@ -516,14 +516,14 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
   const contact  = formData.contact || {};
   const listing  = formData.listing || {};
 
-  const iCls = "w-full font-sans text-[0.88rem] bg-light-gray border border-border rounded-xl px-4 py-2.5 outline-none focus:border-coral focus:ring-2 focus:ring-coral/20 resize-none transition-all placeholder:text-slate/40";
+  const iCls = "w-full font-sans text-[0.88rem] bg-light-gray border border-border rounded-xl px-4 py-2.5 outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 resize-none transition-all placeholder:text-slate/40";
 
   return (
     <div className="max-w-[780px] mx-auto px-6 py-10">
       {/* Back */}
       <button
         onClick={onBack}
-        className="flex items-center gap-2 font-sans text-[0.85rem] text-slate hover:text-deep transition-colors mb-6 border-none bg-transparent cursor-pointer p-0"
+        className="flex items-center gap-2 font-sans text-[0.85rem] text-slate hover:text-ink transition-colors mb-6 border-none bg-transparent cursor-pointer p-0"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <path d="M10 3L5 8l5 5"/>
@@ -534,8 +534,8 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-8">
         <div>
-          <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-coral mb-1">{order.typeLabel}</p>
-          <h1 className="font-serif text-[1.8rem] text-deep leading-tight">{order.address || "Order Detail"}</h1>
+          <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-brass mb-1">{order.typeLabel}</p>
+          <h1 className="font-serif text-[1.8rem] text-ink leading-tight">{order.address || "Order Detail"}</h1>
           <p className="font-sans text-[0.85rem] text-slate mt-1">{order.id} · Submitted {fmt(order.submittedAt)}</p>
         </div>
         <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-sans text-[0.75rem] font-semibold flex-shrink-0 ${s.badge}`}>
@@ -558,11 +558,11 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
               <div key={stage.key} className="flex-1 flex flex-col items-center relative">
                 {/* Connector line */}
                 {i < TIMELINE_STAGES.length - 1 && (
-                  <div className="absolute top-3 left-1/2 w-full h-0.5" style={{ background: isComplete ? "#E8825A" : "#E2DDD6" }} />
+                  <div className="absolute top-3 left-1/2 w-full h-0.5" style={{ background: isComplete ? "#8F6F3E" : "#E2DED6" }} />
                 )}
                 {/* Dot */}
                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center z-10 relative transition-all ${
-                  isComplete ? "bg-coral border-coral" : isActive ? "bg-coral border-coral ring-4 ring-coral/20" : "bg-white border-border"
+                  isComplete ? "bg-brass border-brass" : isActive ? "bg-brass border-brass ring-4 ring-brass/20" : "bg-white border-border"
                 }`}>
                   {isComplete && (
                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
@@ -571,7 +571,7 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
                   )}
                   {isActive && <div className="w-2 h-2 rounded-full bg-white" />}
                 </div>
-                <p className={`font-sans text-center mt-2 leading-tight ${isActive ? "text-[0.72rem] font-bold text-coral" : "text-[0.68rem] text-slate/70"}`}>
+                <p className={`font-sans text-center mt-2 leading-tight ${isActive ? "text-[0.72rem] font-bold text-brass" : "text-[0.68rem] text-slate/70"}`}>
                   {stage.label}
                 </p>
               </div>
@@ -582,8 +582,8 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
 
       {/* Approval area */}
       {order.status === "awaiting-approval" && (
-        <div className="bg-coral/5 border-2 border-coral rounded-2xl p-6 mb-6">
-          <h3 className="font-serif text-[1.2rem] text-deep mb-1">Your proof is ready!</h3>
+        <div className="bg-brass/5 border-2 border-brass rounded-2xl p-6 mb-6">
+          <h3 className="font-serif text-[1.2rem] text-ink mb-1">Your proof is ready!</h3>
           <p className="font-sans text-[0.85rem] text-slate mb-5">
             Your design is ready for review. Look over the files below and let us know what you think!
           </p>
@@ -602,14 +602,14 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
               <button
                 onClick={handleApprove}
                 disabled={submitting}
-                className="font-sans bg-coral text-white font-semibold px-8 py-2.5 rounded-full hover:bg-coral-dark transition-colors border-none cursor-pointer disabled:opacity-60 text-[0.9rem]"
+                className="font-sans bg-brass text-white font-semibold px-8 py-2.5 rounded-full hover:bg-brass-dark transition-colors border-none cursor-pointer disabled:opacity-60 text-[0.9rem]"
               >
                 {submitting ? "Approving…" : "✓ Approve This Design"}
               </button>
               {revisionCount === 0 ? (
                 <button
                   onClick={() => setShowRevision(true)}
-                  className="font-sans border border-border text-slate px-6 py-2.5 rounded-full hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer text-[0.9rem]"
+                  className="font-sans border border-border text-slate px-6 py-2.5 rounded-full hover:border-brass hover:text-brass transition-all bg-transparent cursor-pointer text-[0.9rem]"
                 >
                   Request a Revision
                 </button>
@@ -631,10 +631,10 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
                 autoFocus
               />
               <div className="flex gap-3">
-                <button type="submit" className="font-sans bg-deep text-white font-semibold px-6 py-2.5 rounded-full hover:bg-coral transition-colors border-none cursor-pointer text-[0.88rem]">
+                <button type="submit" className="font-sans bg-ink text-white font-semibold px-6 py-2.5 rounded-full hover:bg-brass transition-colors border-none cursor-pointer text-[0.88rem]">
                   Submit Revision Request
                 </button>
-                <button type="button" onClick={() => setShowRevision(false)} className="font-sans text-slate border border-border px-5 py-2.5 rounded-full hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer text-[0.88rem]">
+                <button type="button" onClick={() => setShowRevision(false)} className="font-sans text-slate border border-border px-5 py-2.5 rounded-full hover:border-brass hover:text-brass transition-all bg-transparent cursor-pointer text-[0.88rem]">
                   Cancel
                 </button>
               </div>
@@ -663,7 +663,7 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
           ].filter(Boolean).map(([k, v]) => (
             <div key={k}>
               <p className="font-sans text-[0.72rem] text-slate/60 uppercase tracking-[0.08em]">{k}</p>
-              <p className="font-sans text-[0.88rem] text-deep font-medium mt-0.5">{v || "—"}</p>
+              <p className="font-sans text-[0.88rem] text-ink font-medium mt-0.5">{v || "—"}</p>
             </div>
           ))}
         </div>
@@ -690,25 +690,25 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
         ) : (
           <div className="space-y-3 mb-5">
             {order.notes.map((n, i) => (
-              <div key={i} className={`rounded-xl px-4 py-3 ${n.from === "client" ? "bg-light-gray" : "bg-coral/5 border border-coral/20"}`}>
+              <div key={i} className={`rounded-xl px-4 py-3 ${n.from === "client" ? "bg-light-gray" : "bg-brass/5 border border-brass/20"}`}>
                 <p className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.08em] text-slate/60 mb-1">
-                  {n.from === "client" ? "You" : "The Listing Look"} · {fmt(n.createdAt)}
+                  {n.from === "client" ? "You" : "Elevate Marketing Co."} · {fmt(n.createdAt)}
                 </p>
-                <p className="font-sans text-[0.88rem] text-deep">{n.text}</p>
+                <p className="font-sans text-[0.88rem] text-ink">{n.text}</p>
               </div>
             ))}
           </div>
         )}
         <form onSubmit={submitNote} className="flex gap-2">
           <input
-            className="flex-1 font-sans text-[0.88rem] bg-light-gray border border-border rounded-xl px-4 py-2.5 outline-none focus:border-coral focus:ring-2 focus:ring-coral/20 transition-all placeholder:text-slate/40"
+            className="flex-1 font-sans text-[0.88rem] bg-light-gray border border-border rounded-xl px-4 py-2.5 outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all placeholder:text-slate/40"
             placeholder="Leave a note for our design team…"
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
           <button
             type="submit"
-            className="font-sans bg-coral text-white font-semibold px-5 py-2.5 rounded-xl hover:bg-coral-dark transition-colors border-none cursor-pointer text-[0.88rem] whitespace-nowrap"
+            className="font-sans bg-brass text-white font-semibold px-5 py-2.5 rounded-xl hover:bg-brass-dark transition-colors border-none cursor-pointer text-[0.88rem] whitespace-nowrap"
           >
             Send
           </button>
@@ -772,7 +772,7 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
             </button>
             <button
               onClick={() => { setShowCancel(false); setCancelConfirm(false); setCancelReason(""); }}
-              className="font-sans text-[0.88rem] text-slate border border-border px-5 py-2.5 rounded-full hover:border-coral hover:text-coral transition-all bg-transparent cursor-pointer"
+              className="font-sans text-[0.88rem] text-slate border border-border px-5 py-2.5 rounded-full hover:border-brass hover:text-brass transition-all bg-transparent cursor-pointer"
             >
               Keep Order
             </button>
@@ -788,7 +788,7 @@ function OrderDetailView({ order, user, onBack, onRefresh }) {
           )}
           <p className="font-sans text-[0.82rem] text-rose-600/70 mt-2">
             Need to reorder?{" "}
-            <a href="/#services" className="text-coral hover:underline no-underline font-semibold">Browse our services →</a>
+            <a href="/#services" className="text-brass hover:underline no-underline font-semibold">Browse our services →</a>
           </p>
         </div>
       )}
@@ -820,7 +820,7 @@ function ProfileView({ user, onUpdate }) {
   const logoRef        = useRef(null);
   const personalLogoRef = useRef(null);
 
-  const iCls = "w-full font-sans text-[0.9rem] bg-light-gray border border-border rounded-xl px-4 py-2.5 outline-none focus:border-coral focus:ring-2 focus:ring-coral/20 transition-all placeholder:text-slate/40";
+  const iCls = "w-full font-sans text-[0.9rem] bg-light-gray border border-border rounded-xl px-4 py-2.5 outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all placeholder:text-slate/40";
   const lCls = "block font-sans text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-slate mb-1.5";
 
   // Load asset preview URLs from user profile (Supabase Storage public URLs)
@@ -928,7 +928,7 @@ function ProfileView({ user, onUpdate }) {
 
   return (
     <div className="max-w-[620px] mx-auto px-6 py-10 space-y-6">
-      <h1 className="font-serif text-[2rem] text-deep">My Profile</h1>
+      <h1 className="font-serif text-[2rem] text-ink">My Profile</h1>
 
       {/* Profile info */}
       <div className="bg-white rounded-2xl border border-border p-6">
@@ -956,8 +956,8 @@ function ProfileView({ user, onUpdate }) {
               <input className={iCls} type="tel" placeholder="(555) 000-0000" value={officePhone} onChange={(e) => setOfficePhone(e.target.value)} />
             </div>
           </div>
-          {profileMsg && <p className="font-sans text-[0.82rem] text-coral">{profileMsg}</p>}
-          <button type="submit" className="font-sans bg-coral text-white font-semibold px-7 py-2.5 rounded-full hover:bg-coral-dark transition-colors border-none cursor-pointer text-[0.9rem]">
+          {profileMsg && <p className="font-sans text-[0.82rem] text-brass">{profileMsg}</p>}
+          <button type="submit" className="font-sans bg-brass text-white font-semibold px-7 py-2.5 rounded-full hover:bg-brass-dark transition-colors border-none cursor-pointer text-[0.9rem]">
             Save Changes
           </button>
         </form>
@@ -985,7 +985,7 @@ function ProfileView({ user, onUpdate }) {
                     <button
                       type="button"
                       onClick={() => asset.ref.current?.click()}
-                      className="font-sans text-[0.8rem] font-semibold text-coral border border-coral px-4 py-1.5 rounded-full hover:bg-coral hover:text-white transition-all cursor-pointer bg-transparent"
+                      className="font-sans text-[0.8rem] font-semibold text-brass border border-brass px-4 py-1.5 rounded-full hover:bg-brass hover:text-white transition-all cursor-pointer bg-transparent"
                     >
                       Replace
                     </button>
@@ -1002,10 +1002,10 @@ function ProfileView({ user, onUpdate }) {
                 <button
                   type="button"
                   onClick={() => asset.ref.current?.click()}
-                  className="w-full border-2 border-dashed border-border rounded-xl py-5 text-center hover:border-coral transition-colors group"
+                  className="w-full border-2 border-dashed border-border rounded-xl py-5 text-center hover:border-brass transition-colors group"
                 >
                   <span className="block text-xl mb-1 opacity-40 group-hover:opacity-70">📎</span>
-                  <span className="font-sans text-[0.78rem] text-slate group-hover:text-coral transition-colors">{asset.hint}</span>
+                  <span className="font-sans text-[0.78rem] text-slate group-hover:text-brass transition-colors">{asset.hint}</span>
                 </button>
               )}
               <input
@@ -1023,11 +1023,11 @@ function ProfileView({ user, onUpdate }) {
             type="button"
             onClick={saveAssets}
             disabled={savingAssets || !Object.values(pendingAssets).some(Boolean)}
-            className="font-sans bg-coral text-white font-semibold px-7 py-2.5 rounded-full hover:bg-coral-dark transition-colors border-none cursor-pointer text-[0.9rem] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="font-sans bg-brass text-white font-semibold px-7 py-2.5 rounded-full hover:bg-brass-dark transition-colors border-none cursor-pointer text-[0.9rem] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {savingAssets ? "Saving…" : "Save Changes"}
           </button>
-          {assetMsg && <p className="font-sans text-[0.82rem] text-coral">{assetMsg}</p>}
+          {assetMsg && <p className="font-sans text-[0.82rem] text-brass">{assetMsg}</p>}
         </div>
       </div>
 
@@ -1047,8 +1047,8 @@ function ProfileView({ user, onUpdate }) {
             <label className={lCls}>Confirm New Password</label>
             <input className={iCls} type="password" placeholder="Re-enter new password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} />
           </div>
-          {pwMsg && <p className="font-sans text-[0.82rem] text-coral">{pwMsg}</p>}
-          <button type="submit" className="font-sans bg-deep text-white font-semibold px-7 py-2.5 rounded-full hover:bg-coral transition-colors border-none cursor-pointer text-[0.9rem]">
+          {pwMsg && <p className="font-sans text-[0.82rem] text-brass">{pwMsg}</p>}
+          <button type="submit" className="font-sans bg-ink text-white font-semibold px-7 py-2.5 rounded-full hover:bg-brass transition-colors border-none cursor-pointer text-[0.9rem]">
             Update Password
           </button>
         </form>
@@ -1170,10 +1170,10 @@ function ListingLaunchDeliverables({ order }) {
     <div className="mb-6 space-y-4">
       {/* Landing page link */}
       <div className="bg-white rounded-2xl border border-border p-6">
-        <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-coral mb-3">Shareable Landing Page</p>
+        <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-brass mb-3">Shareable Landing Page</p>
         <p className="font-sans text-[0.82rem] text-slate mb-3">Share this link with buyers and on social media:</p>
         <div className="flex gap-2 items-center">
-          <div className="flex-1 font-sans text-[0.82rem] text-deep bg-light-gray rounded-xl px-4 py-2.5 border border-border truncate select-all">
+          <div className="flex-1 font-sans text-[0.82rem] text-ink bg-light-gray rounded-xl px-4 py-2.5 border border-border truncate select-all">
             {landingUrl}
           </div>
           <button
@@ -1187,7 +1187,7 @@ function ListingLaunchDeliverables({ order }) {
             href={landingUrl}
             target="_blank"
             rel="noreferrer"
-            className="flex-shrink-0 font-sans text-[0.82rem] font-semibold px-4 py-2.5 rounded-xl border border-border text-slate hover:border-coral hover:text-coral transition-colors no-underline"
+            className="flex-shrink-0 font-sans text-[0.82rem] font-semibold px-4 py-2.5 rounded-xl border border-border text-slate hover:border-brass hover:text-brass transition-colors no-underline"
           >
             Preview ↗
           </a>
@@ -1198,7 +1198,7 @@ function ListingLaunchDeliverables({ order }) {
       <div className="bg-white rounded-2xl border border-border p-6">
         <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
           <div>
-            <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-coral mb-0.5">Your Graphics</p>
+            <p className="font-sans text-[0.75rem] font-bold uppercase tracking-[0.1em] text-brass mb-0.5">Your Graphics</p>
             <p className="font-sans text-[0.82rem] text-slate">Download your 5 AI-generated social media graphics (1080×1350 PNG, no watermark).</p>
           </div>
           <button
@@ -1222,7 +1222,7 @@ function ListingLaunchDeliverables({ order }) {
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
-                    <span className="font-sans text-[0.9rem] font-semibold text-deep">{label}</span>
+                    <span className="font-sans text-[0.9rem] font-semibold text-ink">{label}</span>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     {svg ? (
@@ -1236,7 +1236,7 @@ function ListingLaunchDeliverables({ order }) {
                         </button>
                         <button
                           onClick={() => { setSvgs(p => ({ ...p, [key]: null })); generateOne(key); }}
-                          className="font-sans text-[0.82rem] px-4 py-2 rounded-full border border-border text-slate bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors"
+                          className="font-sans text-[0.82rem] px-4 py-2 rounded-full border border-border text-slate bg-transparent cursor-pointer hover:border-brass hover:text-brass transition-colors"
                         >
                           ↻ Regenerate
                         </button>
@@ -1245,14 +1245,14 @@ function ListingLaunchDeliverables({ order }) {
                       <button
                         onClick={() => generateOne(key)}
                         disabled={loading || !photosLoaded}
-                        className="font-sans text-[0.82rem] font-semibold px-4 py-2 rounded-full border border-border text-slate bg-transparent cursor-pointer hover:border-coral hover:text-coral transition-colors disabled:opacity-50"
+                        className="font-sans text-[0.82rem] font-semibold px-4 py-2 rounded-full border border-border text-slate bg-transparent cursor-pointer hover:border-brass hover:text-brass transition-colors disabled:opacity-50"
                       >
-                        {loading ? <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-coral border-t-transparent animate-spin inline-block" /> Designing…</span> : "Design"}
+                        {loading ? <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-brass border-t-transparent animate-spin inline-block" /> Designing…</span> : "Design"}
                       </button>
                     )}
                   </div>
                 </div>
-                {err && <p className="font-sans text-[0.78rem] text-coral mt-2">{err}</p>}
+                {err && <p className="font-sans text-[0.78rem] text-brass mt-2">{err}</p>}
                 {svg && (
                   <div className="mt-3 rounded-xl overflow-hidden border border-border" style={{ maxWidth: 280 }}>
                     <div dangerouslySetInnerHTML={{ __html: svg.replace("<svg", '<svg width="100%" height="100%"') }} />
@@ -1309,7 +1309,7 @@ function DeliveredFilesViewer({ order }) {
   if (loading) {
     return (
       <div className="flex items-center gap-2 py-4 font-sans text-[0.85rem] text-slate/60">
-        <div className="w-4 h-4 rounded-full border-2 border-coral border-t-transparent animate-spin" />
+        <div className="w-4 h-4 rounded-full border-2 border-brass border-t-transparent animate-spin" />
         Loading files…
       </div>
     );
@@ -1318,7 +1318,7 @@ function DeliveredFilesViewer({ order }) {
   return (
     <div className="space-y-4">
       {order.deliveryMessage && (
-        <p className="font-sans text-[0.88rem] text-deep italic mb-1">"{order.deliveryMessage}"</p>
+        <p className="font-sans text-[0.88rem] text-ink italic mb-1">"{order.deliveryMessage}"</p>
       )}
       {order.deliveredFiles.map((f) => {
         const fd   = fileData[f.name];
@@ -1355,7 +1355,7 @@ function DeliveredFilesViewer({ order }) {
             <div className="flex items-center gap-3 px-4 py-3">
               <span className="text-lg flex-shrink-0">{icon}</span>
               <div className="flex-1 min-w-0">
-                <p className="font-sans text-[0.85rem] font-semibold text-deep truncate">{f.name}</p>
+                <p className="font-sans text-[0.85rem] font-semibold text-ink truncate">{f.name}</p>
                 <p className="font-sans text-[0.72rem] text-slate/50">{Math.round(f.size / 1024)} KB</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
@@ -1364,7 +1364,7 @@ function DeliveredFilesViewer({ order }) {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-sans text-[0.78rem] font-semibold text-slate border border-border px-3 py-1.5 rounded-full hover:border-coral hover:text-coral transition-all no-underline"
+                    className="font-sans text-[0.78rem] font-semibold text-slate border border-border px-3 py-1.5 rounded-full hover:border-brass hover:text-brass transition-all no-underline"
                   >
                     View
                   </a>
@@ -1373,7 +1373,7 @@ function DeliveredFilesViewer({ order }) {
                   <a
                     href={url}
                     download={f.name}
-                    className="font-sans text-[0.78rem] font-semibold text-white bg-coral px-4 py-1.5 rounded-full hover:bg-coral-dark transition-colors no-underline"
+                    className="font-sans text-[0.78rem] font-semibold text-white bg-brass px-4 py-1.5 rounded-full hover:bg-brass-dark transition-colors no-underline"
                   >
                     Download
                   </a>

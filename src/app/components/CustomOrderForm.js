@@ -25,14 +25,14 @@ export default function CustomOrderForm() {
   };
 
   const inputClass =
-    "w-full bg-white/[0.08] border border-white/[0.12] rounded-xl px-4 py-3 text-white text-[0.9rem] placeholder:text-white/30 focus:outline-none focus:border-coral transition-colors font-sans";
+    "w-full bg-white/[0.08] border border-white/[0.12] rounded-[3px] px-4 py-3 text-white text-[0.9rem] placeholder:text-white/30 focus:outline-none focus:border-champagne transition-colors font-sans";
   const labelClass =
     "block text-[0.82rem] font-semibold text-white/70 uppercase tracking-[0.08em] mb-1.5";
 
   if (submitted) {
     return (
       <div className="text-center py-10">
-        <div className="text-5xl mb-4">🎉</div>
+        <div className="w-14 h-14 mx-auto mb-5 rounded-full border border-champagne/50 flex items-center justify-center text-champagne text-xl">✓</div>
         <h3 className="font-serif text-2xl text-white mb-2">We'll be in touch soon!</h3>
         <p className="font-sans text-white/60 text-[0.9rem] leading-relaxed">
           Thanks for reaching out. Expect a response within 24 hours to answer your questions and get you set up.
@@ -91,12 +91,12 @@ export default function CustomOrderForm() {
           onChange={handleChange}
           className={inputClass + " appearance-none cursor-pointer"}
         >
-          <option value="" style={{ background: "#1C1C2E" }}>Select a plan...</option>
-          <option style={{ background: "#1C1C2E" }}>Essential — $450/month</option>
-          <option style={{ background: "#1C1C2E" }}>Growth — $600/month</option>
-          <option style={{ background: "#1C1C2E" }}>Signature — $750/month</option>
-          <option style={{ background: "#1C1C2E" }}>Listing Launch — $99 one-time</option>
-          <option style={{ background: "#1C1C2E" }}>Not sure yet — just exploring</option>
+          <option value="" style={{ background: "#0F1A2B" }}>Select a plan...</option>
+          <option style={{ background: "#0F1A2B" }}>Essential — $450/month</option>
+          <option style={{ background: "#0F1A2B" }}>Growth — $600/month</option>
+          <option style={{ background: "#0F1A2B" }}>Signature — $750/month</option>
+          <option style={{ background: "#0F1A2B" }}>Listing Launch — $99 one-time</option>
+          <option style={{ background: "#0F1A2B" }}>Not sure yet — just exploring</option>
         </select>
       </div>
 
@@ -115,7 +115,7 @@ export default function CustomOrderForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-coral text-white font-semibold text-[1rem] py-4 rounded-full border-none cursor-pointer hover:bg-coral-dark hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(232,130,90,0.4)] transition-all duration-200 disabled:opacity-60 font-sans"
+        className="w-full bg-champagne text-ink font-semibold uppercase tracking-[0.18em] text-[0.78rem] py-4 rounded-[3px] border-none cursor-pointer hover:bg-white hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(143,111,62,0.4)] transition-all duration-200 disabled:opacity-60 font-sans"
       >
         {loading ? "Sending..." : "Send My Inquiry →"}
       </button>

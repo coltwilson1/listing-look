@@ -1,12 +1,12 @@
-import { Playfair_Display, DM_Sans } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import { SanityLive } from "@/sanity/lib/live";
 import "./globals.css";
 import Toast from "./components/Toast";
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
 });
 
@@ -17,15 +17,15 @@ const dmSans = DM_Sans({
 });
 
 export const metadata = {
-  title: "The Listing Look | Real Estate Marketing Concierge",
+  title: "Elevate Marketing Co. | Social Media for Real Estate Agents",
   description:
-    "Beautiful social media graphics, postcards, and custom marketing materials — designed just for real estate agents.",
+    "Done-for-you social media, listing marketing, and custom branded content for real estate agents who want to stand out.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${playfair.variable} ${dmSans.variable} antialiased`}>
+      <body className={`${cormorant.variable} ${dmSans.variable} antialiased`}>
         {children}
         <Toast />
         <SanityLive />

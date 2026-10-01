@@ -28,7 +28,7 @@ export default function ContactForm() {
   if (submitted) {
     return (
       <div className="text-center py-12">
-        <div className="w-16 h-16 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-5">
+        <div className="w-16 h-16 rounded-full bg-brass/10 flex items-center justify-center mx-auto mb-5">
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
             <path
               d="M7 16l6 6 12-12"
@@ -50,7 +50,7 @@ export default function ContactForm() {
   }
 
   const inputClass =
-    "w-full px-4 py-3 rounded-xl border border-charcoal/15 bg-cream text-charcoal placeholder:text-charcoal/35 focus:outline-none focus:border-coral focus:ring-2 focus:ring-coral/20 transition-all text-sm font-sans";
+    "w-full px-4 py-3 rounded-xl border border-charcoal/15 bg-ivory text-charcoal placeholder:text-charcoal/35 focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all text-sm font-sans";
   const labelClass =
     "block text-xs font-bold text-charcoal/55 uppercase tracking-wider mb-1.5";
 
@@ -128,7 +128,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-coral text-white font-bold text-sm py-4 rounded-xl hover:bg-coral-dark transition-all duration-200 disabled:opacity-60 shadow-md hover:shadow-lg hover:-translate-y-0.5 font-sans"
+        className="w-full bg-brass text-white font-bold text-sm py-4 rounded-xl hover:bg-brass-dark transition-all duration-200 disabled:opacity-60 shadow-md hover:shadow-lg hover:-translate-y-0.5 font-sans"
       >
         {loading ? "Sending..." : "Send Message \u2192"}
       </button>

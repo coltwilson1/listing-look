@@ -22,7 +22,7 @@ export default function Toast() {
       {toasts.map((t) => (
         <div
           key={t.id}
-          className="bg-deep text-white px-6 py-3.5 rounded-2xl shadow-2xl font-sans text-[0.88rem] flex items-center gap-3 whitespace-nowrap"
+          className="bg-ink text-white px-6 py-3.5 rounded-2xl shadow-2xl font-sans text-[0.88rem] flex items-center gap-3 whitespace-nowrap"
           style={{ animation: "toastIn 0.3s ease-out both" }}
         >
           <span className="text-[1.1rem]">✉️</span>

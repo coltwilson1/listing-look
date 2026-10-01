@@ -2,6 +2,8 @@ import { sanityFetch } from "@/sanity/lib/live";
 import SiteHeader from "./components/SiteHeader";
 import CustomOrderForm from "./components/CustomOrderForm";
 import ServicesWithModals from "./components/ServicesWithModals";
+import Logo from "./components/Logo";
+import Icon from "./components/Icons";
 
 const HOME_QUERY = `*[_type == "homePage" && _id == "homePage"][0]`;
 
@@ -116,10 +118,10 @@ const DEFAULTS = {
     subtitle:
       "Fill out the short form and we'll reach out within 24 hours to answer questions and get your account set up.",
     steps: [
-      { icon: "📋", title: "Fill Out the Form", description: "Tell us which plan interests you and a bit about your goals." },
-      { icon: "💬", title: "We'll Reach Out", description: "Expect a reply within 24 hours to confirm your plan and schedule your discovery call." },
-      { icon: "🤝", title: "Discovery Consultation", description: "A one-time call to learn your brand, style, target audience, and posting preferences — so everything feels like you." },
-      { icon: "📱", title: "We Post Every Week", description: "Custom-branded content goes live on your Facebook & Instagram — designed and posted entirely by us." },
+      { icon: "clipboard", title: "Fill Out the Form", description: "Tell us which plan interests you and a bit about your goals." },
+      { icon: "chat", title: "We'll Reach Out", description: "Expect a reply within 24 hours to confirm your plan and schedule your discovery call." },
+      { icon: "handshake", title: "Discovery Consultation", description: "A one-time call to learn your brand, style, target audience, and posting preferences — so everything feels like you." },
+      { icon: "phone", title: "We Post Every Week", description: "Custom-branded content goes live on your Facebook & Instagram — designed and posted entirely by us." },
     ],
   },
   account: {
@@ -129,17 +131,17 @@ const DEFAULTS = {
       "Your own dashboard to monitor orders, message your designer, and keep your brand assets on file.",
     cards: [
       {
-        icon: "📦",
+        icon: "package",
         title: "Order Tracking",
         description: "Real-time status on every active and completed order, plus downloadable final files.",
       },
       {
-        icon: "🖼️",
+        icon: "image",
         title: "Brand Asset Vault",
         description: "Upload your headshot, logo, and colors once — we pull them automatically for every future order.",
       },
       {
-        icon: "💬",
+        icon: "chat",
         title: "Direct Designer Chat",
         description: "Request changes, approve proofs, or ask questions without hunting through email threads.",
       },
@@ -161,54 +163,90 @@ function mergeContent(_data) {
   return DEFAULTS;
 }
 
+// ── Shared ────────────────────────────────────────────────────────────────────
+
+function Eyebrow({ children, light = false }) {
+  return (
+    <div className={`flex items-center gap-3 text-[0.72rem] font-semibold uppercase tracking-[0.28em] mb-4 ${light ? "text-champagne" : "text-brass"}`}>
+      <span className={`w-8 h-px ${light ? "bg-champagne/60" : "bg-brass/60"}`} />
+      {children}
+    </div>
+  );
+}
+
+const primaryBtn =
+  "inline-block font-sans bg-ink text-white font-semibold px-9 py-4 rounded-[3px] text-[0.78rem] uppercase tracking-[0.18em] no-underline hover:bg-brass transition-colors duration-300";
+const secondaryBtn =
+  "inline-block font-sans text-ink font-semibold px-9 py-4 rounded-[3px] text-[0.78rem] uppercase tracking-[0.18em] no-underline border border-ink/25 hover:border-ink transition-colors duration-300";
+
 // ── Hero ──────────────────────────────────────────────────────────────────────
 
-function Hero({ content: c }) {
+function Hero({ content: c, stats }) {
   return (
-    <section className="min-h-screen flex items-center pt-[100px] pb-16 px-8 relative overflow-hidden">
+    <section className="relative overflow-hidden pt-[150px] pb-20 px-6 md:px-10">
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            radial-gradient(ellipse at 70% 30%, rgba(242,196,176,0.38) 0%, transparent 60%),
-            radial-gradient(ellipse at 10% 80%, rgba(212,168,83,0.15) 0%, transparent 50%)
-          `,
-        }}
+        style={{ background: "radial-gradient(ellipse at 85% 20%, rgba(196,164,107,0.14) 0%, transparent 55%)" }}
       />
-      <div className="absolute rounded-full bg-coral opacity-[0.07] animate-float pointer-events-none"
-        style={{ width: 560, height: 560, top: -120, right: -120 }} />
-      <div className="absolute rounded-full bg-gold opacity-[0.07] animate-float-reverse pointer-events-none"
-        style={{ width: 320, height: 320, bottom: 40, left: -90 }} />
 
-      <div className="max-w-[680px] mx-auto w-full relative z-10">
-        <div className="inline-flex items-center gap-2 bg-white border border-border rounded-full px-4 py-1.5 text-[0.8rem] font-medium text-slate mb-6 shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-coral animate-pulse-dot inline-block" />
-          {c.badge}
+      <div className="max-w-[1180px] mx-auto relative grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-16 items-center">
+        <div>
+          <Eyebrow>{c.badge}</Eyebrow>
+
+          <h1 className="font-serif text-[clamp(3rem,6.2vw,5.4rem)] leading-[1.02] text-ink mb-7">
+            {c.headlineStart}
+            <br />
+            <em className="italic text-brass">{c.headlineEmphasis}</em>
+          </h1>
+
+          <p className="font-sans text-[1.06rem] leading-[1.8] text-slate mb-10 max-w-[540px]">
+            {c.subheadline}
+          </p>
+
+          <div className="flex gap-4 flex-wrap">
+            <a href="#services" className={primaryBtn}>{c.primaryButtonText}</a>
+            <a href="#custom" className={secondaryBtn}>{c.secondaryButtonText}</a>
+          </div>
         </div>
 
-        <h1 className="font-serif text-[clamp(2.6rem,5.5vw,4.2rem)] leading-[1.12] text-deep mb-6">
-          {c.headlineStart}{" "}
-          <em className="italic text-coral">{c.headlineEmphasis}</em>
-        </h1>
-
-        <p className="font-sans text-[1.1rem] leading-[1.75] text-slate mb-10 max-w-[580px]">
-          {c.subheadline}
-        </p>
-
-        <div className="flex gap-4 flex-wrap">
-          <a
-            href="#services"
-            className="font-sans bg-deep text-white font-semibold px-8 py-3.5 rounded-full text-[0.95rem] no-underline hover:bg-coral hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(232,130,90,0.35)] transition-all duration-200"
-          >
-            {c.primaryButtonText}
-          </a>
-          <a
-            href="#custom"
-            className="font-sans text-deep font-medium px-8 py-3.5 rounded-full text-[0.95rem] no-underline border border-border hover:border-coral hover:text-coral transition-all duration-200"
-          >
-            {c.secondaryButtonText}
-          </a>
+        {/* Editorial preview card */}
+        <div className="relative hidden lg:block h-[520px]">
+          <div className="absolute top-0 right-0 w-[78%] h-[88%] bg-light-gray border border-border rounded-[4px]" />
+          <div className="absolute bottom-0 left-0 w-[78%] h-[88%] bg-ink rounded-[4px] shadow-[0_30px_60px_rgba(15,26,43,0.25)] p-3">
+            <div className="h-full border border-champagne/35 rounded-[2px] flex flex-col justify-between p-9">
+              <div className="flex items-center justify-between text-champagne/80 text-[0.62rem] uppercase tracking-[0.32em]">
+                <span>Just Listed</span>
+                <span>No. 014</span>
+              </div>
+              <div>
+                <div className="font-serif italic text-champagne text-[1.1rem] mb-2">Introducing</div>
+                <div className="font-serif text-white text-[2.6rem] leading-[1.05] mb-5">
+                  1420 Riverview
+                  <br />
+                  Terrace
+                </div>
+                <div className="w-10 h-px bg-champagne/60 mb-5" />
+                <div className="font-sans text-white/60 text-[0.72rem] uppercase tracking-[0.24em]">
+                  4 Bed · 3.5 Bath · 3,210 Sq Ft
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-sans text-white/40 text-[0.62rem] uppercase tracking-[0.3em]">Your Brand Here</span>
+                <Icon name="home" size={18} className="text-champagne/70" />
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Stats */}
+      <div className="max-w-[1180px] mx-auto relative mt-20 grid grid-cols-1 sm:grid-cols-3 border-t border-border">
+        {stats.map(({ num, label }, i) => (
+          <div key={i} className={`pt-8 pb-2 sm:px-8 ${i > 0 ? "sm:border-l border-border" : "sm:pl-0"}`}>
+            <div className="font-serif text-[2.6rem] leading-none text-ink mb-2">{num}</div>
+            <div className="font-sans text-[0.78rem] uppercase tracking-[0.16em] text-slate">{label}</div>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -219,25 +257,22 @@ function Hero({ content: c }) {
 
 function HowItWorks({ content: c }) {
   return (
-    <section id="how-it-works" className="py-24 px-8 bg-deep">
-      <div className="max-w-[1100px] mx-auto">
-        <div className="text-[0.75rem] font-bold uppercase tracking-[0.15em] text-blush mb-3">{c.tag}</div>
-        <h2 className="font-serif text-[clamp(2rem,4vw,3rem)] text-white mb-4">{c.title}</h2>
-        <p className="font-sans text-[1.05rem] text-white/60 leading-[1.7] max-w-[520px] mb-14">{c.subtitle}</p>
+    <section id="how-it-works" className="py-28 px-6 md:px-10 bg-ink">
+      <div className="max-w-[1180px] mx-auto">
+        <Eyebrow light>{c.tag}</Eyebrow>
+        <h2 className="font-serif text-[clamp(2.3rem,4.4vw,3.5rem)] leading-[1.1] text-white mb-5 max-w-[640px]">{c.title}</h2>
+        <p className="font-sans text-[1.02rem] text-white/60 leading-[1.8] max-w-[520px] mb-16">{c.subtitle}</p>
 
-        <div className="relative">
-          <div className="hidden md:block absolute top-7 left-[10%] right-[10%] h-px bg-white/10 z-0" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {c.steps.map(({ title, description }, i) => (
-              <div key={i} className="group text-center relative z-10">
-                <div className="w-14 h-14 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center font-serif text-xl font-bold text-blush mx-auto mb-4 shadow-sm transition-all duration-200 group-hover:bg-coral group-hover:text-white group-hover:border-coral group-hover:scale-110">
-                  {i + 1}
-                </div>
-                <h3 className="font-sans text-[1rem] font-semibold text-white mb-2">{title}</h3>
-                <p className="font-sans text-[0.87rem] text-white/55 leading-[1.65]">{description}</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 border-t border-white/15">
+          {c.steps.map(({ title, description }, i) => (
+            <div key={i} className={`group pt-10 pb-4 md:px-10 ${i > 0 ? "md:border-l border-white/15" : "md:pl-0"}`}>
+              <div className="font-serif italic text-[3.2rem] leading-none text-champagne/80 mb-6 transition-colors duration-300 group-hover:text-champagne">
+                0{i + 1}
               </div>
-            ))}
-          </div>
+              <h3 className="font-sans text-[0.85rem] font-semibold uppercase tracking-[0.16em] text-white mb-3">{title}</h3>
+              <p className="font-sans text-[0.9rem] text-white/55 leading-[1.75]">{description}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -248,27 +283,27 @@ function HowItWorks({ content: c }) {
 
 function CustomSection({ content: c }) {
   return (
-    <section id="custom" className="bg-deep py-24 px-8">
-      <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+    <section id="custom" className="bg-ink py-28 px-6 md:px-10 border-t border-white/10">
+      <div className="max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
         <div>
-          <div className="text-[0.75rem] font-bold uppercase tracking-[0.15em] text-blush mb-3">{c.tag}</div>
-          <h2 className="font-serif text-[clamp(2rem,4vw,3rem)] text-white mb-4">{c.title}</h2>
-          <p className="font-sans text-[1.05rem] text-white/65 leading-[1.7] mb-10">{c.subtitle}</p>
-          <ul className="space-y-6 list-none p-0">
+          <Eyebrow light>{c.tag}</Eyebrow>
+          <h2 className="font-serif text-[clamp(2.3rem,4.4vw,3.5rem)] leading-[1.1] text-white mb-5">{c.title}</h2>
+          <p className="font-sans text-[1.02rem] text-white/60 leading-[1.8] mb-12">{c.subtitle}</p>
+          <ul className="space-y-7 list-none p-0">
             {c.steps.map(({ icon, title, description }, i) => (
               <li key={i} className="flex gap-5 items-start">
-                <div className="w-11 h-11 rounded-xl bg-blush/15 flex items-center justify-center flex-shrink-0 text-xl">
-                  {icon}
+                <div className="w-11 h-11 rounded-full border border-champagne/40 text-champagne flex items-center justify-center flex-shrink-0">
+                  <Icon name={icon} size={19} />
                 </div>
                 <div>
-                  <h4 className="font-sans text-[0.95rem] font-semibold text-white mb-1">{title}</h4>
-                  <p className="font-sans text-[0.84rem] text-white/55 leading-[1.6]">{description}</p>
+                  <h4 className="font-sans text-[0.82rem] font-semibold uppercase tracking-[0.14em] text-white mb-1.5">{title}</h4>
+                  <p className="font-sans text-[0.88rem] text-white/55 leading-[1.7]">{description}</p>
                 </div>
               </li>
             ))}
           </ul>
         </div>
-        <div className="bg-white/[0.05] border border-white/10 rounded-3xl p-10">
+        <div className="bg-white/[0.04] border border-white/12 rounded-[4px] p-10">
           <CustomOrderForm />
         </div>
       </div>
@@ -307,19 +342,21 @@ const FAQ_ITEMS = [
 
 function FAQ() {
   return (
-    <section id="faq" className="py-24 px-8 bg-light-gray">
-      <div className="max-w-[820px] mx-auto">
-        <div className="text-[0.75rem] font-bold uppercase tracking-[0.15em] text-coral mb-3">FAQ</div>
-        <h2 className="font-serif text-[clamp(2rem,4vw,3rem)] text-deep mb-4">Common questions.</h2>
-        <p className="font-sans text-[1.05rem] text-slate leading-[1.7] mb-12">Everything you need to know before getting started.</p>
-        <div className="space-y-3">
+    <section id="faq" className="py-28 px-6 md:px-10 bg-ivory">
+      <div className="max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-14">
+        <div>
+          <Eyebrow>FAQ</Eyebrow>
+          <h2 className="font-serif text-[clamp(2.3rem,4.4vw,3.5rem)] leading-[1.1] text-ink mb-5">Common questions.</h2>
+          <p className="font-sans text-[1.02rem] text-slate leading-[1.8]">Everything you need to know before getting started.</p>
+        </div>
+        <div className="border-t border-border">
           {FAQ_ITEMS.map(({ q, a }) => (
-            <details key={q} className="group bg-white rounded-2xl border border-border overflow-hidden">
-              <summary className="flex items-center justify-between gap-4 px-7 py-5 cursor-pointer list-none font-sans text-[0.97rem] font-semibold text-deep select-none">
+            <details key={q} className="group border-b border-border">
+              <summary className="flex items-center justify-between gap-6 py-6 cursor-pointer list-none font-serif text-[1.35rem] text-ink select-none hover:text-brass transition-colors">
                 {q}
-                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-light-gray flex items-center justify-center text-slate text-[1rem] leading-none transition-transform duration-200 group-open:rotate-45">+</span>
+                <span className="flex-shrink-0 font-sans font-light text-brass text-[1.5rem] leading-none transition-transform duration-300 group-open:rotate-45">+</span>
               </summary>
-              <div className="px-7 pb-6 font-sans text-[0.9rem] text-slate leading-[1.75]">{a}</div>
+              <div className="pb-7 pr-10 font-sans text-[0.93rem] text-slate leading-[1.8]">{a}</div>
             </details>
           ))}
         </div>
@@ -332,27 +369,26 @@ function FAQ() {
 
 function AccountSection({ content: c }) {
   return (
-    <section id="account" className="py-24 px-8">
-      <div className="max-w-[1100px] mx-auto text-center">
-        <div className="text-[0.75rem] font-bold uppercase tracking-[0.15em] text-coral mb-3">{c.tag}</div>
-        <h2 className="font-serif text-[clamp(2rem,4vw,3rem)] text-deep mb-4">{c.title}</h2>
-        <p className="font-sans text-[1.05rem] text-slate leading-[1.7] max-w-[520px] mx-auto">{c.subtitle}</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-          {c.cards.map(({ icon, title, description }, i) => (
-            <div key={i} className="bg-white rounded-2xl p-8 border border-border text-left hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200">
-              <span className="text-3xl mb-4 block">{icon}</span>
-              <h3 className="font-sans text-[1rem] font-semibold text-deep mb-2">{title}</h3>
-              <p className="font-sans text-[0.85rem] text-slate leading-[1.65]">{description}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-12">
-          <a
-            href="/portal"
-            className="inline-block font-sans bg-deep text-white font-semibold px-8 py-3.5 rounded-full text-[0.95rem] no-underline hover:bg-coral hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(232,130,90,0.35)] transition-all duration-200"
-          >
+    <section id="account" className="py-28 px-6 md:px-10 bg-light-gray">
+      <div className="max-w-[1180px] mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-14">
+          <div>
+            <Eyebrow>{c.tag}</Eyebrow>
+            <h2 className="font-serif text-[clamp(2.3rem,4.4vw,3.5rem)] leading-[1.1] text-ink mb-5">{c.title}</h2>
+            <p className="font-sans text-[1.02rem] text-slate leading-[1.8] max-w-[520px]">{c.subtitle}</p>
+          </div>
+          <a href="/portal" className={`${primaryBtn} self-start md:self-auto flex-shrink-0`}>
             Log In to Your Portal
           </a>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {c.cards.map(({ icon, title, description }, i) => (
+            <div key={i} className="bg-white rounded-[4px] p-9 border border-border hover:border-brass/50 hover:shadow-[0_18px_40px_rgba(15,26,43,0.08)] transition-all duration-300">
+              <Icon name={icon} size={26} className="text-brass mb-6" />
+              <h3 className="font-serif text-[1.45rem] text-ink mb-2">{title}</h3>
+              <p className="font-sans text-[0.88rem] text-slate leading-[1.75]">{description}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -363,12 +399,14 @@ function AccountSection({ content: c }) {
 
 function PaymentStrip({ content: c }) {
   return (
-    <div className="bg-blush py-10 px-8 text-center">
-      <div className="max-w-[600px] mx-auto">
-        <h3 className="font-serif text-[1.5rem] text-deep mb-2">{c.heading}</h3>
-        <p className="font-sans text-[0.9rem] text-slate mb-5 leading-relaxed">{c.body}</p>
-        <span className="inline-flex items-center gap-2.5 bg-[#008CFF] text-white font-bold text-[0.95rem] px-6 py-2.5 rounded-full">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+    <div className="bg-ivory border-t border-border py-14 px-6 md:px-10">
+      <div className="max-w-[1180px] mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div className="max-w-[620px]">
+          <h3 className="font-serif text-[1.9rem] text-ink mb-2">{c.heading}</h3>
+          <p className="font-sans text-[0.92rem] text-slate leading-relaxed">{c.body}</p>
+        </div>
+        <span className="inline-flex items-center gap-2.5 bg-[#008CFF] text-white font-semibold text-[0.88rem] px-6 py-3 rounded-[3px] self-start md:self-auto flex-shrink-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
             <path d="M19.5 2C20.9 2 22 3.1 22 4.5c0 .9-.5 2.2-1.3 3.5L14 20.5H8.3L5 2H10l1.8 10.7L16.5 2H19.5z" />
           </svg>
           @Colt-Wilson on Venmo
@@ -385,21 +423,19 @@ const ACCOUNT_HREFS  = ["/portal", "#", "#how-it-works"];
 
 function Footer({ content: c }) {
   return (
-    <footer className="bg-deep pt-12 pb-8 px-8">
-      <div className="max-w-[1100px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-12 pb-8 border-b border-white/10">
+    <footer className="bg-ink pt-20 pb-10 px-6 md:px-10">
+      <div className="max-w-[1180px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-12 pb-12 border-b border-white/10">
           <div>
-            <a href="#" className="font-serif text-xl text-white no-underline">
-              The Listing <span className="text-coral">Look</span>
-            </a>
-            <p className="font-sans text-[0.85rem] text-white/50 leading-[1.7] mt-3 max-w-[280px]">{c.tagline}</p>
+            <Logo tone="light" href="#" />
+            <p className="font-sans text-[0.88rem] text-white/50 leading-[1.8] mt-6 max-w-[320px]">{c.tagline}</p>
           </div>
           <div>
-            <h4 className="font-sans text-[0.8rem] font-bold uppercase tracking-[0.12em] text-white/40 mb-4">Plans</h4>
-            <ul className="list-none p-0 space-y-2">
+            <h4 className="font-sans text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-champagne mb-5">Plans</h4>
+            <ul className="list-none p-0 space-y-3">
               {c.servicesLinks.map((label, i) => (
                 <li key={i}>
-                  <a href={SERVICES_HREFS[i] ?? "#services"} className="font-sans text-[0.88rem] text-white/65 no-underline hover:text-blush transition-colors">
+                  <a href={SERVICES_HREFS[i] ?? "#services"} className="font-sans text-[0.9rem] text-white/65 no-underline hover:text-white transition-colors">
                     {label}
                   </a>
                 </li>
@@ -407,11 +443,11 @@ function Footer({ content: c }) {
             </ul>
           </div>
           <div>
-            <h4 className="font-sans text-[0.8rem] font-bold uppercase tracking-[0.12em] text-white/40 mb-4">Account</h4>
-            <ul className="list-none p-0 space-y-2">
+            <h4 className="font-sans text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-champagne mb-5">Account</h4>
+            <ul className="list-none p-0 space-y-3">
               {c.accountLinks.map((label, i) => (
                 <li key={i}>
-                  <a href={ACCOUNT_HREFS[i] ?? "#"} className="font-sans text-[0.88rem] text-white/65 no-underline hover:text-blush transition-colors">
+                  <a href={ACCOUNT_HREFS[i] ?? "#"} className="font-sans text-[0.9rem] text-white/65 no-underline hover:text-white transition-colors">
                     {label}
                   </a>
                 </li>
@@ -419,8 +455,8 @@ function Footer({ content: c }) {
             </ul>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row justify-between mt-6 font-sans text-[0.8rem] text-white/30 gap-2">
-          <span>&copy; 2025 The Listing Look. All rights reserved.</span>
+        <div className="flex flex-col md:flex-row justify-between mt-8 font-sans text-[0.72rem] uppercase tracking-[0.16em] text-white/35 gap-2">
+          <span>&copy; {new Date().getFullYear()} Elevate Marketing Co. All rights reserved.</span>
           <span>Built for real estate agents who mean business.</span>
         </div>
       </div>
@@ -437,7 +473,7 @@ export default async function HomePage() {
   return (
     <main>
       <SiteHeader />
-      <Hero content={cms.hero} />
+      <Hero content={cms.hero} stats={cms.stats} />
       <HowItWorks content={cms.howItWorks} />
       <ServicesWithModals content={cms.services} />
       <CustomSection content={cms.customOrder} />
