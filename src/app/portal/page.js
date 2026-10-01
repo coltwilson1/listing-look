@@ -9,6 +9,7 @@ import { supabase } from "@/app/lib/supabase";
 import { getFile, storeFile } from "@/app/lib/fileStorage";
 import SocialMediaOrderModal from "@/app/components/SocialMediaOrderModal";
 import PostcardOrderModal from "@/app/components/PostcardOrderModal";
+import { LogoImage } from "@/app/components/Logo";
 
 // ── Status config ─────────────────────────────────────────────────────────────
 
@@ -92,7 +93,7 @@ export default function PortalPage() {
         {/* Logo */}
         <div className="px-6 pt-7 pb-6 border-b border-white/10">
           <a href="/" className="font-serif text-[1.25rem] text-white no-underline">
-            Elevate <span className="italic text-champagne">Marketing Co.</span>
+            <LogoImage tone="light" height={46} />
           </a>
           <p className="font-sans text-[0.72rem] text-white/40 mt-0.5">Client Portal</p>
         </div>
@@ -161,7 +162,7 @@ export default function PortalPage() {
             </svg>
           </button>
           <span className="font-serif text-white text-[1.1rem]">
-            Elevate <span className="italic text-champagne">Marketing Co.</span>
+            <LogoImage tone="light" height={30} />
           </span>
           <span className="w-8" />
         </div>
@@ -219,7 +220,7 @@ function LoginScreen({ onLogin }) {
     <div className="min-h-screen bg-ivory flex items-center justify-center px-4">
       <div className="w-full max-w-[440px]">
         <a href="/" className="font-serif text-[1.5rem] text-ink no-underline block mb-8">
-          Elevate <span className="italic text-brass">Marketing Co.</span>
+          <LogoImage height={56} />
         </a>
         <h1 className="font-serif text-[2rem] text-ink mb-1">Welcome back</h1>
         <p className="font-sans text-[0.9rem] text-slate mb-8">Log in to your client portal to track your orders.</p>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import SuccessWithAccount from "@/app/components/SuccessWithAccount";
+import { LogoImage } from "@/app/components/Logo";
 
 function generateOrderId() {
   const year = new Date().getFullYear();
@@ -1066,7 +1067,7 @@ export default function ListingLaunchPage() {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <a href="/" className="font-serif text-[1.2rem] text-ink no-underline">Elevate <span className="italic text-brass">Marketing Co.</span></a>
+          <a href="/" className="font-serif text-[1.2rem] text-ink no-underline"><LogoImage height={52} /></a>
           <h1 className="font-serif text-[2rem] text-ink mt-4 mb-1">Listing Launch</h1>
           <p className="font-sans text-[0.9rem] text-slate">Get a landing page, social graphics, and ready-to-post captions — powered by AI in seconds.</p>
         </div>

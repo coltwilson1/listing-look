@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { storeFile, getFile } from "@/app/lib/fileStorage";
 import { supabase } from "@/app/lib/supabase";
+import { LogoImage } from "@/app/components/Logo";
 
 // ── Change this to update the admin password ───────────────────────────────────
 const ADMIN_PASSWORD    = "admin2025";
@@ -277,7 +278,7 @@ function AdminLoginScreen({ onLogin }) {
       <div className="w-full max-w-[400px]">
         <div className="mb-8">
           <p className="font-serif text-[1.5rem] text-ink">
-            Elevate <span className="italic text-brass">Marketing Co.</span>
+            <LogoImage height={56} />
           </p>
           <p className="font-sans text-[0.78rem] text-slate/60 mt-0.5 uppercase tracking-[0.1em]">Admin Dashboard</p>
         </div>
@@ -324,7 +325,7 @@ function AdminSidebar({ view, navigate, awaitingCount, onLogout, open }) {
       {/* Logo */}
       <div className="px-6 pt-7 pb-5 border-b border-white/10">
         <p className="font-serif text-[1.2rem] text-white">
-          Elevate <span className="italic text-champagne">Marketing Co.</span>
+          <LogoImage tone="light" height={46} />
         </p>
         <p className="font-sans text-[0.68rem] text-white/40 mt-0.5 uppercase tracking-[0.12em]">Admin Panel</p>
       </div>

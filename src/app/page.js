@@ -427,7 +427,7 @@ function Footer({ content: c }) {
       <div className="max-w-[1180px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-12 pb-12 border-b border-white/10">
           <div>
-            <Logo tone="light" href="#" />
+            <Logo tone="light" href="#" height={64} />
             <p className="font-sans text-[0.88rem] text-white/50 leading-[1.8] mt-6 max-w-[320px]">{c.tagline}</p>
           </div>
           <div>
