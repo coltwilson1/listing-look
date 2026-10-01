@@ -174,85 +174,34 @@ function Hero() {
 
 const SCREENS = [
   {
-    eyebrow: "Listing moments",
-    title: "Listings that stop the scroll.",
-    body: "Just Listed, Under Contract, Sold — designed in your brand and posted the moment it happens.",
-  },
-  {
+    img: "/samples/market-moment.webp",
+    alt: "Sample post: The market moves. Your strategy should, too.",
     eyebrow: "Market expertise",
     title: "Market know‑how, made shareable.",
     body: "Tips, market updates, and buyer and seller education that position you as the local expert.",
   },
   {
-    eyebrow: "Community",
-    title: "Local, like you.",
-    body: "Neighborhood spotlights, small‑business features, and seasonal content your sphere actually cares about.",
+    img: "/samples/fall-curb-appeal.webp",
+    alt: "Sample post: Fall curb appeal. Hold the pumpkin patch.",
+    eyebrow: "Seasonal",
+    title: "Right on time, every season.",
+    body: "Holiday and seasonal content with real personality — never the same stock graphic everyone else posts.",
   },
   {
-    eyebrow: "Social proof",
-    title: "Proof that sells.",
-    body: "Client testimonials turned into polished graphics that do the bragging for you.",
+    img: "/samples/love-where-you-live.webp",
+    alt: "Sample post: Chattanooga, Tennessee. Love where you live.",
+    eyebrow: "Community",
+    title: "Local, like you.",
+    body: "Neighborhood spotlights and hometown pride your sphere actually cares about.",
+  },
+  {
+    img: "/samples/fifteen-minute-reset.webp",
+    alt: "Sample post: The 15-minute reset. Your house doesn't clean itself.",
+    eyebrow: "Everyday living",
+    title: "Useful, with a wink.",
+    body: "Home tips and everyday content that keep you top of mind between transactions.",
   },
 ];
-
-function PostArt({ index }) {
-  if (index === 0) {
-    return (
-      <div className="h-full bg-ink p-3">
-        <div className="h-full border border-champagne/40 flex flex-col justify-between p-5">
-          <div className="flex justify-between text-champagne/80 text-[0.5rem] uppercase tracking-[0.3em]"><span>Just Listed</span><span>No. 014</span></div>
-          <div>
-            <div className="font-serif italic text-champagne text-[0.85rem] mb-1">Introducing</div>
-            <div className="font-serif text-white text-[1.7rem] leading-[1.05]">1420 Riverview Terrace</div>
-            <div className="w-8 h-px bg-champagne/60 my-3" />
-            <div className="text-white/60 text-[0.5rem] uppercase tracking-[0.22em]">4 Bed · 3.5 Bath · 3,210 Sq Ft</div>
-          </div>
-          <div className="text-white/40 text-[0.48rem] uppercase tracking-[0.3em]">Your brand here</div>
-        </div>
-      </div>
-    );
-  }
-  if (index === 1) {
-    return (
-      <div className="h-full bg-ivory p-6 flex flex-col justify-between">
-        <div className="text-brass text-[0.5rem] font-semibold uppercase tracking-[0.3em]">Market Update · Sample</div>
-        <div>
-          <div className="font-serif text-ink text-[3.4rem] leading-none">+4.2%</div>
-          <div className="text-slate text-[0.62rem] mt-2 leading-snug">Median sale price,<br />year over year</div>
-        </div>
-        <div className="flex items-end gap-1.5 h-16">
-          {[34, 48, 42, 60, 55, 74, 88].map((h, i) => (
-            <span key={i} className={`flex-1 rounded-t-[2px] ${i === 6 ? "bg-brass" : "bg-ink/15"}`} style={{ height: `${h}%` }} />
-          ))}
-        </div>
-      </div>
-    );
-  }
-  if (index === 2) {
-    return (
-      <div className="h-full p-6 flex flex-col justify-between text-white" style={{ background: "linear-gradient(160deg, #8F6F3E 0%, #C6AA76 60%, #DCC79E 100%)" }}>
-        <div className="text-[0.5rem] font-semibold uppercase tracking-[0.3em] text-white/85">Local Spotlight</div>
-        <div>
-          <div className="font-serif italic text-[1rem] text-white/90">This weekend</div>
-          <div className="font-serif text-[1.9rem] leading-[1.02] mt-1">Saturday at the farmers market</div>
-        </div>
-        <div className="text-[0.55rem] uppercase tracking-[0.24em] text-white/85">3 things worth the trip →</div>
-      </div>
-    );
-  }
-  return (
-    <div className="h-full bg-light-gray p-6 flex flex-col justify-between">
-      <div className="font-serif text-brass text-[3rem] leading-none h-6">“</div>
-      <div className="font-serif text-ink text-[1.25rem] leading-[1.25]">
-        Sold in six days, over asking. We never felt out of the loop.
-      </div>
-      <div>
-        <div className="text-brass text-[0.6rem] tracking-[0.2em]">★★★★★</div>
-        <div className="text-slate text-[0.52rem] uppercase tracking-[0.24em] mt-1.5">Happy clients · Sample</div>
-      </div>
-    </div>
-  );
-}
 
 function PhoneScene() {
   const [active, setActive] = useState(0);
@@ -273,7 +222,7 @@ function PhoneScene() {
         </div>
 
         {/* Phone */}
-        <div className="ev-phone relative order-1 md:order-2 flex-shrink-0" style={{ width: "min(290px, 58vw)", aspectRatio: "9 / 18.5" }}>
+        <div className="ev-phone relative order-1 md:order-2 flex-shrink-0" style={{ width: "min(290px, 58vw)", aspectRatio: "9 / 16.4" }}>
           <div className="absolute -inset-16 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(198,170,118,0.22) 0%, transparent 65%)" }} />
           <div className="relative h-full rounded-[2.6rem] bg-[#05090F] p-[9px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)] ring-1 ring-white/15">
             <div className="relative h-full rounded-[2.1rem] overflow-hidden bg-white flex flex-col">
@@ -282,14 +231,15 @@ function PhoneScene() {
                 <span className="w-6 h-6 rounded-full bg-ink flex items-center justify-center text-champagne font-serif text-[0.7rem]">E</span>
                 <span className="text-[0.62rem] font-semibold text-ink">yourname.realtor</span>
               </div>
-              <div className="relative flex-1">
-                {SCREENS.map((_, i) => (
+              <div className="relative w-full flex-shrink-0" style={{ aspectRatio: "1122 / 1402" }}>
+                {SCREENS.map((sc, i) => (
                   <div key={i} className={`ev-screen absolute inset-0 ${i === active ? "ev-on" : ""}`}>
-                    <PostArt index={i} />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={sc.img} alt={sc.alt} className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>
-              <div className="px-3 py-3 border-t border-border">
+              <div className="px-3 py-3 flex-1">
                 <div className="flex gap-2 mb-1.5 text-ink text-[0.8rem] leading-none">♡ <span className="opacity-60">◯</span> <span className="opacity-60">➤</span></div>
                 <div className="h-1.5 w-3/4 rounded-full bg-ink/10 mb-1" />
                 <div className="h-1.5 w-1/2 rounded-full bg-ink/10" />
