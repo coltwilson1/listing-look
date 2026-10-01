@@ -64,26 +64,26 @@ export default function CustomOrderForm() {
           required
           value={formData.email}
           onChange={handleChange}
-          placeholder="jane@realty.com"
+          placeholder="jane@example.com"
           className={inputClass}
         />
       </div>
 
       <div>
-        <label className={labelClass}>Brokerage</label>
+        <label className={labelClass}>Business or Brokerage</label>
         <input
           type="text"
           name="brokerage"
           required
           value={formData.brokerage}
           onChange={handleChange}
-          placeholder="Your brokerage name"
+          placeholder="Your business name"
           className={inputClass}
         />
       </div>
 
       <div>
-        <label className={labelClass}>Plan Interest</label>
+        <label className={labelClass}>I&apos;m Interested In</label>
         <select
           name="plan"
           required
@@ -91,12 +91,12 @@ export default function CustomOrderForm() {
           onChange={handleChange}
           className={inputClass + " appearance-none cursor-pointer"}
         >
-          <option value="" style={{ background: "#14243A" }}>Select a plan...</option>
+          <option value="" style={{ background: "#14243A" }}>Select one...</option>
           <option style={{ background: "#14243A" }}>Starter — $300/month</option>
           <option style={{ background: "#14243A" }}>Essential — $450/month</option>
           <option style={{ background: "#14243A" }}>Growth — $600/month</option>
           <option style={{ background: "#14243A" }}>Signature — $750/month</option>
-          <option style={{ background: "#14243A" }}>Listing Launch — $99 one-time</option>
+          <option style={{ background: "#14243A" }}>Other services — branding, websites &amp; more</option>
           <option style={{ background: "#14243A" }}>Not sure yet — just exploring</option>
         </select>
       </div>

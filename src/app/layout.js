@@ -17,9 +17,9 @@ const dmSans = DM_Sans({
 });
 
 export const metadata = {
-  title: "Elevate Marketing Co. | Social Media for Real Estate Agents",
+  title: "Elevate Marketing Co. | Done-for-You Social Media & Marketing",
   description:
-    "Done-for-you social media, listing marketing, and custom branded content for real estate agents who want to stand out.",
+    "Done-for-you social media and custom branded content that keeps your business visible — with branding and websites coming soon.",
 };
 
 export default function RootLayout({ children }) {

@@ -112,6 +112,7 @@ function Nav() {
           <a href="#work" className="no-underline hover:text-white transition-colors">The Work</a>
           <a href="#process" className="no-underline hover:text-white transition-colors">Process</a>
           <a href="#plans" className="no-underline hover:text-white transition-colors">Plans</a>
+          <a href="#services" className="no-underline hover:text-white transition-colors">Coming Soon</a>
           <a href="#faq" className="no-underline hover:text-white transition-colors">FAQ</a>
         </div>
         <div className="flex items-center gap-5">
@@ -143,7 +144,7 @@ function Hero() {
 
         <div className="ev-hero-copy relative text-center px-6">
           <div className="ev-rise text-[0.72rem] font-semibold uppercase tracking-[0.34em] text-brass mb-8">
-            Social media for real estate agents
+            Done‑for‑you marketing
           </div>
           <h1 className="ev-rise font-serif text-[clamp(3.4rem,11vw,9.5rem)] leading-[0.95] text-ink" style={{ animationDelay: "120ms" }}>
             Your social media.
@@ -178,7 +179,7 @@ const SCREENS = [
     alt: "Sample post: The market moves. Your strategy should, too.",
     eyebrow: "Market expertise",
     title: "Market know‑how, made shareable.",
-    body: "Tips, market updates, and buyer and seller education that position you as the local expert.",
+    body: "Timely, useful posts that position you as the expert your audience turns to.",
   },
   {
     img: "/samples/fall-curb-appeal.webp",
@@ -192,14 +193,14 @@ const SCREENS = [
     alt: "Sample post: Chattanooga, Tennessee. Love where you live.",
     eyebrow: "Community",
     title: "Local, like you.",
-    body: "Neighborhood spotlights and hometown pride your sphere actually cares about.",
+    body: "Neighborhood spotlights and hometown pride your audience actually cares about.",
   },
   {
     img: "/samples/fifteen-minute-reset.webp",
     alt: "Sample post: The 15-minute reset. Your house doesn't clean itself.",
     eyebrow: "Everyday living",
     title: "Useful, with a wink.",
-    body: "Home tips and everyday content that keep you top of mind between transactions.",
+    body: "Everyday content with personality that keeps you top of mind all year.",
   },
 ];
 
@@ -229,7 +230,7 @@ function PhoneScene() {
               <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-5 rounded-full bg-[#05090F] z-10" />
               <div className="pt-10 px-3 pb-2 flex items-center gap-2 border-b border-border">
                 <span className="w-6 h-6 rounded-full bg-ink flex items-center justify-center text-champagne font-serif text-[0.7rem]">E</span>
-                <span className="text-[0.62rem] font-semibold text-ink">yourname.realtor</span>
+                <span className="text-[0.62rem] font-semibold text-ink">yourbrand</span>
               </div>
               <div className="relative w-full flex-shrink-0" style={{ aspectRatio: "1122 / 1402" }}>
                 {SCREENS.map((sc, i) => (
@@ -262,7 +263,7 @@ function PhoneScene() {
 // ── Statement ─────────────────────────────────────────────────────────────────
 
 const STATEMENT =
-  "We learn your brand once. Then we design, write, and publish every single week — so you stay visible while you're out selling homes.";
+  "We learn your brand once. Then we design, write, and publish every single week — so you stay visible while you run your business.";
 
 function Statement() {
   const ref = useScene();
@@ -387,7 +388,7 @@ function Plans() {
     <section id="plans" className="bg-ivory py-32 px-6">
       <div className="max-w-[1280px] mx-auto">
         <Reveal className="text-center mb-20">
-          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-brass mb-5">Plans</div>
+          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-brass mb-5">Social media plans · for real estate agents</div>
           <h2 className="font-serif text-ink text-[clamp(2.8rem,7vw,6rem)] leading-[0.98]">
             Pick your <em className="italic text-brass">pace.</em>
           </h2>
@@ -426,17 +427,51 @@ function Plans() {
           ))}
         </div>
 
-        <Reveal className="mt-5">
-          <div className="rounded-[1.75rem] bg-light-gray p-8 md:p-12 flex flex-col md:flex-row md:items-center justify-between gap-8">
-            <div>
-              <div className="text-[0.7rem] font-semibold uppercase tracking-[0.26em] text-brass mb-3">One‑time · no subscription</div>
-              <h3 className="font-serif text-ink text-[clamp(2rem,4vw,3.2rem)] leading-none">Listing Launch <span className="italic text-brass">$99</span></h3>
-              <p className="text-slate text-[0.95rem] leading-[1.7] mt-4 max-w-[520px]">
-                A landing page, graphics for every stage, and ready‑to‑post captions for a single listing.
-              </p>
-            </div>
-            <a href="/listing-launch" className={`${btnDark} flex-shrink-0 self-start md:self-auto`}>Launch a Listing</a>
-          </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Coming soon ───────────────────────────────────────────────────────────────
+
+const COMING_SOON = [
+  { icon: "pen", name: "Branding", body: "Logos, color palettes, and brand guides that make you unmistakable." },
+  { icon: "image", name: "Websites", body: "Clean, modern websites designed to turn visitors into clients." },
+  { icon: "home", name: "Listing Launch", body: "For real estate agents: a landing page, graphics for every stage, and ready‑to‑post captions for a single listing." },
+];
+
+function ComingSoon() {
+  return (
+    <section id="services" className="bg-light-gray py-32 px-6">
+      <div className="max-w-[1280px] mx-auto">
+        <Reveal className="text-center mb-16">
+          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-brass mb-5">Coming soon</div>
+          <h2 className="font-serif text-ink text-[clamp(2.6rem,6vw,4.8rem)] leading-[0.98]">
+            More ways to <em className="italic text-brass">elevate.</em>
+          </h2>
+          <p className="text-slate text-[1.05rem] leading-[1.7] max-w-[540px] mx-auto mt-6">
+            We&apos;re growing beyond social media — for any business that wants to look its best.
+          </p>
+        </Reveal>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {COMING_SOON.map((c, i) => (
+            <Reveal key={c.name} delay={i * 110} className="h-full">
+              <div className="h-full bg-white rounded-[1.75rem] p-9 border border-border flex flex-col">
+                <div className="flex items-center justify-between mb-10">
+                  <Icon name={c.icon} size={28} className="text-brass" />
+                  <span className="text-[0.58rem] font-semibold uppercase tracking-[0.2em] border border-brass/40 text-brass px-2.5 py-1 rounded-full">Coming soon</span>
+                </div>
+                <h3 className="font-serif text-ink text-[2.2rem] leading-none mb-4">{c.name}</h3>
+                <p className="text-slate text-[0.92rem] leading-[1.75]">{c.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal className="text-center mt-12">
+          <p className="text-slate text-[0.95rem]">
+            …and more on the way. Have something in mind?{" "}
+            <a href="#start" className="text-ink font-semibold underline underline-offset-4 decoration-brass hover:text-brass transition-colors">Tell us what you need</a>.
+          </p>
         </Reveal>
       </div>
     </section>
@@ -459,10 +494,6 @@ const FAQ_ITEMS = [
     a: "Just your logo, a headshot, your brand colors, and your brokerage name. After you sign up, we schedule a one-time discovery consultation call to understand your style, audience, and posting preferences — then we take it from there.",
   },
   {
-    q: "Can I buy Listing Launch without a monthly plan?",
-    a: "Yes — Listing Launch is completely standalone. No subscription required. Just fill out the form, select Listing Launch, and we'll handle the rest. $99 flat per listing.",
-  },
-  {
     q: "Do the graphics include my brokerage name and compliance disclosures?",
     a: "Absolutely. All graphics include your brokerage name and any required compliance text you provide — so every post is brand-compliant and ready to share.",
   },
@@ -474,7 +505,7 @@ const FAQ_ITEMS = [
 
 function FAQ() {
   return (
-    <section id="faq" className="bg-ivory pb-32 px-6">
+    <section id="faq" className="bg-ivory py-32 px-6">
       <div className="max-w-[900px] mx-auto">
         <Reveal className="text-center mb-14">
           <div className="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-brass mb-5">FAQ</div>
@@ -533,7 +564,6 @@ function Footer() {
         <div className="flex gap-8 text-[0.72rem] uppercase tracking-[0.18em] text-white/55">
           <a href="/portal" className="no-underline hover:text-white transition-colors">Agent Portal</a>
           <a href="#plans" className="no-underline hover:text-white transition-colors">Plans</a>
-          <a href="/listing-launch" className="no-underline hover:text-white transition-colors">Listing Launch</a>
         </div>
         <div className="text-[0.68rem] uppercase tracking-[0.16em] text-white/35">&copy; {new Date().getFullYear()} Elevate Marketing Co.</div>
       </div>
@@ -553,6 +583,7 @@ export default function ScrollHome() {
       <Process />
       <Numbers />
       <Plans />
+      <ComingSoon />
       <FAQ />
       <Start />
       <Footer />
