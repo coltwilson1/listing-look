@@ -263,7 +263,7 @@ function PhoneScene() {
 // ── Statement ─────────────────────────────────────────────────────────────────
 
 const STATEMENT =
-  "We learn your brand once. Then we design, write, and publish every single week — so you stay visible while you run your business.";
+  "Your brand. Your voice. Your story. Consistently created. Beautifully delivered. Always visible.";
 
 function Statement() {
   const ref = useScene();
