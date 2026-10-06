@@ -9,6 +9,9 @@
 /* Hero */
 .ev-hero-copy { transform: scale(calc(1 + var(--p, 0) * 0.18)); opacity: calc(1 - var(--p, 0) * 2.2); will-change: transform, opacity; }
 .ev-hero-glow { transform: translate3d(0, calc(var(--p, 0) * -18vh), 0) scale(calc(1 + var(--p, 0) * 0.6)); }
+.ev-hint-wrap { opacity: calc(1 - var(--p, 0) * 6); }
+.ev-iris { clip-path: circle(calc(clamp(0, (var(--p, 0) - 0.22) * 1.6, 1) * 150vmax) at 50% 55%); will-change: clip-path; }
+.ev-iris-copy { opacity: clamp(0, calc((var(--p, 0) - 0.5) * 4), 1); transform: translateY(calc((1 - clamp(0, (var(--p, 0) - 0.5) * 4, 1)) * 30px)); }
 @keyframes evDrift { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(3vw, -2vh, 0); } }
 .ev-drift { animation: evDrift 14s ease-in-out infinite; }
 @keyframes evRise { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }

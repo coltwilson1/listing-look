@@ -133,8 +133,8 @@ function Nav() {
 function Hero() {
   const ref = useScene();
   return (
-    <section id="top" ref={ref} className="relative h-[170vh]">
-      <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center">
+    <section id="top" ref={ref} className="relative z-10 h-[170vh]">
+      <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-ivory">
         <div className="ev-hero-glow absolute inset-0 pointer-events-none">
           <div
             className="ev-drift absolute rounded-full"
@@ -162,9 +162,21 @@ function Hero() {
           </div>
         </div>
 
-        <div className="ev-hint absolute bottom-8 left-1/2 -translate-x-1/2 text-[0.62rem] uppercase tracking-[0.3em] text-slate/70 flex flex-col items-center gap-2">
-          Scroll
-          <span className="w-px h-8 bg-slate/40" />
+        <div className="ev-hint-wrap absolute bottom-8 left-1/2 -translate-x-1/2">
+          <div className="ev-hint text-[0.62rem] uppercase tracking-[0.3em] text-slate/70 flex flex-col items-center gap-2">
+            Scroll
+            <span className="w-px h-8 bg-slate/40" />
+          </div>
+        </div>
+
+        {/* Navy iris that grows out of the centre and hands off to the phone scene */}
+        <div className="ev-iris absolute inset-0 bg-ink flex items-center justify-center px-6" aria-hidden="true">
+          <div className="ev-iris-copy text-center">
+            <div className="text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-champagne mb-5">The work</div>
+            <div className="font-serif text-white text-[clamp(2.4rem,7vw,5.5rem)] leading-[1]">
+              Content worth <em className="italic text-champagne">stopping for.</em>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -206,10 +218,17 @@ const SCREENS = [
 
 function PhoneScene() {
   const [active, setActive] = useState(0);
-  const ref = useScene((p) => setActive(Math.min(SCREENS.length - 1, Math.floor(p * SCREENS.length))));
+  // The scene starts pinned underneath the hero (see -mt-[100vh]) so it is revealed
+  // in place as the hero slides away; that first 100vh of its scroll is hidden.
+  const visible = SCREENS.length * 100 + 60;
+  const ref = useScene((p) => {
+    const q = Math.max(0, (p * (visible + 100) - 100) / visible);
+    setActive(Math.min(SCREENS.length - 1, Math.floor(q * SCREENS.length)));
+  });
 
   return (
-    <section id="work" ref={ref} className="relative bg-ink" style={{ height: `${SCREENS.length * 100 + 60}vh` }}>
+    <section ref={ref} className="relative bg-ink -mt-[100vh]" style={{ height: `${visible + 200}vh` }}>
+      <span id="work" className="absolute left-0 top-[100vh]" />
       <div className="sticky top-0 h-screen overflow-hidden flex flex-col md:flex-row items-center justify-center gap-8 md:gap-20 px-6 pt-14">
         {/* Captions */}
         <div className="relative w-full md:w-[400px] h-[190px] md:h-[300px] order-2 md:order-1">
