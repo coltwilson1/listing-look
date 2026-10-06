@@ -375,7 +375,7 @@ const PLANS = [
     price: 300,
     pace: "1–2 posts a week",
     blurb: "A simple, polished presence for agents just getting started.",
-    items: ["Real estate tips & education", "Local & community content", "Holiday & seasonal posts", "Custom branded graphics", "Captions written for you"],
+    items: ["Real estate tips & education", "Local & community content", "Holiday & seasonal posts", "Custom branded graphics", "Captions written for you", "Complimentary logo & branding consultation"],
     note: "Listing posts not included",
   },
   {
@@ -446,6 +446,32 @@ function Plans() {
           ))}
         </div>
 
+        <Reveal className="mt-5">
+          <div className="rounded-[1.75rem] bg-light-gray p-8 md:p-12 grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-8 md:gap-12 items-center">
+            <div>
+              <div className="text-[0.7rem] font-semibold uppercase tracking-[0.26em] text-brass mb-3">Included with every plan</div>
+              <h3 className="font-serif text-ink text-[clamp(1.7rem,3vw,2.4rem)] leading-[1.05]">
+                One complimentary logo &amp; branding consultation.
+              </h3>
+            </div>
+            <div className="hidden md:block w-px self-stretch bg-ink/10" />
+            <div>
+              <div className="text-[0.7rem] font-semibold uppercase tracking-[0.26em] text-brass mb-3">Or on its own</div>
+              <h3 className="font-serif text-ink text-[clamp(1.7rem,3vw,2.4rem)] leading-[1.05]">
+                Logo &amp; Branding <span className="italic text-brass">$150</span>
+              </h3>
+              <ul className="list-none p-0 mt-4 mb-6 flex flex-wrap gap-x-6 gap-y-2">
+                {["Logo", "Secondary logo", "Color scheme"].map((it) => (
+                  <li key={it} className="flex items-center gap-2 text-slate text-[0.9rem]">
+                    <Icon name="check" size={14} strokeWidth={1.8} className="text-brass" />
+                    {it}
+                  </li>
+                ))}
+              </ul>
+              <a href="#start" className={btnDark}>Get Started</a>
+            </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -454,7 +480,6 @@ function Plans() {
 // ── Coming soon ───────────────────────────────────────────────────────────────
 
 const COMING_SOON = [
-  { icon: "pen", name: "Branding", body: "Logos, color palettes, and brand guides that make you unmistakable." },
   { icon: "image", name: "Websites", body: "Clean, modern websites designed to turn visitors into clients." },
   { icon: "home", name: "Listing Launch", body: "For real estate agents: a landing page, graphics for every stage, and ready‑to‑post captions for a single listing." },
 ];
@@ -472,7 +497,7 @@ function ComingSoon() {
             We&apos;re growing beyond social media — for any business that wants to look its best.
           </p>
         </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-[860px] mx-auto">
           {COMING_SOON.map((c, i) => (
             <Reveal key={c.name} delay={i * 110} className="h-full">
               <div className="h-full bg-white rounded-[1.75rem] p-9 border border-border flex flex-col">

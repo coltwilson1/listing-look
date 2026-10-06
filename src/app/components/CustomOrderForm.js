@@ -96,7 +96,8 @@ export default function CustomOrderForm() {
           <option style={{ background: "#14243A" }}>Essential — $450/month</option>
           <option style={{ background: "#14243A" }}>Growth — $600/month</option>
           <option style={{ background: "#14243A" }}>Signature — $750/month</option>
-          <option style={{ background: "#14243A" }}>Other services — branding, websites &amp; more</option>
+          <option style={{ background: "#14243A" }}>Logo &amp; Branding — $150 one-time</option>
+          <option style={{ background: "#14243A" }}>Other services — websites &amp; more</option>
           <option style={{ background: "#14243A" }}>Not sure yet — just exploring</option>
         </select>
       </div>
