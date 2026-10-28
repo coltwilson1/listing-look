@@ -12,6 +12,7 @@ export default function CustomOrderForm() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -19,9 +20,21 @@ export default function CustomOrderForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 900));
-    setLoading(false);
-    setSubmitted(true);
+    setError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Something went wrong. Please try again.");
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputClass =
@@ -113,6 +126,10 @@ export default function CustomOrderForm() {
           className={inputClass + " resize-none"}
         />
       </div>
+
+      {error && (
+        <p className="text-[0.85rem] text-red-300 font-sans" role="alert">{error}</p>
+      )}
 
       <button
         type="submit"
