@@ -5,34 +5,32 @@ import { storeFile, getFile } from "@/app/lib/fileStorage";
 import { supabase } from "@/app/lib/supabase";
 import { LogoImage } from "@/app/components/Logo";
 
-// ── Change this to update the admin password ───────────────────────────────────
-const ADMIN_PASSWORD    = "admin2025";
-const ADMIN_SESSION_KEY = "tll_admin_session";
-const AUTH_HEADER       = { "x-admin-password": ADMIN_PASSWORD };
+// Admin password is checked server-side (ADMIN_PASSWORD env var in Vercel);
+// the session is an httpOnly cookie sent automatically with these requests.
 
 // ── API helpers ────────────────────────────────────────────────────────────────
 async function fetchOrders() {
   try {
-    const r = await fetch("/api/admin/orders", { headers: AUTH_HEADER });
+    const r = await fetch("/api/admin/orders");
     return r.ok ? r.json() : [];
   } catch { return []; }
 }
 async function fetchNotifications() {
   try {
-    const r = await fetch("/api/admin/notifications", { headers: AUTH_HEADER });
+    const r = await fetch("/api/admin/notifications");
     return r.ok ? r.json() : [];
   } catch { return []; }
 }
 async function markNotifsRead() {
   try {
-    await fetch("/api/admin/notifications/read", { method: "POST", headers: AUTH_HEADER });
+    await fetch("/api/admin/notifications/read", { method: "POST" });
   } catch {}
 }
 async function apiUpdateOrder(id, updates) {
   try {
     const r = await fetch(`/api/admin/orders/${id}`, {
       method: "PATCH",
-      headers: { ...AUTH_HEADER, "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updates),
     });
     return r.ok;
@@ -103,10 +101,10 @@ export default function AdminPage() {
   async function loadNotifications() { setNotifications(await fetchNotifications()); }
 
   useEffect(() => {
-    try {
-      const s = localStorage.getItem(ADMIN_SESSION_KEY);
-      if (s === "1") { setAuthed(true); loadOrders(); loadNotifications(); }
-    } catch {}
+    fetch("/api/admin/login")
+      .then((r) => r.json())
+      .then((d) => { if (d.authed) { setAuthed(true); loadOrders(); loadNotifications(); } })
+      .catch(() => {});
   }, []);
 
   // Poll orders + notifications every 8s
@@ -116,20 +114,23 @@ export default function AdminPage() {
     return () => clearInterval(id);
   }, [authed]);
 
-  function handleLogin(pw) {
-    if (pw === ADMIN_PASSWORD) {
-      localStorage.setItem(ADMIN_SESSION_KEY, "1");
-      setAuthed(true);
-      loadOrders();
-      loadNotifications();
-    } else {
-      return false;
-    }
+  async function handleLogin(pw) {
+    try {
+      const r = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pw }),
+      });
+      if (!r.ok) return false;
+    } catch { return false; }
+    setAuthed(true);
+    loadOrders();
+    loadNotifications();
     return true;
   }
 
   function handleLogout() {
-    localStorage.removeItem(ADMIN_SESSION_KEY);
+    fetch("/api/admin/login", { method: "DELETE" }).catch(() => {});
     setAuthed(false);
     setView("dashboard");
     setSelectedOrder(null);
@@ -263,14 +264,12 @@ function AdminLoginScreen({ onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    setTimeout(() => {
-      const ok = onLogin(pw);
-      if (!ok) { setError("Incorrect password."); setLoading(false); }
-    }, 400);
+    const ok = await onLogin(pw);
+    if (!ok) { setError("Incorrect password."); setLoading(false); }
   }
 
   return (

@@ -2,17 +2,13 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { flattenUpdates } from "@/app/lib/orderUtils";
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin2025";
+import { isAdmin } from "@/app/lib/adminAuth";
 
 function serviceClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
-}
-
-function isAdmin(req) {
-  return req.headers.get("x-admin-password") === ADMIN_PASSWORD;
 }
 
 export async function PATCH(req, { params }) {
