@@ -784,7 +784,7 @@ export default function ListingLaunchPage() {
                         ? <span className="flex items-center justify-center gap-2"><span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin inline-block"/>Submitting…</span>
                         : "Continue →"}
                     </button>
-                    <p className="font-sans text-[0.72rem] text-slate/50 text-center">Payment via Venmo @Colt-Wilson after checkout</p>
+                    <p className="font-sans text-[0.72rem] text-slate/50 text-center">Payment via Venmo @elevatemarketingco after checkout</p>
                   </form>
                 </>
               ) : purchaseOrder ? (

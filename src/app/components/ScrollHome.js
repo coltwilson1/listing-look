@@ -534,7 +534,7 @@ function ComingSoon() {
 const FAQ_ITEMS = [
   {
     q: "How does billing work?",
-    a: "Plans are month-to-month with no auto-renewal. Payment is due by the 25th of each month for the following month's content. We'll send a reminder each month — no auto-charges, no surprises. All payments are via Venmo @Colt-Wilson.",
+    a: "Plans are month-to-month with no auto-renewal. Payment is due by the 25th of each month for the following month's content. We'll send a reminder each month — no auto-charges, no surprises. All payments are via Venmo @elevatemarketingco.",
   },
   {
     q: "Will you post for me, or just send me the content?",
