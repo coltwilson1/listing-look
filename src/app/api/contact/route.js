@@ -32,9 +32,9 @@ export async function POST(req) {
       from: `"Elevate Website" <${user}>`,
       to: process.env.CONTACT_TO_EMAIL || user,
       replyTo: `"${name.replace(/"/g, "")}" <${email}>`,
-      subject: `New inquiry from ${name}${plan ? ` — ${plan}` : ""}`,
+      subject: `New waitlist signup: ${name}${plan ? ` — ${plan}` : ""}`,
       text: fields.map(([k, v]) => `${k}: ${v || "—"}`).join("\n"),
-      html: `<h2 style="font-family:sans-serif">New website inquiry</h2>
+      html: `<h2 style="font-family:sans-serif">New waitlist signup</h2>
 <table style="font-family:sans-serif;font-size:14px;border-collapse:collapse">
 ${fields
   .map(

@@ -120,7 +120,7 @@ function Nav() {
             Log In
           </a>
           <a href="#start" className="bg-champagne text-ink text-[0.68rem] font-semibold uppercase tracking-[0.16em] px-4 py-2 rounded-full no-underline hover:bg-white transition-colors">
-            Get Started
+            Join Waitlist
           </a>
         </div>
       </div>
@@ -402,6 +402,9 @@ const PLANS = [
   },
 ];
 
+// Pre-selects the clicked plan in the waitlist form (see CustomOrderForm).
+const selectPlan = (name) => window.dispatchEvent(new CustomEvent("ev:select-plan", { detail: name }));
+
 function Plans() {
   return (
     <section id="plans" className="bg-ivory py-32 px-6">
@@ -414,6 +417,10 @@ function Plans() {
           <p className="text-slate text-[1.05rem] leading-[1.7] max-w-[520px] mx-auto mt-6">
             Month‑to‑month. No contracts. Everything custom to your brand — never recycled templates.
           </p>
+          <div className="inline-flex items-center gap-2.5 mt-8 border border-brass/40 rounded-full px-5 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-brass">
+            <span className="w-1.5 h-1.5 rounded-full bg-brass" />
+            Limited spots available
+          </div>
         </Reveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
@@ -440,7 +447,7 @@ function Plans() {
                   ))}
                   {p.note && <li className="text-[0.76rem] text-slate/70 italic pl-6">{p.note}</li>}
                 </ul>
-                <a href="#start" className={`${p.featured ? btnLight : btnDark} text-center`}>Get Started</a>
+                <a href="#start" onClick={() => selectPlan(p.name)} className={`${p.featured ? btnLight : btnDark} text-center`}>Join the Waitlist</a>
               </div>
             </Reveal>
           ))}
@@ -468,7 +475,7 @@ function Plans() {
                   </li>
                 ))}
               </ul>
-              <a href="#start" className={btnDark}>Get Started</a>
+              <a href="#start" onClick={() => selectPlan("Logo")} className={btnDark}>Join the Waitlist</a>
             </div>
           </div>
         </Reveal>
@@ -582,12 +589,12 @@ function Start() {
     <section id="start" className="bg-ink py-32 px-6">
       <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <Reveal>
-          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-champagne mb-5">Get started</div>
+          <div className="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-champagne mb-5">Join the waitlist</div>
           <h2 className="font-serif text-white text-[clamp(3rem,7vw,6rem)] leading-[0.96]">
             Ready to <em className="italic text-champagne">elevate?</em>
           </h2>
           <p className="text-white/60 text-[1.05rem] leading-[1.75] mt-7 max-w-[440px]">
-            Tell us a little about you. We&apos;ll reach out within 24 hours to answer questions and schedule your discovery call.
+            Spots are limited for our launch. Join the waitlist and we&apos;ll reach out personally to answer questions and save your place.
           </p>
         </Reveal>
         <Reveal delay={150}>

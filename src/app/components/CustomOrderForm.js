@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function CustomOrderForm() {
   const [formData, setFormData] = useState({
@@ -13,6 +13,17 @@ export default function CustomOrderForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const selectRef = useRef(null);
+
+  // Plan buttons on the homepage fire this to pre-select their plan.
+  useEffect(() => {
+    const onSelect = (e) => {
+      const match = Array.from(selectRef.current?.options || []).find((o) => o.value.startsWith(e.detail));
+      if (match) setFormData((prev) => ({ ...prev, plan: match.value }));
+    };
+    window.addEventListener("ev:select-plan", onSelect);
+    return () => window.removeEventListener("ev:select-plan", onSelect);
+  }, []);
 
   const handleChange = (e) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -46,9 +57,9 @@ export default function CustomOrderForm() {
     return (
       <div className="text-center py-10">
         <div className="w-14 h-14 mx-auto mb-5 rounded-full border border-champagne/50 flex items-center justify-center text-champagne text-xl">✓</div>
-        <h3 className="font-serif text-2xl text-white mb-2">We'll be in touch soon!</h3>
+        <h3 className="font-serif text-2xl text-white mb-2">You&apos;re on the list!</h3>
         <p className="font-sans text-white/60 text-[0.9rem] leading-relaxed">
-          Thanks for reaching out. Expect a response within 24 hours to answer your questions and get you set up.
+          Thanks for joining the waitlist. We&apos;ll reach out personally within 24 hours about your spot.
         </p>
       </div>
     );
@@ -99,6 +110,7 @@ export default function CustomOrderForm() {
         <label className={labelClass}>I&apos;m Interested In</label>
         <select
           name="plan"
+          ref={selectRef}
           required
           value={formData.plan}
           onChange={handleChange}
@@ -136,7 +148,7 @@ export default function CustomOrderForm() {
         disabled={loading}
         className="w-full bg-champagne text-ink font-semibold uppercase tracking-[0.18em] text-[0.78rem] py-4 rounded-[3px] border-none cursor-pointer hover:bg-white hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(143,111,62,0.4)] transition-all duration-200 disabled:opacity-60 font-sans"
       >
-        {loading ? "Sending..." : "Send My Inquiry →"}
+        {loading ? "Sending..." : "Join the Waitlist →"}
       </button>
     </form>
   );
