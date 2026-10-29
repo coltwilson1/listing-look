@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { storeFile, getFile } from "@/app/lib/fileStorage";
 import { supabase } from "@/app/lib/supabase";
 import { LogoImage } from "@/app/components/Logo";
+import { answerRows } from "@/app/brand-discovery/questions";
 
 // Admin password is checked server-side (ADMIN_PASSWORD env var in Vercel);
 // the session is an httpOnly cookie sent automatically with these requests.
@@ -53,7 +54,7 @@ const STATUS_OPTIONS = [
   { value: "revision",          label: "Revision Requested" },
   { value: "completed",         label: "Completed" },
 ];
-const NOTIF_ICONS = { "new-order": "🛒", "message": "💬", "revision": "✏️" };
+const NOTIF_ICONS = { "new-order": "🛒", "message": "💬", "revision": "✏️", "questionnaire": "📝" };
 
 // ── Utilities ──────────────────────────────────────────────────────────────────
 function fmtDate(iso) {
@@ -204,6 +205,7 @@ export default function AdminPage() {
               : view === "in-progress" ? "In Progress"
               : view === "awaiting-approval" ? "Awaiting Approval"
               : view === "completed" ? "Completed"
+              : view === "questionnaires" ? "Brand Discovery"
               : ""}
           </span>
           <NotificationBell
@@ -211,6 +213,7 @@ export default function AdminPage() {
             unreadCount={unreadNotifs}
             onMarkRead={async () => { await markNotifsRead(); loadNotifications(); }}
             onClickOrder={(id) => {
+              if (id?.startsWith("bd-")) return navigateTo("questionnaires");
               const o = orders.find((x) => x.id === id);
               if (o) openOrderDetail(o);
             }}
@@ -226,6 +229,8 @@ export default function AdminPage() {
               onUpdate={handleOrderUpdate}
               showToast={showToast}
             />
+          ) : view === "questionnaires" ? (
+            <QuestionnairesView showToast={showToast} />
           ) : view === "dashboard" ? (
             <DashboardView orders={orders} onSelectOrder={openOrderDetail} navigate={navigateTo} />
           ) : (
@@ -317,6 +322,7 @@ function AdminSidebar({ view, navigate, awaitingCount, onLogout, open }) {
     { id: "in-progress",        label: "In Progress",        icon: "⟳" },
     { id: "awaiting-approval",  label: "Awaiting Approval",  icon: "◉", badge: awaitingCount },
     { id: "completed",          label: "Completed",          icon: "✓" },
+    { id: "questionnaires",     label: "Brand Discovery",    icon: "✎" },
   ];
 
   return (
@@ -430,6 +436,104 @@ function NotificationBell({ notifications, unreadCount, onMarkRead, onClickOrder
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Brand Discovery Questionnaires ─────────────────────────────────────────────
+function QuestionnairesView({ showToast }) {
+  const [data, setData] = useState(null);
+  const [openId, setOpenId] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/admin/questionnaires")
+      .then((r) => r.json())
+      .then(setData)
+      .catch(() => setData({ submissions: [], error: "Could not load submissions" }));
+  }, []);
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(data.link);
+      showToast("Private link copied");
+    } catch {
+      showToast("Couldn't copy — select the link and copy it manually", "error");
+    }
+  }
+
+  return (
+    <div className="max-w-[1100px] mx-auto px-6 py-8">
+      <div className="mb-7">
+        <h1 className="font-serif text-[1.9rem] text-ink">Brand Discovery</h1>
+        <p className="font-sans text-[0.88rem] text-slate mt-0.5">Private questionnaire for agents. Share the link below — it isn&apos;t linked anywhere on the site.</p>
+      </div>
+
+      <InfoCard title="Private questionnaire link">
+        {data?.link ? (
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+            <input
+              readOnly
+              value={data.link}
+              onFocus={(e) => e.target.select()}
+              className="flex-1 min-w-0 font-sans text-[0.85rem] text-ink bg-light-gray border border-border rounded-xl px-3.5 py-2.5"
+            />
+            <div className="flex gap-2">
+              <button onClick={copyLink} className="font-sans text-[0.82rem] font-semibold bg-ink text-white px-4 py-2.5 rounded-xl border-none cursor-pointer hover:bg-brass transition-colors">
+                Copy Link
+              </button>
+              <a href={data.link} target="_blank" rel="noreferrer" className="font-sans text-[0.82rem] font-semibold text-ink border border-border px-4 py-2.5 rounded-xl no-underline hover:border-ink transition-colors">
+                Preview
+              </a>
+            </div>
+          </div>
+        ) : (
+          <p className="font-sans text-[0.85rem] text-slate/60">{data ? "Set ADMIN_PASSWORD in Vercel to generate the link." : "Loading…"}</p>
+        )}
+        <p className="font-sans text-[0.75rem] text-slate/60 mt-3">Changing the admin password generates a new link and turns off the old one.</p>
+      </InfoCard>
+
+      <div className="mt-6">
+        <p className="font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-slate mb-3">
+          Submissions {data?.submissions ? `(${data.submissions.length})` : ""}
+        </p>
+        {data?.error && <p className="font-sans text-[0.85rem] text-rose-600 mb-3">{data.error}</p>}
+        {data?.submissions?.length === 0 && !data.error && (
+          <div className="bg-white rounded-2xl border border-border p-8 text-center font-sans text-[0.88rem] text-slate/60">
+            No questionnaires yet. Submissions also arrive in your email.
+          </div>
+        )}
+        <div className="space-y-3">
+          {data?.submissions?.map((s) => {
+            const open = openId === s.id;
+            return (
+              <div key={s.id} className="bg-white rounded-2xl border border-border overflow-hidden">
+                <button
+                  onClick={() => setOpenId(open ? null : s.id)}
+                  className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left border-none bg-transparent cursor-pointer hover:bg-light-gray transition-colors"
+                >
+                  <div className="min-w-0">
+                    <p className="font-sans text-[0.92rem] font-semibold text-ink truncate">{s.answers?.name || "Unnamed"}</p>
+                    <p className="font-sans text-[0.78rem] text-slate truncate">
+                      {[s.answers?.brokerage, s.answers?.market, s.answers?.email].filter(Boolean).join(" · ")}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="font-sans text-[0.75rem] text-slate/60">{fmtDate(s.submittedAt)}</span>
+                    <span className={`text-brass transition-transform ${open ? "rotate-45" : ""}`}>+</span>
+                  </div>
+                </button>
+                {open && (
+                  <div className="px-5 pb-5 pt-1 border-t border-border">
+                    <div className="mt-4">
+                      <InfoGrid items={answerRows(s.answers)} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

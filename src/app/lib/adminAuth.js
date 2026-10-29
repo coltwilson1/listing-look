@@ -19,6 +19,19 @@ export function sessionToken() {
   return createHmac("sha256", pw).update("elevate-admin-session").digest("hex");
 }
 
+// Secret key in the private Brand Discovery link (/brand-discovery/<key>).
+// Derived from ADMIN_PASSWORD, so changing that password also retires old links.
+export function questionnaireKey() {
+  const pw = process.env.ADMIN_PASSWORD;
+  if (!pw) return null;
+  return createHmac("sha256", pw).update("elevate-brand-discovery").digest("hex").slice(0, 24);
+}
+
+export function checkQuestionnaireKey(key) {
+  const expected = questionnaireKey();
+  return Boolean(expected) && safeEqual(key ?? "", expected);
+}
+
 export function checkPassword(pw) {
   const expected = process.env.ADMIN_PASSWORD;
   return Boolean(expected) && safeEqual(pw ?? "", expected);
